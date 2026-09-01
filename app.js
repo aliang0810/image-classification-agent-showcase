@@ -190,12 +190,67 @@ const workflows = {
   },
 };
 
+const OVERVIEW_PHASES = [
+  {
+    code: "01",
+    label: "INPUT & GUARDRAILS",
+    title: "输入与前置校验",
+    description: "标准化任务输入，在进入模型前拦截缺失字段与无效图片。",
+    color: "#42d4e8",
+  },
+  {
+    code: "02",
+    label: "CONTEXT & RULES",
+    title: "配置与规则装载",
+    description: "加载模型参数、Prompt、Taxonomy 与分类优先级规则。",
+    color: "#8eb0ff",
+  },
+  {
+    code: "03",
+    label: "MODEL EXECUTION",
+    title: "分层模型推理",
+    description: "执行候选召回、细分类与最终仲裁，并在必要时补偿重试。",
+    color: "#ff8ca1",
+  },
+  {
+    code: "04",
+    label: "DECISION & ASSEMBLY",
+    title: "判断与结果组装",
+    description: "校验模型结果、聚合候选与错误，并生成稳定输出。",
+    color: "#e6b763",
+  },
+  {
+    code: "05",
+    label: "OBSERVE & IMPROVE",
+    title: "观测与自动 RCA",
+    description: "上报 Metric 与 Trace，自动定位错误并驱动下一轮规则迭代。",
+    color: "#70d9c0",
+  },
+];
+
+const LANE_DEFS = [
+  { code: "A", label: "主推理链", color: "#63d6af" },
+  { code: "B", label: "规则与异常", color: "#e6b763" },
+  { code: "C", label: "观测与迭代", color: "#8eb0ff" },
+];
+
+const NODE_WIDTH = 190;
+const NODE_HEIGHT = 72;
+const LANE_TOPS = [28, 238, 448];
+const LANE_NODE_TOP_OFFSET = 58;
+const NODE_START_X = 126;
+const NODE_X_GAP = 224;
+
 const nodeLayer = document.querySelector("#nodeLayer");
 const edgeLayer = document.querySelector("#edgeLayer");
 const canvasStage = document.querySelector("#canvasStage");
 const canvasViewport = document.querySelector("#canvasViewport");
 const stageFilters = document.querySelector("#stageFilters");
 const layerTabs = [...document.querySelectorAll(".layer-tab")];
+const viewTabs = [...document.querySelectorAll(".view-tab")];
+const workspace = document.querySelector(".workspace");
+const overviewFlowTrack = document.querySelector("#overviewFlowTrack");
+const inspectorPanel = document.querySelector("#inspector");
 const inspector = {
   index: document.querySelector("#inspectorIndex"),
   stage: document.querySelector("#inspectorStage"),
@@ -209,6 +264,7 @@ const inspector = {
 let activeLayer = "main";
 let activeStage = "all";
 let selectedNode = null;
+let activeView = "overview";
 let scale = 0.8;
 let panX = 20;
 let panY = 45;
@@ -225,6 +281,92 @@ function getNode(id) {
 
 function stageNames() {
   return [...new Set(getWorkflow().nodes.map((node) => node.stage))];
+}
+
+function phaseIndexForNode(node) {
+  const id = node.id.toLowerCase();
+  const name = node.name.toLowerCase();
+  if (/rca|metric|trace|report/.test(id) || node.stage === "report") return 4;
+  if (
+    /start|init|item-check|image-check|prepinputs/.test(id) ||
+    name === "开始节点" ||
+    node.stage === "input"
+  ) return 0;
+  if (node.stage === "context" || node.stage === "prompt") return 1;
+  if (node.stage === "inference") return 2;
+  return 3;
+}
+
+function laneIndexForNode(node) {
+  const id = node.id.toLowerCase();
+  if (/rca|metric|trace|report/.test(id) || node.stage === "report") return 2;
+  if (node.stage === "decision" || node.stage === "context" || node.stage === "prompt") return 1;
+  if (/error/.test(id)) return 1;
+  return node.stage === "result" ? 2 : 0;
+}
+
+function getGraphLayout(workflow) {
+  const lanes = LANE_DEFS.map(() => []);
+  workflow.nodes.forEach((node) => lanes[laneIndexForNode(node)].push(node));
+  const positions = new Map();
+
+  lanes.forEach((nodes, laneIndex) => {
+    nodes
+      .sort((a, b) => a.x - b.x || a.y - b.y)
+      .forEach((node, columnIndex) => {
+        positions.set(node.id, {
+          ...node,
+          x: NODE_START_X + columnIndex * NODE_X_GAP,
+          y: LANE_TOPS[laneIndex] + LANE_NODE_TOP_OFFSET,
+          laneIndex,
+        });
+      });
+  });
+
+  const longestLane = Math.max(...lanes.map((nodes) => nodes.length));
+  return {
+    lanes,
+    positions,
+    width: Math.max(1280, NODE_START_X + longestLane * NODE_X_GAP + 70),
+    height: 660,
+  };
+}
+
+function renderOverview() {
+  const workflow = getWorkflow();
+  const groupedNodes = OVERVIEW_PHASES.map(() => []);
+  workflow.nodes.forEach((node) => groupedNodes[phaseIndexForNode(node)].push(node));
+
+  document.querySelector("#overviewFlowTitle").textContent = workflow.title;
+  document.querySelector("#overviewFlowSubtitle").textContent = workflow.subtitle;
+  document.querySelector("#overviewPhaseCount").textContent = String(OVERVIEW_PHASES.length).padStart(2, "0");
+  document.querySelector("#overviewNodeCount").textContent = String(workflow.nodes.length).padStart(2, "0");
+
+  overviewFlowTrack.innerHTML = OVERVIEW_PHASES.map((phase, index) => `
+    <article class="overview-phase" style="--phase-color:${phase.color}">
+      <header><span>${phase.code} / ${phase.label}</span><b>${String(groupedNodes[index].length).padStart(2, "0")}</b></header>
+      <h4>${phase.title}</h4>
+      <p>${phase.description}</p>
+      <button type="button" data-phase="${index}">
+        <span>查看相关节点</span>
+        <i data-lucide="arrow-up-right"></i>
+      </button>
+    </article>
+  `).join("");
+
+  overviewFlowTrack.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nodes = groupedNodes[Number(button.dataset.phase)];
+      selectedNode = nodes[0]?.id || null;
+      setViewMode("detail");
+      updateInspector();
+      setInspectorOpen(Boolean(selectedNode));
+      renderGraph();
+      resetReadableView();
+    });
+  });
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function renderFilters() {
@@ -248,23 +390,41 @@ function renderFilters() {
 
 function renderGraph() {
   const workflow = getWorkflow();
-  const maxX = Math.max(...workflow.nodes.map((node) => node.x)) + 230;
-  const maxY = Math.max(...workflow.nodes.map((node) => node.y)) + 120;
-  canvasStage.style.width = `${maxX}px`;
-  canvasStage.style.height = `${Math.max(620, maxY)}px`;
-  edgeLayer.setAttribute("viewBox", `0 0 ${maxX} ${Math.max(620, maxY)}`);
+  const layout = getGraphLayout(workflow);
+  canvasStage.style.width = `${layout.width}px`;
+  canvasStage.style.height = `${layout.height}px`;
+  edgeLayer.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
   document.querySelector("#canvasTitle").textContent = workflow.title;
   document.querySelector("#nodeCount").textContent = `${workflow.nodes.length} nodes`;
 
-  nodeLayer.innerHTML = workflow.nodes
+  const connectedIds = new Set(selectedNode ? [selectedNode] : []);
+  workflow.edges.forEach(([fromId, toId]) => {
+    if (fromId === selectedNode) connectedIds.add(toId);
+    if (toId === selectedNode) connectedIds.add(fromId);
+  });
+
+  const lanes = LANE_DEFS.map(
+    (lane, index) => `
+      <div
+        class="workflow-lane"
+        style="top:${LANE_TOPS[index]}px;--lane-color:${lane.color}"
+      >
+        <span><b>${lane.code}</b>${lane.label}</span>
+      </div>
+    `,
+  ).join("");
+
+  const nodes = workflow.nodes
     .map((node, index) => {
       const stage = STAGES[node.stage];
+      const position = layout.positions.get(node.id);
       const dimmed = activeStage !== "all" && activeStage !== node.stage;
+      const contextDimmed = selectedNode && !connectedIds.has(node.id);
       return `
         <button
-          class="flow-node${selectedNode === node.id ? " selected" : ""}${dimmed ? " dimmed" : ""}"
+          class="flow-node${selectedNode === node.id ? " selected" : ""}${dimmed ? " dimmed" : ""}${contextDimmed ? " context-dimmed" : ""}"
           data-node-id="${node.id}"
-          style="left:${node.x}px;top:${node.y}px;--node-color:${stage.color}"
+          style="left:${position.x}px;top:${position.y}px;--node-color:${stage.color}"
           aria-label="${node.name}"
         >
           <span class="flow-node-icon"><i data-lucide="${stage.icon}"></i></span>
@@ -272,16 +432,17 @@ function renderGraph() {
         </button>`;
     })
     .join("");
+  nodeLayer.innerHTML = lanes + nodes;
 
   edgeLayer.innerHTML = workflow.edges
     .map(([fromId, toId]) => {
-      const from = workflow.nodes.find((node) => node.id === fromId);
-      const to = workflow.nodes.find((node) => node.id === toId);
+      const from = layout.positions.get(fromId);
+      const to = layout.positions.get(toId);
       if (!from || !to) return "";
-      const x1 = from.x + 176;
-      const y1 = from.y + 34;
+      const x1 = from.x + NODE_WIDTH;
+      const y1 = from.y + NODE_HEIGHT / 2;
       const x2 = to.x;
-      const y2 = to.y + 34;
+      const y2 = to.y + NODE_HEIGHT / 2;
       const bend = Math.max(45, Math.abs(x2 - x1) * 0.42);
       const active = selectedNode && (fromId === selectedNode || toId === selectedNode);
       const hidden =
@@ -297,6 +458,7 @@ function renderGraph() {
       event.stopPropagation();
       selectedNode = button.dataset.nodeId;
       updateInspector();
+      setInspectorOpen(true);
       renderGraph();
     });
   });
@@ -320,6 +482,11 @@ function updateInspector() {
     node.note || `当前节点位于“${STAGES[node.stage].label}”阶段。`;
 }
 
+function setInspectorOpen(open) {
+  inspectorPanel.classList.toggle("open", open);
+  inspectorPanel.setAttribute("aria-hidden", String(!open));
+}
+
 function applyTransform() {
   canvasStage.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
   document.querySelector("#zoomValue").textContent = `${Math.round(scale * 100)}%`;
@@ -327,28 +494,54 @@ function applyTransform() {
 
 function fitView() {
   const workflow = getWorkflow();
-  const maxX = Math.max(...workflow.nodes.map((node) => node.x)) + 220;
-  const maxY = Math.max(...workflow.nodes.map((node) => node.y)) + 100;
+  const layout = getGraphLayout(workflow);
   const bounds = canvasViewport.getBoundingClientRect();
-  scale = Math.min(0.84, (bounds.width - 30) / maxX, (bounds.height - 30) / maxY);
-  scale = Math.max(0.2, scale);
+  scale = Math.min(0.9, (bounds.width - 30) / layout.width, (bounds.height - 30) / layout.height);
+  scale = Math.max(0.28, scale);
   panX = 14;
-  panY = Math.max(14, (bounds.height - maxY * scale) / 2);
+  panY = Math.max(14, (bounds.height - layout.height * scale) / 2);
   applyTransform();
+}
+
+function resetReadableView() {
+  scale = window.innerWidth <= 640 ? 0.68 : 0.78;
+  panX = 18;
+  panY = 14;
+  applyTransform();
+}
+
+function setViewMode(view) {
+  activeView = view;
+  workspace.dataset.view = view;
+  viewTabs.forEach((tab) => {
+    const active = tab.dataset.view === view;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+  if (view === "detail") requestAnimationFrame(resetReadableView);
+  else setInspectorOpen(false);
 }
 
 function changeLayer(layer) {
   activeLayer = layer;
   activeStage = "all";
-  selectedNode = getWorkflow().nodes[0].id;
+  selectedNode = null;
   layerTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.layer === layer));
   renderFilters();
+  renderOverview();
   updateInspector();
   renderGraph();
-  requestAnimationFrame(fitView);
+  setInspectorOpen(false);
+  if (activeView === "detail") requestAnimationFrame(resetReadableView);
 }
 
 layerTabs.forEach((tab) => tab.addEventListener("click", () => changeLayer(tab.dataset.layer)));
+viewTabs.forEach((tab) => tab.addEventListener("click", () => setViewMode(tab.dataset.view)));
+document.querySelector("#inspectorClose").addEventListener("click", () => {
+  selectedNode = null;
+  setInspectorOpen(false);
+  renderGraph();
+});
 
 document.querySelector("#zoomIn").addEventListener("click", () => {
   scale = Math.min(1.35, scale + 0.1);
@@ -394,19 +587,20 @@ canvasViewport.addEventListener("pointerup", () => {
 
 document.querySelector("#downloadSvg").addEventListener("click", () => {
   const workflow = getWorkflow();
-  const width = Math.max(...workflow.nodes.map((node) => node.x)) + 220;
-  const height = Math.max(...workflow.nodes.map((node) => node.y)) + 120;
+  const layout = getGraphLayout(workflow);
+  const { width, height } = layout;
   const lines = workflow.edges
     .map(([fromId, toId]) => {
-      const from = workflow.nodes.find((node) => node.id === fromId);
-      const to = workflow.nodes.find((node) => node.id === toId);
-      return `<line x1="${from.x + 176}" y1="${from.y + 34}" x2="${to.x}" y2="${to.y + 34}" stroke="#4b5d7c" stroke-width="2"/>`;
+      const from = layout.positions.get(fromId);
+      const to = layout.positions.get(toId);
+      return `<line x1="${from.x + NODE_WIDTH}" y1="${from.y + NODE_HEIGHT / 2}" x2="${to.x}" y2="${to.y + NODE_HEIGHT / 2}" stroke="#4b5d7c" stroke-width="2"/>`;
     })
     .join("");
   const boxes = workflow.nodes
     .map((node) => {
+      const position = layout.positions.get(node.id);
       const color = STAGES[node.stage].color;
-      return `<g><rect x="${node.x}" y="${node.y}" width="176" height="68" rx="7" fill="#151d30" stroke="${color}"/><text x="${node.x + 14}" y="${node.y + 27}" fill="#8290a8" font-family="monospace" font-size="9">${STAGES[node.stage].label}</text><text x="${node.x + 14}" y="${node.y + 49}" fill="#f7f8fb" font-family="sans-serif" font-size="12">${node.name.replaceAll("&", "&amp;")}</text></g>`;
+      return `<g><rect x="${position.x}" y="${position.y}" width="${NODE_WIDTH}" height="${NODE_HEIGHT}" rx="4" fill="#151d30" stroke="${color}"/><text x="${position.x + 14}" y="${position.y + 28}" fill="#8290a8" font-family="monospace" font-size="9">${STAGES[node.stage].label}</text><text x="${position.x + 14}" y="${position.y + 51}" fill="#f7f8fb" font-family="sans-serif" font-size="12">${node.name.replaceAll("&", "&amp;")}</text></g>`;
     })
     .join("");
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#070a13"/>${lines}${boxes}</svg>`;
@@ -420,11 +614,11 @@ document.querySelector("#downloadSvg").addEventListener("click", () => {
 
 window.addEventListener("resize", fitView);
 
-selectedNode = workflows.main.nodes[0].id;
+workspace.dataset.view = activeView;
 renderFilters();
 updateInspector();
+renderOverview();
 renderGraph();
-requestAnimationFrame(fitView);
 if (window.lucide) window.lucide.createIcons();
 
 const promptSections = [

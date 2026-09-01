@@ -103,18 +103,30 @@
         <div class="section-title workflow-title">
           <div>
             <span class="micro">01.2 / AGENT · WORKFLOW</span>
-            <h2>逐节点拆解 Agent 工作流</h2>
+            <h2>先看链路，再看节点</h2>
           </div>
-          <p>点击节点查看职责，拖动画布探索链路，滚轮缩放视图。</p>
+          <p>先用五阶段概览理解系统，再进入三泳道节点图查看职责、分支与上下游关系。</p>
         </div>
 
         <div class="workspace">
           <div class="workspace-toolbar">
-            <div class="layer-tabs" role="tablist" aria-label="选择工作流层级">
-              <button class="layer-tab active" data-layer="main" role="tab">总链路</button>
-              <button class="layer-tab" data-layer="l1" role="tab">PT_Layer1</button>
-              <button class="layer-tab" data-layer="l2" role="tab">PT_Layer2</button>
-              <button class="layer-tab" data-layer="l3" role="tab">PT_Layer3</button>
+            <div class="workspace-navigation">
+              <div class="layer-tabs" role="tablist" aria-label="选择工作流层级">
+                <button class="layer-tab active" data-layer="main" role="tab">总链路</button>
+                <button class="layer-tab" data-layer="l1" role="tab">PT_Layer1</button>
+                <button class="layer-tab" data-layer="l2" role="tab">PT_Layer2</button>
+                <button class="layer-tab" data-layer="l3" role="tab">PT_Layer3</button>
+              </div>
+              <div class="view-tabs" role="tablist" aria-label="选择工作流视图">
+                <button class="view-tab active" data-view="overview" role="tab" aria-selected="true">
+                  <i data-lucide="layout-dashboard"></i>
+                  <span>流程概览</span>
+                </button>
+                <button class="view-tab" data-view="detail" role="tab" aria-selected="false">
+                  <i data-lucide="workflow"></i>
+                  <span>完整节点</span>
+                </button>
+              </div>
             </div>
             <div class="toolbar-actions">
               <button class="icon-button" id="fitView" title="适配视图" aria-label="适配视图">
@@ -126,49 +138,74 @@
             </div>
           </div>
 
-          <div class="stage-filters" id="stageFilters" aria-label="阶段筛选"></div>
-
-          <div class="canvas-grid">
-            <div class="canvas-wrap" id="canvasWrap">
-              <div class="canvas-head">
-                <div>
-                  <span class="micro">WORKFLOW CANVAS</span>
-                  <h3 id="canvasTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
-                </div>
-                <span id="nodeCount">25 nodes</span>
+          <section class="workflow-overview" id="workflowOverview" aria-live="polite">
+            <header class="overview-flow-head">
+              <div>
+                <span class="micro">SYSTEM OVERVIEW</span>
+                <h3 id="overviewFlowTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
+                <p id="overviewFlowSubtitle">编排三级分类、统一错误处理、辅助标注实验、RCA 与运行上报。</p>
               </div>
-              <div class="canvas-viewport" id="canvasViewport">
-                <div class="canvas-stage" id="canvasStage">
-                  <svg id="edgeLayer" aria-hidden="true"></svg>
-                  <div id="nodeLayer"></div>
-                </div>
-                <div class="canvas-hint">
-                  <i data-lucide="move"></i>
-                  <span>拖拽探索 · 滚轮缩放</span>
-                </div>
-                <div class="zoom-control">
-                  <button id="zoomOut" aria-label="缩小"><i data-lucide="minus"></i></button>
-                  <output id="zoomValue">80%</output>
-                  <button id="zoomIn" aria-label="放大"><i data-lucide="plus"></i></button>
-                </div>
+              <div class="overview-flow-stats">
+                <span><b id="overviewPhaseCount">05</b>PHASES</span>
+                <span><b id="overviewNodeCount">25</b>NODES</span>
               </div>
+            </header>
+            <div class="overview-flow-track" id="overviewFlowTrack"></div>
+            <div class="overview-lanes">
+              <span><i class="lane-dot lane-main"></i>主推理链</span>
+              <span><i class="lane-dot lane-support"></i>规则与异常</span>
+              <span><i class="lane-dot lane-observe"></i>观测与迭代</span>
             </div>
+          </section>
 
-            <aside class="inspector" id="inspector">
-              <span class="micro">NODE INSPECTOR</span>
-              <div class="inspector-index" id="inspectorIndex">01</div>
-              <p class="stage-label" id="inspectorStage">入口</p>
-              <h3 id="inspectorTitle">开始节点</h3>
-              <p id="inspectorDescription">接收一次新的图片分类任务并启动工作流。</p>
-              <dl>
-                <div><dt>输入</dt><dd id="inspectorInput">执行请求 / 运行上下文</dd></div>
-                <div><dt>输出</dt><dd id="inspectorOutput">启动信号 / 初始状态</dd></div>
-              </dl>
-              <div class="inspector-note">
-                <i data-lucide="corner-down-right"></i>
-                <span id="inspectorNote">这是整个链路的起点。</span>
+          <div class="workflow-detail" id="workflowDetail">
+            <div class="stage-filters" id="stageFilters" aria-label="阶段筛选"></div>
+
+            <div class="canvas-grid">
+              <div class="canvas-wrap" id="canvasWrap">
+                <div class="canvas-head">
+                  <div>
+                    <span class="micro">THREE-LANE NODE MAP</span>
+                    <h3 id="canvasTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
+                  </div>
+                  <span id="nodeCount">25 nodes</span>
+                </div>
+                <div class="canvas-viewport" id="canvasViewport">
+                  <div class="canvas-stage" id="canvasStage">
+                    <svg id="edgeLayer" aria-hidden="true"></svg>
+                    <div id="nodeLayer"></div>
+                  </div>
+                  <div class="canvas-hint">
+                    <i data-lucide="move"></i>
+                    <span>拖拽探索 · 滚轮缩放</span>
+                  </div>
+                  <div class="zoom-control">
+                    <button id="zoomOut" aria-label="缩小"><i data-lucide="minus"></i></button>
+                    <output id="zoomValue">80%</output>
+                    <button id="zoomIn" aria-label="放大"><i data-lucide="plus"></i></button>
+                  </div>
+                </div>
               </div>
-            </aside>
+
+              <aside class="inspector" id="inspector" aria-hidden="true">
+                <button class="inspector-close" id="inspectorClose" aria-label="关闭节点详情" title="关闭节点详情">
+                  <i data-lucide="x"></i>
+                </button>
+                <span class="micro">NODE INSPECTOR</span>
+                <div class="inspector-index" id="inspectorIndex">01</div>
+                <p class="stage-label" id="inspectorStage">入口</p>
+                <h3 id="inspectorTitle">开始节点</h3>
+                <p id="inspectorDescription">接收一次新的图片分类任务并启动工作流。</p>
+                <dl>
+                  <div><dt>输入</dt><dd id="inspectorInput">执行请求 / 运行上下文</dd></div>
+                  <div><dt>输出</dt><dd id="inspectorOutput">启动信号 / 初始状态</dd></div>
+                </dl>
+                <div class="inspector-note">
+                  <i data-lucide="corner-down-right"></i>
+                  <span id="inspectorNote">这是整个链路的起点。</span>
+                </div>
+              </aside>
+            </div>
           </div>
         </div>
       </section>
