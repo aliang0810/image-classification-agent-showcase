@@ -1031,13 +1031,13 @@ function initAmbientCanvas() {
   const pointer = { x: 0, y: 0 };
 
   function buildParticles() {
-    const count = Math.min(104, Math.max(42, Math.floor((width * height) / 15000)));
+    const count = Math.min(62, Math.max(28, Math.floor((width * height) / 26000)));
     particles = Array.from({ length: count }, (_, index) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.24,
-      vy: (Math.random() - 0.5) * 0.18,
-      size: index % 5 === 0 ? 2 : 1,
+      vx: (Math.random() - 0.5) * 0.16,
+      vy: (Math.random() - 0.5) * 0.12,
+      size: index % 7 === 0 ? 1.5 : 0.8,
       depth: 0.3 + Math.random() * 0.7,
       color: palette[index % palette.length],
     }));
@@ -1061,6 +1061,32 @@ function initAmbientCanvas() {
     pointer.x = width / 2;
     pointer.y = height / 2;
     buildParticles();
+  }
+
+  function drawTopographicField(time) {
+    const fieldTop = height * 0.1;
+    const fieldHeight = height * 0.76;
+    const pointerShift = (pointer.x - width / 2) * 0.008;
+
+    for (let row = 0; row < 13; row += 1) {
+      const progress = row / 12;
+      const baseY = fieldTop + progress * fieldHeight;
+      ctx.beginPath();
+      for (let x = -40; x <= width + 40; x += 20) {
+        const wave =
+          Math.sin(x * 0.007 + time * 0.00016 + row * 0.72) * (8 + progress * 18) +
+          Math.cos(x * 0.0028 - time * 0.00011 + row) * 10;
+        const y = baseY + wave + pointerShift * (progress - 0.5);
+        if (x === -40) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle =
+        row % 4 === 0
+          ? `rgba(91, 194, 196, ${0.08 + progress * 0.045})`
+          : `rgba(108, 137, 159, ${0.035 + progress * 0.025})`;
+      ctx.lineWidth = row % 4 === 0 ? 0.9 : 0.55;
+      ctx.stroke();
+    }
   }
 
   function drawPerspectiveGrid(time) {
@@ -1087,6 +1113,49 @@ function initAmbientCanvas() {
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
+  }
+
+  function drawCircuitTraces(time) {
+    const traceColors = [
+      "rgba(104, 210, 208, 0.18)",
+      "rgba(126, 160, 214, 0.13)",
+      "rgba(168, 125, 205, 0.11)",
+    ];
+
+    for (let route = 0; route < 9; route += 1) {
+      const fromLeft = route % 2 === 0;
+      const direction = fromLeft ? 1 : -1;
+      const startX = fromLeft ? -30 : width + 30;
+      const baseY = height * (0.1 + route * 0.105);
+      const firstTurn = width * (0.15 + (route % 4) * 0.08);
+      const secondTurn = width * (0.44 + (route % 3) * 0.12);
+      const verticalShift = ((route % 3) - 1) * 34;
+      const x1 = fromLeft ? firstTurn : width - firstTurn;
+      const x2 = fromLeft ? secondTurn : width - secondTurn;
+      const endX = fromLeft ? Math.min(width + 20, x2 + width * 0.18) : Math.max(-20, x2 - width * 0.18);
+
+      ctx.beginPath();
+      ctx.moveTo(startX, baseY);
+      ctx.lineTo(x1, baseY);
+      ctx.lineTo(x1 + direction * 22, baseY + verticalShift);
+      ctx.lineTo(x2, baseY + verticalShift);
+      ctx.lineTo(x2 + direction * 18, baseY + verticalShift + 18);
+      ctx.lineTo(endX, baseY + verticalShift + 18);
+      ctx.setLineDash([1, 9]);
+      ctx.lineDashOffset = -(time * 0.018 + route * 13);
+      ctx.strokeStyle = traceColors[route % traceColors.length];
+      ctx.lineWidth = route % 3 === 0 ? 1.1 : 0.7;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const pulse = ((time * (0.018 + route * 0.001) + route * 97) % 260) / 260;
+      const pulseX = x1 + (x2 - x1) * pulse;
+      const pulseY = baseY + verticalShift;
+      ctx.beginPath();
+      ctx.arc(pulseX, pulseY, route % 3 === 0 ? 2.4 : 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = traceColors[route % traceColors.length].replace(/0\.\d+\)/, "0.72)");
+      ctx.fill();
+    }
   }
 
   function drawDataLanes(time) {
@@ -1130,9 +1199,34 @@ function initAmbientCanvas() {
 
     ctx.save();
     ctx.translate(centerX, centerY);
-    ctx.rotate(rotation);
     ctx.globalAlpha = heroFade;
 
+    ctx.save();
+    ctx.rotate(rotation * 0.7);
+    for (let latitude = -3; latitude <= 3; latitude += 1) {
+      const latitudeAngle = (latitude / 7) * Math.PI;
+      const latitudeRadius = Math.cos(latitudeAngle) * radius * 0.52;
+      const latitudeY = Math.sin(latitudeAngle) * radius * 0.27;
+      ctx.beginPath();
+      ctx.ellipse(0, latitudeY, Math.abs(latitudeRadius), Math.abs(latitudeRadius) * 0.34, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = latitude === 0 ? "rgba(115, 222, 219, 0.3)" : "rgba(129, 167, 190, 0.14)";
+      ctx.lineWidth = latitude === 0 ? 1.1 : 0.65;
+      ctx.stroke();
+    }
+    for (let longitude = 0; longitude < 10; longitude += 1) {
+      const angle = (longitude / 10) * Math.PI;
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, radius * 0.52, radius * 0.18, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = longitude % 3 === 0 ? "rgba(118, 190, 211, 0.2)" : "rgba(130, 151, 177, 0.1)";
+      ctx.lineWidth = 0.65;
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+
+    ctx.rotate(rotation);
     for (let ring = 0; ring < 16; ring += 1) {
       const ringRadius = radius * (0.34 + ring * 0.047);
       const phase = rotation * (ring % 2 === 0 ? 1.8 : -1.25) + ring * 0.53;
@@ -1166,8 +1260,8 @@ function initAmbientCanvas() {
       ctx.stroke();
     }
 
-    for (let shard = 0; shard < 28; shard += 1) {
-      const angle = (Math.PI * 2 * shard) / 28 + rotation * (1.4 + (shard % 3) * 0.15);
+    for (let shard = 0; shard < 14; shard += 1) {
+      const angle = (Math.PI * 2 * shard) / 14 + rotation * (1.4 + (shard % 3) * 0.15);
       const orbit = radius * (0.72 + (shard % 5) * 0.055);
       const x = Math.cos(angle) * orbit;
       const y = Math.sin(angle) * orbit * 0.52;
@@ -1176,11 +1270,11 @@ function initAmbientCanvas() {
       ctx.rotate(angle);
       ctx.fillStyle =
         shard % 3 === 0
-          ? "rgba(108, 238, 239, 0.65)"
+          ? "rgba(108, 238, 239, 0.4)"
           : shard % 3 === 1
-            ? "rgba(126, 234, 188, 0.45)"
-            : "rgba(189, 138, 239, 0.42)";
-      ctx.fillRect(-4, -1, 8 + (shard % 4) * 3, shard % 4 === 0 ? 3 : 1.5);
+            ? "rgba(126, 234, 188, 0.28)"
+            : "rgba(189, 138, 239, 0.26)";
+      ctx.fillRect(-3, -0.5, 6 + (shard % 4) * 2, 1);
       ctx.restore();
     }
 
@@ -1214,8 +1308,8 @@ function initAmbientCanvas() {
         const dy = a.y - b.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance > 136) continue;
-        ctx.strokeStyle = `rgba(90, 181, 214, ${0.16 * (1 - distance / 136)})`;
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = `rgba(90, 181, 214, ${0.09 * (1 - distance / 136)})`;
+        ctx.lineWidth = 0.65;
         ctx.beginPath();
         ctx.moveTo(a.x + parallaxX * a.depth, a.y + parallaxY * a.depth);
         ctx.lineTo(b.x + parallaxX * b.depth, b.y + parallaxY * b.depth);
@@ -1227,8 +1321,10 @@ function initAmbientCanvas() {
       const [r, g, b] = particle.color;
       const x = particle.x + parallaxX * particle.depth;
       const y = particle.y + parallaxY * particle.depth;
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${index % 5 === 0 ? 0.82 : 0.5})`;
-      ctx.fillRect(x, y, particle.size * 2.8, particle.size * 1.15);
+      ctx.beginPath();
+      ctx.arc(x, y, particle.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${index % 7 === 0 ? 0.62 : 0.34})`;
+      ctx.fill();
     });
   }
 
@@ -1282,17 +1378,64 @@ function initAmbientCanvas() {
     ctx.fillRect(0, y - 24, width, 24);
   }
 
+  function drawCalibrationFrame(time) {
+    const margin = 22;
+    const tick = 8;
+    const phase = Math.floor(time / 900) % 12;
+    ctx.strokeStyle = "rgba(146, 184, 192, 0.12)";
+    ctx.lineWidth = 0.8;
+
+    for (let index = 0; index < 12; index += 1) {
+      const x = margin + ((width - margin * 2) * index) / 11;
+      const length = index === phase ? tick * 1.8 : tick;
+      ctx.beginPath();
+      ctx.moveTo(x, margin);
+      ctx.lineTo(x, margin + length);
+      ctx.moveTo(x, height - margin);
+      ctx.lineTo(x, height - margin - length);
+      ctx.stroke();
+    }
+
+    for (let index = 0; index < 7; index += 1) {
+      const y = margin + ((height - margin * 2) * index) / 6;
+      ctx.beginPath();
+      ctx.moveTo(margin, y);
+      ctx.lineTo(margin + tick, y);
+      ctx.moveTo(width - margin, y);
+      ctx.lineTo(width - margin - tick, y);
+      ctx.stroke();
+    }
+
+    const bracket = 26;
+    const corners = [
+      [margin, margin, 1, 1],
+      [width - margin, margin, -1, 1],
+      [margin, height - margin, 1, -1],
+      [width - margin, height - margin, -1, -1],
+    ];
+    corners.forEach(([x, y, dx, dy]) => {
+      ctx.beginPath();
+      ctx.moveTo(x + dx * bracket, y);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x, y + dy * bracket);
+      ctx.stroke();
+    });
+  }
+
   function render(time = 0) {
     const delta = Math.min(32, time - lastTime || 16);
     lastTime = time;
     ctx.clearRect(0, 0, width, height);
     ctx.globalCompositeOperation = "screen";
+    drawTopographicField(time);
     drawPerspectiveGrid(time);
+    drawCircuitTraces(time);
     drawDataLanes(time);
     drawKineticCore(time);
     drawNetwork(delta);
     drawPulses(time);
     drawScan(time);
+    drawCalibrationFrame(time);
     ctx.globalCompositeOperation = "source-over";
 
     if (!reducedMotion.matches && !document.hidden) {
