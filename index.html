@@ -168,7 +168,13 @@
                     <span class="micro">THREE-LANE NODE MAP</span>
                     <h3 id="canvasTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
                   </div>
-                  <span id="nodeCount">25 nodes</span>
+                  <div class="lineage-controls" aria-label="节点血缘范围">
+                    <span id="nodeCount">25 nodes</span>
+                    <div class="lineage-tabs" role="tablist">
+                      <button class="lineage-tab active" data-lineage="direct" role="tab" aria-selected="true">直接关联</button>
+                      <button class="lineage-tab" data-lineage="full" role="tab" aria-selected="false">完整路径</button>
+                    </div>
+                  </div>
                 </div>
                 <div class="canvas-viewport" id="canvasViewport">
                   <div class="canvas-stage" id="canvasStage">
@@ -187,7 +193,7 @@
                 </div>
               </div>
 
-              <aside class="inspector" id="inspector" aria-hidden="true">
+              <aside class="inspector" id="inspector" aria-hidden="true" inert>
                 <button class="inspector-close" id="inspectorClose" aria-label="关闭节点详情" title="关闭节点详情">
                   <i data-lucide="x"></i>
                 </button>
@@ -196,6 +202,20 @@
                 <p class="stage-label" id="inspectorStage">入口</p>
                 <h3 id="inspectorTitle">开始节点</h3>
                 <p id="inspectorDescription">接收一次新的图片分类任务并启动工作流。</p>
+                <div class="lineage-summary" aria-label="节点上下游统计">
+                  <span><i data-lucide="arrow-up-left"></i><b id="upstreamCount">0</b> 个上游</span>
+                  <span><i data-lucide="arrow-down-right"></i><b id="downstreamCount">1</b> 个下游</span>
+                </div>
+                <div class="lineage-neighbors">
+                  <section>
+                    <span>UPSTREAM</span>
+                    <div id="upstreamNodes" class="lineage-node-list"></div>
+                  </section>
+                  <section>
+                    <span>DOWNSTREAM</span>
+                    <div id="downstreamNodes" class="lineage-node-list"></div>
+                  </section>
+                </div>
                 <dl>
                   <div><dt>输入</dt><dd id="inspectorInput">执行请求 / 运行上下文</dd></div>
                   <div><dt>输出</dt><dd id="inspectorOutput">启动信号 / 初始状态</dd></div>

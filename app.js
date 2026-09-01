@@ -248,6 +248,7 @@ const canvasViewport = document.querySelector("#canvasViewport");
 const stageFilters = document.querySelector("#stageFilters");
 const layerTabs = [...document.querySelectorAll(".layer-tab")];
 const viewTabs = [...document.querySelectorAll(".view-tab")];
+const lineageTabs = [...document.querySelectorAll(".lineage-tab")];
 const workspace = document.querySelector(".workspace");
 const overviewFlowTrack = document.querySelector("#overviewFlowTrack");
 const inspectorPanel = document.querySelector("#inspector");
@@ -259,12 +260,17 @@ const inspector = {
   input: document.querySelector("#inspectorInput"),
   output: document.querySelector("#inspectorOutput"),
   note: document.querySelector("#inspectorNote"),
+  upstreamCount: document.querySelector("#upstreamCount"),
+  downstreamCount: document.querySelector("#downstreamCount"),
+  upstreamNodes: document.querySelector("#upstreamNodes"),
+  downstreamNodes: document.querySelector("#downstreamNodes"),
 };
 
 let activeLayer = "main";
 let activeStage = "all";
 let selectedNode = null;
 let activeView = "overview";
+let activeLineageMode = "direct";
 let scale = 0.8;
 let panX = 20;
 let panY = 45;
@@ -332,6 +338,94 @@ function getGraphLayout(workflow) {
   };
 }
 
+function edgeKey(fromId, toId) {
+  return `${fromId}->${toId}`;
+}
+
+function walkLineage(startId, direction) {
+  const workflow = getWorkflow();
+  const nodeIds = new Set();
+  const edgeIds = new Set();
+  const queue = [startId];
+
+  while (queue.length) {
+    const currentId = queue.shift();
+    workflow.edges.forEach(([fromId, toId]) => {
+      const matches = direction === "upstream" ? toId === currentId : fromId === currentId;
+      if (!matches) return;
+      const nextId = direction === "upstream" ? fromId : toId;
+      edgeIds.add(edgeKey(fromId, toId));
+      if (nextId !== startId && !nodeIds.has(nextId)) {
+        nodeIds.add(nextId);
+        queue.push(nextId);
+      }
+    });
+  }
+
+  return { nodeIds, edgeIds };
+}
+
+function getLineage(nodeId = selectedNode) {
+  if (!nodeId) {
+    return {
+      upstreamNodes: new Set(),
+      downstreamNodes: new Set(),
+      upstreamEdges: new Set(),
+      downstreamEdges: new Set(),
+      visibleNodes: new Set(),
+    };
+  }
+
+  const workflow = getWorkflow();
+  if (activeLineageMode === "full") {
+    const upstream = walkLineage(nodeId, "upstream");
+    const downstream = walkLineage(nodeId, "downstream");
+    return {
+      upstreamNodes: upstream.nodeIds,
+      downstreamNodes: downstream.nodeIds,
+      upstreamEdges: upstream.edgeIds,
+      downstreamEdges: downstream.edgeIds,
+      visibleNodes: new Set([nodeId, ...upstream.nodeIds, ...downstream.nodeIds]),
+    };
+  }
+
+  const upstreamNodes = new Set();
+  const downstreamNodes = new Set();
+  const upstreamEdges = new Set();
+  const downstreamEdges = new Set();
+  workflow.edges.forEach(([fromId, toId]) => {
+    if (toId === nodeId) {
+      upstreamNodes.add(fromId);
+      upstreamEdges.add(edgeKey(fromId, toId));
+    }
+    if (fromId === nodeId) {
+      downstreamNodes.add(toId);
+      downstreamEdges.add(edgeKey(fromId, toId));
+    }
+  });
+
+  return {
+    upstreamNodes,
+    downstreamNodes,
+    upstreamEdges,
+    downstreamEdges,
+    visibleNodes: new Set([nodeId, ...upstreamNodes, ...downstreamNodes]),
+  };
+}
+
+function edgeKind(fromId, toId) {
+  const from = getNode(fromId);
+  const to = getNode(toId);
+  const ids = `${fromId} ${toId}`.toLowerCase();
+  if (ids.includes("retry")) return "retry";
+  if (
+    toId.toLowerCase().includes("error") ||
+    (from?.stage === "decision" && to?.stage === "result" && /preout|error/.test(toId.toLowerCase()))
+  ) return "failure";
+  if (from?.stage === "decision" && /end|final/.test(toId.toLowerCase())) return "skip";
+  return "normal";
+}
+
 function renderOverview() {
   const workflow = getWorkflow();
   const groupedNodes = OVERVIEW_PHASES.map(() => []);
@@ -357,12 +451,8 @@ function renderOverview() {
   overviewFlowTrack.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
       const nodes = groupedNodes[Number(button.dataset.phase)];
-      selectedNode = nodes[0]?.id || null;
       setViewMode("detail");
-      updateInspector();
-      setInspectorOpen(Boolean(selectedNode));
-      renderGraph();
-      resetReadableView();
+      selectNode(nodes[0]?.id || null, true);
     });
   });
 
@@ -397,11 +487,7 @@ function renderGraph() {
   document.querySelector("#canvasTitle").textContent = workflow.title;
   document.querySelector("#nodeCount").textContent = `${workflow.nodes.length} nodes`;
 
-  const connectedIds = new Set(selectedNode ? [selectedNode] : []);
-  workflow.edges.forEach(([fromId, toId]) => {
-    if (fromId === selectedNode) connectedIds.add(toId);
-    if (toId === selectedNode) connectedIds.add(fromId);
-  });
+  const lineage = getLineage();
 
   const lanes = LANE_DEFS.map(
     (lane, index) => `
@@ -419,10 +505,12 @@ function renderGraph() {
       const stage = STAGES[node.stage];
       const position = layout.positions.get(node.id);
       const dimmed = activeStage !== "all" && activeStage !== node.stage;
-      const contextDimmed = selectedNode && !connectedIds.has(node.id);
+      const contextDimmed = selectedNode && !lineage.visibleNodes.has(node.id);
+      const upstream = lineage.upstreamNodes.has(node.id);
+      const downstream = lineage.downstreamNodes.has(node.id);
       return `
         <button
-          class="flow-node${selectedNode === node.id ? " selected" : ""}${dimmed ? " dimmed" : ""}${contextDimmed ? " context-dimmed" : ""}"
+          class="flow-node${selectedNode === node.id ? " selected" : ""}${dimmed ? " dimmed" : ""}${contextDimmed ? " context-dimmed" : ""}${upstream ? " lineage-upstream" : ""}${downstream ? " lineage-downstream" : ""}"
           data-node-id="${node.id}"
           style="left:${position.x}px;top:${position.y}px;--node-color:${stage.color}"
           aria-label="${node.name}"
@@ -434,7 +522,14 @@ function renderGraph() {
     .join("");
   nodeLayer.innerHTML = lanes + nodes;
 
-  edgeLayer.innerHTML = workflow.edges
+  const arrowDefs = `
+    <defs>
+      <marker id="arrow-muted" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" /></marker>
+      <marker id="arrow-upstream" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" /></marker>
+      <marker id="arrow-downstream" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" /></marker>
+    </defs>`;
+
+  const edges = workflow.edges
     .map(([fromId, toId]) => {
       const from = layout.positions.get(fromId);
       const to = layout.positions.get(toId);
@@ -444,22 +539,41 @@ function renderGraph() {
       const x2 = to.x;
       const y2 = to.y + NODE_HEIGHT / 2;
       const bend = Math.max(45, Math.abs(x2 - x1) * 0.42);
-      const active = selectedNode && (fromId === selectedNode || toId === selectedNode);
+      const key = edgeKey(fromId, toId);
+      const upstream = lineage.upstreamEdges.has(key);
+      const downstream = lineage.downstreamEdges.has(key);
+      const active = upstream || downstream;
+      const direct = selectedNode && (fromId === selectedNode || toId === selectedNode);
+      const kind = edgeKind(fromId, toId);
       const hidden =
         activeStage !== "all" &&
         from.stage !== activeStage &&
         to.stage !== activeStage;
-      return `<path class="edge-path${active ? " active" : ""}" style="opacity:${hidden ? 0.08 : 1}" d="M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}" />`;
+      const faded = selectedNode && !active;
+      const opacity = hidden || faded ? 0.07 : 1;
+      const marker = upstream ? "arrow-upstream" : downstream ? "arrow-downstream" : "arrow-muted";
+      const label = upstream ? "UPSTREAM" : downstream ? "DOWNSTREAM" : "";
+      const kindLabel = kind === "retry" ? "RETRY" : kind === "failure" ? "ERROR" : kind === "skip" ? "SKIP" : "";
+      const labelText = [label, kindLabel].filter(Boolean).join(" · ");
+      const labelX = (x1 + x2) / 2;
+      const labelY = (y1 + y2) / 2 - 8;
+      return `
+        <path
+          class="edge-path edge-${kind}${upstream ? " lineage-upstream" : ""}${downstream ? " lineage-downstream" : ""}"
+          style="opacity:${opacity}"
+          marker-end="url(#${marker})"
+          d="M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}"
+        />
+        ${direct && labelText ? `<text class="edge-label edge-label-${kind}" x="${labelX}" y="${labelY}">${labelText}</text>` : ""}
+      `;
     })
     .join("");
+  edgeLayer.innerHTML = arrowDefs + edges;
 
   nodeLayer.querySelectorAll(".flow-node").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      selectedNode = button.dataset.nodeId;
-      updateInspector();
-      setInspectorOpen(true);
-      renderGraph();
+      selectNode(button.dataset.nodeId, true);
     });
   });
 
@@ -470,6 +584,7 @@ function renderGraph() {
 function updateInspector() {
   const workflow = getWorkflow();
   const node = getNode(selectedNode) || workflow.nodes[0];
+  const lineage = getLineage(node.id);
   const index = workflow.nodes.indexOf(node) + 1;
   inspector.index.textContent = String(index).padStart(2, "0");
   inspector.stage.textContent = STAGES[node.stage].label;
@@ -480,11 +595,42 @@ function updateInspector() {
   inspector.output.textContent = node.output;
   inspector.note.textContent =
     node.note || `当前节点位于“${STAGES[node.stage].label}”阶段。`;
+  inspector.upstreamCount.textContent = lineage.upstreamNodes.size;
+  inspector.downstreamCount.textContent = lineage.downstreamNodes.size;
+  renderLineageList(inspector.upstreamNodes, lineage.upstreamNodes, "当前节点没有上游依赖");
+  renderLineageList(inspector.downstreamNodes, lineage.downstreamNodes, "当前节点没有下游输出");
+}
+
+function renderLineageList(container, nodeIds, emptyText) {
+  const workflow = getWorkflow();
+  const nodes = [...nodeIds]
+    .map((id) => workflow.nodes.find((node) => node.id === id))
+    .filter(Boolean);
+  container.innerHTML = nodes.length
+    ? nodes
+      .map((node) => `<button type="button" data-related-node="${node.id}">${node.name}<i data-lucide="arrow-right"></i></button>`)
+      .join("")
+    : `<span class="lineage-empty">${emptyText}</span>`;
+
+  container.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => selectNode(button.dataset.relatedNode, true));
+  });
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function selectNode(nodeId, shouldFocus = false) {
+  if (!nodeId) return;
+  selectedNode = nodeId;
+  updateInspector();
+  setInspectorOpen(true);
+  renderGraph();
+  if (shouldFocus) requestAnimationFrame(() => focusNode(nodeId));
 }
 
 function setInspectorOpen(open) {
   inspectorPanel.classList.toggle("open", open);
   inspectorPanel.setAttribute("aria-hidden", String(!open));
+  inspectorPanel.toggleAttribute("inert", !open);
 }
 
 function applyTransform() {
@@ -510,6 +656,17 @@ function resetReadableView() {
   applyTransform();
 }
 
+function focusNode(nodeId) {
+  const position = getGraphLayout(getWorkflow()).positions.get(nodeId);
+  if (!position) return;
+  const bounds = canvasViewport.getBoundingClientRect();
+  const drawerWidth = window.innerWidth <= 640 ? 0 : Math.min(360, bounds.width * 0.42);
+  const usableWidth = Math.max(260, bounds.width - drawerWidth);
+  panX = usableWidth / 2 - (position.x + NODE_WIDTH / 2) * scale;
+  panY = bounds.height / 2 - (position.y + NODE_HEIGHT / 2) * scale;
+  applyTransform();
+}
+
 function setViewMode(view) {
   activeView = view;
   workspace.dataset.view = view;
@@ -526,7 +683,13 @@ function changeLayer(layer) {
   activeLayer = layer;
   activeStage = "all";
   selectedNode = null;
+  activeLineageMode = "direct";
   layerTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.layer === layer));
+  lineageTabs.forEach((tab) => {
+    const active = tab.dataset.lineage === activeLineageMode;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
   renderFilters();
   renderOverview();
   updateInspector();
@@ -537,6 +700,19 @@ function changeLayer(layer) {
 
 layerTabs.forEach((tab) => tab.addEventListener("click", () => changeLayer(tab.dataset.layer)));
 viewTabs.forEach((tab) => tab.addEventListener("click", () => setViewMode(tab.dataset.view)));
+lineageTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    activeLineageMode = tab.dataset.lineage;
+    lineageTabs.forEach((item) => {
+      const active = item === tab;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-selected", String(active));
+    });
+    updateInspector();
+    renderGraph();
+    if (selectedNode) requestAnimationFrame(() => focusNode(selectedNode));
+  });
+});
 document.querySelector("#inspectorClose").addEventListener("click", () => {
   selectedNode = null;
   setInspectorOpen(false);
