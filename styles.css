@@ -522,6 +522,56 @@ body.project-menu-open {
   line-height: 1.85;
 }
 
+.project-decision-evidence {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 22px 0;
+  border-top: 1px solid var(--drawer-line);
+}
+
+.project-decision-evidence div {
+  min-width: 0;
+}
+
+.project-decision-evidence strong,
+.project-decision-evidence span,
+.project-decision-evidence small {
+  display: block;
+}
+
+.project-decision-evidence strong {
+  color: var(--panel-accent);
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.project-decision-evidence span {
+  margin-top: 5px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.project-decision-evidence small {
+  margin-top: 5px;
+  color: var(--dim);
+  font-size: 10px;
+}
+
+.project-decision-evidence > i {
+  width: 17px;
+  height: 17px;
+  color: var(--panel-accent);
+}
+
+.project-decision-evidence + .project-statement {
+  margin-top: 0;
+}
+
 .project-statement {
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr);

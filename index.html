@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-21" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-22" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -90,13 +90,26 @@
               <div><span>PROJECT CONTEXT</span><h2>项目背景</h2></div>
               <b>01</b>
             </header>
-            <h3 class="project-panel-title">从人工检索，走向候选驱动的分类决策。</h3>
+            <h3 class="project-panel-title">端到端 Top-1 暂不足以支撑全自动分类。</h3>
             <p class="project-panel-lead">
               Photo Taxonomy 5.0 类目层级深、相似边界多。标注员需要反复检索规则并比较近似类目，判断成本高，结果也容易受到经验差异影响。
             </p>
+            <div class="project-decision-evidence" aria-label="方案判断依据">
+              <div>
+                <strong>52.9%</strong>
+                <span>L3 Top-1 Accuracy</span>
+                <small>不满足无人审核要求</small>
+              </div>
+              <i data-lucide="arrow-right"></i>
+              <div>
+                <strong>86.5%</strong>
+                <span>L2 Candidate Recall</span>
+                <small>适合候选辅助标注</small>
+              </div>
+            </div>
             <div class="project-statement">
               <span>核心判断</span>
-              <p>模型暂不适合直接替代人工，但可以先缩小候选范围，把复杂的开放式检索转化为更高效的有限选择。</p>
+              <p>保留人工最终决策，将模型能力用于缩小候选范围，把开放式类目检索转化为更高效的有限选择。</p>
             </div>
             <dl class="project-facts">
               <div><dt>分类结构</dt><dd>L1 → L2 → L3</dd></div>
@@ -110,14 +123,15 @@
               <div><span>PROJECT OBJECTIVE</span><h2>项目目标</h2></div>
               <b>02</b>
             </header>
-            <h3 class="project-panel-title">先保证正确答案进入候选，再提升标注效率。</h3>
+            <h3 class="project-panel-title">构建 Candidate-first 分层方案，并验证辅助标注收益。</h3>
             <p class="project-panel-lead">
-              项目不以无人审核的全自动分类为当前目标，而是构建稳定的辅助标注 Copilot，在质量不劣化的前提下缩短单条任务的判断路径。
+              以 L2 高召回候选集作为生产落点，L3 Top-1 用于能力评测与错误分析；通过结构化规则、稳定执行链路和对照评测，验证候选推荐是否真正降低人工判断成本。
             </p>
             <div class="project-objectives">
-              <section><b>01</b><strong>Recall First</strong><p>以 L2 Recall 为首要模型指标，优先降低正确类目的漏召风险。</p></section>
-              <section><b>02</b><strong>Human Control</strong><p>输出经过排序的 Top-3 候选，由标注员保留最终决策权。</p></section>
-              <section><b>03</b><strong>Closed Loop</strong><p>将错误自动归因并转化为 Prompt 与边界规则的下一轮迭代输入。</p></section>
+              <section><b>01</b><strong>候选优先</strong><p>建立 L1 召回、L2 Top-3 候选与人工最终判断的分层分类路径。</p></section>
+              <section><b>02</b><strong>稳定执行</strong><p>通过七层 Prompt、结构化输出、解析校验与补偿重试约束结果质量。</p></section>
+              <section><b>03</b><strong>对照评测</strong><p>区分离线评测与标注实验样本，以 AHT 衡量效率，以 Accuracy 作为质量护栏。</p></section>
+              <section><b>04</b><strong>RCA 回流</strong><p>将评测错例归入九类根因，生成规则修正，并用 Focus Set 完成定向回归。</p></section>
             </div>
           </article>
 
@@ -663,6 +677,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-21"></script>
+    <script src="./app.js?v=20260901-22"></script>
   </body>
 </html>

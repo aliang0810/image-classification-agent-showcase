@@ -45,6 +45,7 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 - Major sections: AGENT, PROMPT, RCA, RESULT.
 - The first viewport prioritizes the contributor's role and the three outcome metrics: L2 Recall, AHT change, and Labeler Accuracy change.
 - Engineering scale such as node counts and RCA category counts belongs in implementation sections, not the hero.
+- The project drawer carries supporting narrative: background explains the Top-1 limitation and Candidate-first decision; objective defines the layered solution, reliability controls, evaluation, and RCA loop.
 - Every section starts with the same two-column heading pattern: technical eyebrow on the left, title and summary on the right.
 - Section headings use a top datum line and a low-contrast oversized index as the shared navigation coordinate.
 - Product and data surfaces use the surface ladder and 1px hairlines.
