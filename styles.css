@@ -85,6 +85,7 @@ button {
   margin-inline: auto;
 }
 
+#contribution,
 #overview,
 #method,
 #rca,
@@ -1056,6 +1057,67 @@ footer {
   height: 1px;
   background: var(--cyan);
   opacity: 0.56;
+}
+
+.contribution {
+  position: relative;
+  z-index: 1;
+  padding: 88px 0 96px;
+}
+
+.contribution-heading {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 680px);
+  gap: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.contribution-heading h2 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.contribution-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.contribution-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  margin: 48px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contribution-list li {
+  min-width: 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.contribution-list b,
+.contribution-list strong {
+  display: block;
+}
+
+.contribution-list b {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.contribution-list strong {
+  margin-top: 24px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.65;
 }
 
 .overview,
@@ -3520,6 +3582,16 @@ footer a {
     margin-top: 9px;
   }
 
+  .contribution-heading {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .contribution-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 28px;
+  }
+
   .prompt-framework {
     grid-template-columns: 1fr;
     gap: 32px;
@@ -3824,6 +3896,24 @@ footer a {
 
   .signal-panel {
     padding-top: 20px;
+  }
+
+  .contribution {
+    padding: 68px 0 76px;
+  }
+
+  .contribution-heading h2 {
+    font-size: 28px;
+  }
+
+  .contribution-list {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 36px;
+  }
+
+  .contribution-list strong {
+    margin-top: 12px;
   }
 
   .signal-list {

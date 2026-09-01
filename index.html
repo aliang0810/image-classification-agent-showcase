@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-19" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-20" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -218,6 +218,22 @@
             <a class="signal" href="#rca"><b>03</b><span>RCA<small>evaluate · diagnose · patch</small></span><i></i></a>
           </div>
         </div>
+      </section>
+
+      <section class="contribution shell" id="contribution" aria-labelledby="contributionTitle">
+        <header class="contribution-heading">
+          <span class="micro">个人贡献</span>
+          <div>
+            <h2 id="contributionTitle">我负责的核心工作</h2>
+            <p>覆盖工作流设计、Prompt 规则、自动 RCA 与辅助标注效果验证。</p>
+          </div>
+        </header>
+        <ol class="contribution-list">
+          <li><b>01</b><strong>设计 L1–L3 分层分类工作流</strong></li>
+          <li><b>02</b><strong>建立七层 Prompt 规则框架</strong></li>
+          <li><b>03</b><strong>定义九类 RCA 根因及修复策略</strong></li>
+          <li><b>04</b><strong>设计辅助标注实验与结果评估口径</strong></li>
+        </ol>
       </section>
 
       <section class="overview shell" id="overview">
@@ -663,6 +679,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-19"></script>
+    <script src="./app.js?v=20260901-20"></script>
   </body>
 </html>
