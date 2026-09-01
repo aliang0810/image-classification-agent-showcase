@@ -14,25 +14,10 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-16" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-18" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
-    <div class="ambient-hud" aria-hidden="true">
-      <span class="ambient-hud-left">SYS / PT5 / 001</span>
-      <span class="ambient-hud-right">LAT 31.2304 / LON 121.4737</span>
-      <div class="ambient-hud-top">
-        <span>AIA CORE / SIGNAL STABLE</span>
-        <i></i>
-        <span>FRAME 004 · SYNC 98.7</span>
-      </div>
-      <div class="ambient-hud-readout">
-        <span><b>03</b> ACTIVE LAYERS</span>
-        <span><b>94</b> TRACE NODES</span>
-        <span><b>09</b> RCA CHANNELS</span>
-      </div>
-      <div class="ambient-reticle"><i></i></div>
-    </div>
     <header class="site-header">
       <button
         class="brand"
@@ -187,22 +172,37 @@
         <div class="hero-kicker">
           <span>PROJECT FILE</span>
           <span class="kicker-track"><b>01</b> / Image Classification Workflow</span>
-          <span class="hero-credit">LIANG ZHONG</span>
         </div>
 
         <div class="hero-copy">
-          <p class="eyebrow">Image classification workflow</p>
-          <h1>Image Classification <em>AGENT</em></h1>
-          <div class="hero-summary">
+          <div class="hero-message">
+            <p class="eyebrow">Image classification workflow</p>
+            <h1><span>Image Classification</span><em>AGENT</em></h1>
             <p class="hero-lead">
               Agent 执行分层分类，Prompt 约束判断过程，RCA 将错误转化为下一版规则。
             </p>
-            <div class="hero-facts" aria-label="项目规模">
-              <div><strong>03</strong><span>System stages</span></div>
-              <div><strong>94</strong><span>Nodes</span></div>
-              <div><strong>09</strong><span>RCA types</span></div>
-            </div>
           </div>
+          <aside class="hero-impact" aria-label="个人角色与项目核心结果">
+            <header>
+              <span class="micro">PROJECT ROLE</span>
+              <strong>AI Agent &amp; Prompt Engineer</strong>
+              <small>LIANG ZHONG</small>
+            </header>
+            <div class="hero-results">
+              <article>
+                <strong>86.5%</strong>
+                <span>L2 Recall</span>
+              </article>
+              <article>
+                <strong>−8.0%</strong>
+                <span>Average Handling Time</span>
+              </article>
+              <article>
+                <strong>+1.90 pp</strong>
+                <span>Labeler Accuracy</span>
+              </article>
+            </div>
+          </aside>
         </div>
 
         <div class="signal-panel" aria-label="系统处理阶段">
@@ -211,7 +211,6 @@
               <span class="micro">链路概览</span>
               <h2>从执行到规则回流</h2>
             </div>
-            <span class="live-pill">运行中</span>
           </div>
           <div class="signal-list">
             <a class="signal" href="#overview"><b>01</b><span>AGENT<small>L1 · L2 · L3 execution</small></span><i></i></a>
@@ -664,6 +663,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-16"></script>
+    <script src="./app.js?v=20260901-18"></script>
   </body>
 </html>

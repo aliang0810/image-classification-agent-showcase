@@ -1233,52 +1233,7 @@ function initAmbientCanvas() {
       ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
       ctx.stroke();
 
-      if (!compact && index % 2 === 0) {
-        ctx.fillStyle = "rgba(180, 187, 183, 0.3)";
-        ctx.font = "8px DM Mono, monospace";
-        ctx.fillText(`N-${String(index + 1).padStart(2, "0")}`, x + 14, y - 7);
-      }
     });
-    ctx.restore();
-  }
-
-  function drawTelemetryScope(time) {
-    const compact = width < 720;
-    const scopeWidth = compact ? Math.min(210, width * 0.54) : 270;
-    const scopeHeight = 58;
-    const x = compact ? 18 : width * 0.055;
-    const y = height - (compact ? 94 : 112);
-
-    ctx.save();
-    ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
-    ctx.lineWidth = 0.7;
-    ctx.strokeRect(x, y, scopeWidth, scopeHeight);
-
-    for (let column = 1; column < 6; column += 1) {
-      const gridX = x + (scopeWidth * column) / 6;
-      ctx.beginPath();
-      ctx.moveTo(gridX, y);
-      ctx.lineTo(gridX, y + scopeHeight);
-      ctx.stroke();
-    }
-
-    ctx.beginPath();
-    for (let offset = 0; offset <= scopeWidth; offset += 4) {
-      const signal =
-        Math.sin(offset * 0.09 + time * 0.002) * 7 +
-        Math.sin(offset * 0.028 - time * 0.0013) * 4;
-      const pointY = y + scopeHeight * 0.55 + signal;
-      if (offset === 0) ctx.moveTo(x + offset, pointY);
-      else ctx.lineTo(x + offset, pointY);
-    }
-    ctx.strokeStyle = "rgba(104, 213, 189, 0.44)";
-    ctx.lineWidth = 0.9;
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(180, 187, 183, 0.3)";
-    ctx.font = "8px DM Mono, monospace";
-    ctx.fillText("LIVE SIGNAL / 04", x + 8, y + 12);
-    ctx.fillText("SYNC", x + scopeWidth - 34, y + scopeHeight - 8);
     ctx.restore();
   }
 
@@ -1489,10 +1444,6 @@ function initAmbientCanvas() {
     ctx.fill();
     ctx.restore();
 
-    ctx.fillStyle = "rgba(180, 187, 183, 0.42)";
-    ctx.font = "8px DM Mono, monospace";
-    ctx.fillText("CORE / 03", radius * 0.4, -radius * 0.34);
-    ctx.fillText("SYNC 98.7", -radius * 0.82, radius * 0.58);
     ctx.restore();
   }
 
@@ -1574,63 +1525,6 @@ function initAmbientCanvas() {
     });
   }
 
-  function drawScan(time) {
-    const x = (time * 0.035) % (width + 240) - 120;
-    const y = (time * 0.022) % (height + 180) - 90;
-    ctx.fillStyle = "rgba(104, 213, 189, 0.1)";
-    ctx.fillRect(x, 0, 1, height);
-    ctx.fillStyle = "rgba(104, 213, 189, 0.025)";
-    ctx.fillRect(x - 42, 0, 42, height);
-    ctx.fillStyle = "rgba(104, 213, 189, 0.05)";
-    ctx.fillRect(0, y, width, 1);
-    ctx.fillStyle = "rgba(104, 213, 189, 0.015)";
-    ctx.fillRect(0, y - 24, width, 24);
-  }
-
-  function drawCalibrationFrame(time) {
-    const margin = 22;
-    const tick = 8;
-    const phase = Math.floor(time / 900) % 12;
-    ctx.strokeStyle = "rgba(146, 184, 192, 0.12)";
-    ctx.lineWidth = 0.8;
-
-    for (let index = 0; index < 12; index += 1) {
-      const x = margin + ((width - margin * 2) * index) / 11;
-      const length = index === phase ? tick * 1.8 : tick;
-      ctx.beginPath();
-      ctx.moveTo(x, margin);
-      ctx.lineTo(x, margin + length);
-      ctx.moveTo(x, height - margin);
-      ctx.lineTo(x, height - margin - length);
-      ctx.stroke();
-    }
-
-    for (let index = 0; index < 7; index += 1) {
-      const y = margin + ((height - margin * 2) * index) / 6;
-      ctx.beginPath();
-      ctx.moveTo(margin, y);
-      ctx.lineTo(margin + tick, y);
-      ctx.moveTo(width - margin, y);
-      ctx.lineTo(width - margin - tick, y);
-      ctx.stroke();
-    }
-
-    const bracket = 26;
-    const corners = [
-      [margin, margin, 1, 1],
-      [width - margin, margin, -1, 1],
-      [margin, height - margin, 1, -1],
-      [width - margin, height - margin, -1, -1],
-    ];
-    corners.forEach(([x, y, dx, dy]) => {
-      ctx.beginPath();
-      ctx.moveTo(x + dx * bracket, y);
-      ctx.lineTo(x, y);
-      ctx.lineTo(x, y + dy * bracket);
-      ctx.stroke();
-    });
-  }
-
   function render(time = 0) {
     lastTime = time;
     ctx.clearRect(0, 0, width, height);
@@ -1638,11 +1532,8 @@ function initAmbientCanvas() {
     drawPerspectiveGrid(time);
     drawCircuitTraces(time);
     drawSignalTopology(time);
-    drawTelemetryScope(time);
     drawRadarSweep(time);
     drawKineticCore(time);
-    drawScan(time);
-    drawCalibrationFrame(time);
     ctx.globalCompositeOperation = "source-over";
 
     if (!staticPreview && !reducedMotion.matches && !document.hidden) {

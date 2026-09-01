@@ -42,6 +42,8 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 
 - Content width: maximum 1180px.
 - Major sections: AGENT, PROMPT, RCA, RESULT.
+- The first viewport prioritizes the contributor's role and the three outcome metrics: L2 Recall, AHT change, and Labeler Accuracy change.
+- Engineering scale such as node counts and RCA category counts belongs in implementation sections, not the hero.
 - Every section starts with the same two-column heading pattern: technical eyebrow on the left, title and summary on the right.
 - Section headings use a top datum line and a low-contrast oversized index as the shared navigation coordinate.
 - Product and data surfaces use the surface ladder and 1px hairlines.
@@ -50,12 +52,11 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 
 ## Ambient Background
 
-- Use a fixed 48px technical grid, edge calibration ticks, and sparse cyan-green circuit pulses.
-- Add bounded radar rings, labelled topology nodes, moving data packets, and one compact signal scope to imply live system activity.
-- Edge telemetry may show terse system codes and counts; it stays decorative, non-interactive, and below content contrast.
+- Use a fixed 48px technical grid, sparse cyan-green circuit pulses, and unlabelled topology nodes.
 - Reserve the wireframe kinetic core for the first viewport and fade it as the page scrolls.
 - Build the core from three orbital planes, segmented instrument rings, radial calibration ticks, and a counter-rotating hexagonal reactor. Avoid dense random ellipses.
 - Keep the background monochromatic and low contrast behind long-form content.
+- Do not use simulated monitoring labels, fictional status values, scan lines, or edge calibration scales.
 - Do not combine topographic waves, colorful particles, and decorative blocks in the same scene.
 
 ## Components
