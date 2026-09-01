@@ -1482,6 +1482,7 @@ function initProjectDrawer() {
   const closeButton = document.querySelector("#projectDrawerClose");
   const sectionButtons = [...document.querySelectorAll("[data-project-section]")];
   const sectionPanels = [...document.querySelectorAll("[data-project-panel]")];
+  const content = document.querySelector(".project-drawer-content");
 
   function setOpen(open) {
     toggle.setAttribute("aria-expanded", String(open));
@@ -1517,6 +1518,7 @@ function initProjectDrawer() {
       panel.classList.toggle("active", active);
       panel.hidden = !active;
     });
+    content.scrollTop = 0;
   }
 
   sectionButtons.forEach((button) => {

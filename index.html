@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-6" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-7" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -86,8 +86,11 @@
 
         <div class="project-drawer-content" aria-live="polite">
           <article class="project-panel active" id="projectPanelBackground" data-project-panel="background">
-            <span class="project-panel-code">01 / CONTEXT</span>
-            <h2>从人工检索，走向候选驱动的分类决策。</h2>
+            <header class="project-panel-identity">
+              <div><span>PROJECT CONTEXT</span><h2>项目背景</h2></div>
+              <b>01</b>
+            </header>
+            <h3 class="project-panel-title">从人工检索，走向候选驱动的分类决策。</h3>
             <p class="project-panel-lead">
               Photo Taxonomy 5.0 类目层级深、相似边界多。标注员需要反复检索规则并比较近似类目，判断成本高，结果也容易受到经验差异影响。
             </p>
@@ -103,8 +106,11 @@
           </article>
 
           <article class="project-panel" id="projectPanelGoal" data-project-panel="goal" hidden>
-            <span class="project-panel-code">02 / OBJECTIVE</span>
-            <h2>先保证正确答案进入候选，再提升标注效率。</h2>
+            <header class="project-panel-identity">
+              <div><span>PROJECT OBJECTIVE</span><h2>项目目标</h2></div>
+              <b>02</b>
+            </header>
+            <h3 class="project-panel-title">先保证正确答案进入候选，再提升标注效率。</h3>
             <p class="project-panel-lead">
               项目不以无人审核的全自动分类为当前目标，而是构建稳定的辅助标注 Copilot，在质量不劣化的前提下缩短单条任务的判断路径。
             </p>
@@ -116,8 +122,11 @@
           </article>
 
           <article class="project-panel" id="projectPanelWork" data-project-panel="work" hidden>
-            <span class="project-panel-code">03 / CORE WORK</span>
-            <h2>从数据、Agent 到实验验证的完整建设链路。</h2>
+            <header class="project-panel-identity">
+              <div><span>CORE WORK</span><h2>主要工作</h2></div>
+              <b>03</b>
+            </header>
+            <h3 class="project-panel-title">从数据、Agent 到实验验证的完整建设链路。</h3>
             <div class="project-work-list">
               <section><b>01</b><div><strong>数据与类目治理</strong><p>清洗训练数据，确定高优类目，并建立固定集与滚动集的双周评估机制。</p></div></section>
               <section><b>02</b><div><strong>分层 Agent 架构</strong><p>搭建 L1 召回、L2 候选生成和 L3 冲突仲裁，并补齐异常、重试与上报链路。</p></div></section>
@@ -127,8 +136,11 @@
           </article>
 
           <article class="project-panel" id="projectPanelResult" data-project-panel="result" hidden>
-            <span class="project-panel-code">04 / OUTCOME</span>
-            <h2>模型候选能力与人机协同收益均得到验证。</h2>
+            <header class="project-panel-identity">
+              <div><span>FINAL OUTCOME</span><h2>最终成果</h2></div>
+              <b>04</b>
+            </header>
+            <h3 class="project-panel-title">模型候选能力与人机协同收益均得到验证。</h3>
             <div class="project-result-group">
               <header><span>OFFLINE EVALUATION</span><small>Candidate quality</small></header>
               <div class="project-result-grid">
@@ -561,6 +573,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-6"></script>
+    <script src="./app.js?v=20260901-7"></script>
   </body>
 </html>
