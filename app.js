@@ -1165,6 +1165,160 @@ function initAmbientCanvas() {
     }
   }
 
+  function drawSignalTopology(time) {
+    const compact = width < 720;
+    const nodes = compact
+      ? [
+          [0.12, 0.18],
+          [0.34, 0.13],
+          [0.56, 0.2],
+          [0.82, 0.15],
+          [0.22, 0.72],
+          [0.5, 0.78],
+          [0.78, 0.7],
+        ]
+      : [
+          [0.07, 0.18],
+          [0.21, 0.12],
+          [0.36, 0.23],
+          [0.53, 0.14],
+          [0.68, 0.24],
+          [0.89, 0.16],
+          [0.12, 0.72],
+          [0.29, 0.82],
+          [0.48, 0.69],
+          [0.66, 0.8],
+          [0.86, 0.71],
+        ];
+    const links = compact
+      ? [[0, 1], [1, 2], [2, 3], [4, 5], [5, 6]]
+      : [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [6, 7], [7, 8], [8, 9], [9, 10]];
+
+    ctx.save();
+    links.forEach(([fromIndex, toIndex], linkIndex) => {
+      const [fromX, fromY] = nodes[fromIndex];
+      const [toX, toY] = nodes[toIndex];
+      const x1 = fromX * width;
+      const y1 = fromY * height;
+      const x2 = toX * width;
+      const y2 = toY * height;
+      const progress = ((time * 0.000055 + linkIndex * 0.17) % 1 + 1) % 1;
+      const packetX = x1 + (x2 - x1) * progress;
+      const packetY = y1 + (y2 - y1) * progress;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.setLineDash([2, 10]);
+      ctx.lineDashOffset = -time * 0.008;
+      ctx.strokeStyle = "rgba(104, 213, 189, 0.075)";
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.strokeStyle = "rgba(104, 213, 189, 0.46)";
+      ctx.strokeRect(packetX - 4, packetY - 4, 8, 8);
+    });
+
+    nodes.forEach(([nodeX, nodeY], index) => {
+      const x = nodeX * width;
+      const y = nodeY * height;
+      const pulse = 3 + Math.sin(time * 0.0012 + index) * 1.2;
+      ctx.beginPath();
+      ctx.arc(x, y, pulse, 0, Math.PI * 2);
+      ctx.fillStyle = index % 3 === 0 ? "rgba(104, 213, 189, 0.54)" : "rgba(180, 187, 183, 0.3)";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
+      ctx.stroke();
+
+      if (!compact && index % 2 === 0) {
+        ctx.fillStyle = "rgba(180, 187, 183, 0.3)";
+        ctx.font = "8px DM Mono, monospace";
+        ctx.fillText(`N-${String(index + 1).padStart(2, "0")}`, x + 14, y - 7);
+      }
+    });
+    ctx.restore();
+  }
+
+  function drawTelemetryScope(time) {
+    const compact = width < 720;
+    const scopeWidth = compact ? Math.min(210, width * 0.54) : 270;
+    const scopeHeight = 58;
+    const x = compact ? 18 : width * 0.055;
+    const y = height - (compact ? 94 : 112);
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
+    ctx.lineWidth = 0.7;
+    ctx.strokeRect(x, y, scopeWidth, scopeHeight);
+
+    for (let column = 1; column < 6; column += 1) {
+      const gridX = x + (scopeWidth * column) / 6;
+      ctx.beginPath();
+      ctx.moveTo(gridX, y);
+      ctx.lineTo(gridX, y + scopeHeight);
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    for (let offset = 0; offset <= scopeWidth; offset += 4) {
+      const signal =
+        Math.sin(offset * 0.09 + time * 0.002) * 7 +
+        Math.sin(offset * 0.028 - time * 0.0013) * 4;
+      const pointY = y + scopeHeight * 0.55 + signal;
+      if (offset === 0) ctx.moveTo(x + offset, pointY);
+      else ctx.lineTo(x + offset, pointY);
+    }
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.44)";
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(180, 187, 183, 0.3)";
+    ctx.font = "8px DM Mono, monospace";
+    ctx.fillText("LIVE SIGNAL / 04", x + 8, y + 12);
+    ctx.fillText("SYNC", x + scopeWidth - 34, y + scopeHeight - 8);
+    ctx.restore();
+  }
+
+  function drawRadarSweep(time) {
+    const heroFade = Math.max(0, 1 - scrollY / Math.max(1, height * 0.9));
+    if (heroFade <= 0.01) return;
+
+    const compact = width < 720;
+    const centerX = width * (compact ? 0.72 : 0.77);
+    const centerY = height * (compact ? 0.34 : 0.38);
+    const radius = Math.min(width, height) * (compact ? 0.2 : 0.24);
+    const angle = time * 0.00022;
+
+    ctx.save();
+    ctx.globalAlpha = heroFade;
+    ctx.translate(centerX, centerY);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
+    ctx.lineWidth = 0.7;
+    [0.42, 0.68, 1].forEach((scale) => {
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * scale, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.beginPath();
+    ctx.moveTo(-radius, 0);
+    ctx.lineTo(radius, 0);
+    ctx.moveTo(0, -radius);
+    ctx.lineTo(0, radius);
+    ctx.stroke();
+
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(radius, 0);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.54)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawDataLanes(time) {
     const laneColors = [
       "rgba(66, 212, 232, 0.24)",
@@ -1435,6 +1589,9 @@ function initAmbientCanvas() {
     ctx.globalCompositeOperation = "screen";
     drawPerspectiveGrid(time);
     drawCircuitTraces(time);
+    drawSignalTopology(time);
+    drawTelemetryScope(time);
+    drawRadarSweep(time);
     drawKineticCore(time);
     drawScan(time);
     drawCalibrationFrame(time);

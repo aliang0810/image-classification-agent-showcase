@@ -14,13 +14,24 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-13" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-14" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
     <div class="ambient-hud" aria-hidden="true">
       <span class="ambient-hud-left">SYS / PT5 / 001</span>
       <span class="ambient-hud-right">LAT 31.2304 / LON 121.4737</span>
+      <div class="ambient-hud-top">
+        <span>AIA CORE / SIGNAL STABLE</span>
+        <i></i>
+        <span>FRAME 004 · SYNC 98.7</span>
+      </div>
+      <div class="ambient-hud-readout">
+        <span><b>03</b> ACTIVE LAYERS</span>
+        <span><b>94</b> TRACE NODES</span>
+        <span><b>09</b> RCA CHANNELS</span>
+      </div>
+      <div class="ambient-reticle"><i></i></div>
     </div>
     <header class="site-header">
       <button
@@ -661,6 +672,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-13"></script>
+    <script src="./app.js?v=20260901-14"></script>
   </body>
 </html>

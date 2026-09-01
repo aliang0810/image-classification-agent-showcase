@@ -119,12 +119,125 @@ body::after {
   writing-mode: vertical-rl;
 }
 
-.ambient-hud-left {
+.ambient-hud > .ambient-hud-left {
   left: 8px;
 }
 
-.ambient-hud-right {
+.ambient-hud > .ambient-hud-right {
   right: 8px;
+}
+
+.ambient-hud-top {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: auto 86px auto;
+  gap: 14px;
+  align-items: center;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.ambient-hud-top span {
+  position: static;
+  writing-mode: initial;
+}
+
+.ambient-hud-top i {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(104, 213, 189, 0.14);
+}
+
+.ambient-hud-top i::after {
+  position: absolute;
+  width: 22px;
+  height: 1px;
+  background: rgba(104, 213, 189, 0.72);
+  content: "";
+  animation: hud-data-sweep 3.6s linear infinite;
+}
+
+.ambient-hud-readout {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  display: grid;
+  gap: 7px;
+  width: 142px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(104, 213, 189, 0.12);
+  border-bottom: 1px solid rgba(104, 213, 189, 0.12);
+  background: rgba(11, 13, 14, 0.22);
+}
+
+.ambient-hud-readout span {
+  position: static;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  writing-mode: initial;
+}
+
+.ambient-hud-readout b {
+  color: rgba(104, 213, 189, 0.56);
+  font-weight: 500;
+}
+
+.ambient-reticle {
+  position: absolute;
+  top: 18%;
+  left: 9%;
+  width: 96px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(104, 213, 189, 0.11);
+  border-radius: 50%;
+}
+
+.ambient-reticle::before,
+.ambient-reticle::after {
+  position: absolute;
+  background: rgba(104, 213, 189, 0.12);
+  content: "";
+}
+
+.ambient-reticle::before {
+  top: 50%;
+  left: -13px;
+  width: calc(100% + 26px);
+  height: 1px;
+}
+
+.ambient-reticle::after {
+  top: -13px;
+  left: 50%;
+  width: 1px;
+  height: calc(100% + 26px);
+}
+
+.ambient-reticle i {
+  position: absolute;
+  inset: 17px;
+  border: 1px dashed rgba(104, 213, 189, 0.15);
+  border-radius: 50%;
+  animation: hud-reticle-spin 18s linear infinite;
+}
+
+@keyframes hud-data-sweep {
+  from {
+    transform: translateX(-24px);
+  }
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes hud-reticle-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 main,
@@ -3460,6 +3573,15 @@ footer a {
     inset-inline: 12px;
   }
 
+  .ambient-hud-top {
+    display: none;
+  }
+
+  .ambient-hud-readout {
+    right: 14px;
+    opacity: 0.65;
+  }
+
   .section-title::after {
     top: 16px;
     font-size: 68px;
@@ -4445,7 +4567,10 @@ footer a {
 
 @media (prefers-reduced-motion: reduce) {
   .project-drawer,
-  .project-drawer-backdrop {
+  .project-drawer-backdrop,
+  .ambient-hud-top i::after,
+  .ambient-reticle i {
+    animation: none;
     transition: none;
   }
 }
