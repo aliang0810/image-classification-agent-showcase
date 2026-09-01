@@ -89,11 +89,15 @@ button {
 
 .brand {
   gap: 11px;
+  padding: 0;
+  border: 0;
   color: var(--text);
+  background: transparent;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .brand-mark {
@@ -103,6 +107,19 @@ button {
   border-top: 2px solid var(--text);
   border-bottom: 2px solid var(--cyan);
   transform: none;
+  transition: width 180ms ease, border-color 180ms ease;
+}
+
+.brand:hover .brand-mark,
+.brand[aria-expanded="true"] .brand-mark {
+  width: 30px;
+  border-top-color: var(--cyan);
+}
+
+.brand:focus-visible,
+.project-drawer button:focus-visible {
+  outline: 1px solid var(--cyan);
+  outline-offset: 4px;
 }
 
 .top-nav {
@@ -127,6 +144,188 @@ button {
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+body.project-menu-open {
+  overflow: hidden;
+}
+
+.project-drawer-backdrop {
+  position: fixed;
+  z-index: 29;
+  inset: 0;
+  opacity: 0;
+  background: rgba(4, 6, 7, 0.72);
+  backdrop-filter: blur(5px);
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.project-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.project-drawer {
+  position: fixed;
+  z-index: 40;
+  inset: 0 auto 0 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: min(420px, calc(100vw - 24px));
+  border-right: 1px solid var(--line-strong);
+  background:
+    linear-gradient(rgba(114, 184, 178, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(114, 184, 178, 0.025) 1px, transparent 1px),
+    rgba(17, 19, 21, 0.985);
+  background-size: 42px 42px;
+  box-shadow: 28px 0 80px rgba(0, 0, 0, 0.48);
+  transform: translateX(-102%);
+  visibility: hidden;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 300ms;
+}
+
+.project-drawer.open {
+  transform: translateX(0);
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.project-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 98px;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.project-drawer-head strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.project-drawer-close {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+}
+
+.project-drawer-close:hover {
+  border-color: var(--cyan);
+  color: var(--text);
+}
+
+.project-drawer-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.project-drawer-nav {
+  display: grid;
+  grid-template-rows: repeat(4, minmax(116px, 1fr));
+  overflow-y: auto;
+}
+
+.project-drawer-nav button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  align-content: center;
+  width: 100%;
+  min-height: 116px;
+  padding: 24px 26px;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.012);
+  text-align: left;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.project-drawer-nav button::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--cyan);
+  content: "";
+  transform: scaleY(0);
+  transition: transform 180ms ease;
+}
+
+.project-drawer-nav button:hover,
+.project-drawer-nav button.active {
+  background: rgba(114, 184, 178, 0.07);
+}
+
+.project-drawer-nav button:hover::before,
+.project-drawer-nav button.active::before {
+  transform: scaleY(1);
+}
+
+.project-drawer-nav button > span {
+  grid-row: 1 / 3;
+  align-self: start;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.project-drawer-nav button strong {
+  align-self: end;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.project-drawer-nav button small {
+  grid-column: 2;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.project-drawer-nav button > svg {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 17px;
+  height: 17px;
+  color: var(--dim);
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.project-drawer-nav button:hover > svg,
+.project-drawer-nav button.active > svg {
+  color: var(--cyan);
+  transform: translate(3px, -3px);
+}
+
+.project-drawer-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 54px;
+  padding: 18px 26px;
+  border-top: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
 
 .hero {
@@ -2438,6 +2637,32 @@ footer a {
     display: none;
   }
 
+  .project-drawer {
+    width: calc(100vw - 16px);
+  }
+
+  .project-drawer-head {
+    min-height: 82px;
+    padding: 18px 20px;
+  }
+
+  .project-drawer-nav {
+    grid-template-rows: repeat(4, minmax(104px, 1fr));
+  }
+
+  .project-drawer-nav button {
+    min-height: 104px;
+    padding: 20px;
+  }
+
+  .project-drawer-nav button strong {
+    font-size: 21px;
+  }
+
+  .project-drawer-foot {
+    padding-inline: 20px;
+  }
+
   .hero {
     min-height: auto;
     margin-top: 24px;
@@ -2894,5 +3119,12 @@ footer a {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-drawer,
+  .project-drawer-backdrop {
+    transition: none;
   }
 }

@@ -1331,3 +1331,53 @@ function initAmbientCanvas() {
 }
 
 initAmbientCanvas();
+
+function initProjectDrawer() {
+  const toggle = document.querySelector("#projectMenuToggle");
+  const drawer = document.querySelector("#projectDrawer");
+  const backdrop = document.querySelector("#projectDrawerBackdrop");
+  const closeButton = document.querySelector("#projectDrawerClose");
+  const sectionButtons = [...document.querySelectorAll("[data-project-section]")];
+
+  function setOpen(open) {
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "关闭项目目录" : "打开项目目录");
+    drawer.setAttribute("aria-hidden", String(!open));
+    drawer.toggleAttribute("inert", !open);
+    drawer.classList.toggle("open", open);
+    backdrop.classList.toggle("open", open);
+    backdrop.setAttribute("aria-hidden", String(!open));
+    document.body.classList.toggle("project-menu-open", open);
+
+    if (open) {
+      window.requestAnimationFrame(() => closeButton.focus());
+    } else if (document.activeElement !== toggle) {
+      toggle.focus();
+    }
+  }
+
+  toggle.addEventListener("click", () => {
+    setOpen(toggle.getAttribute("aria-expanded") !== "true");
+  });
+  closeButton.addEventListener("click", () => setOpen(false));
+  backdrop.addEventListener("click", () => setOpen(false));
+
+  sectionButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => {
+      sectionButtons.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      setOpen(false);
+    }
+  });
+}
+
+initProjectDrawer();

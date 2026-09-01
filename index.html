@@ -19,10 +19,17 @@
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="回到顶部">
+      <button
+        class="brand"
+        id="projectMenuToggle"
+        type="button"
+        aria-label="打开项目目录"
+        aria-controls="projectDrawer"
+        aria-expanded="false"
+      >
         <span class="brand-mark" aria-hidden="true"></span>
         <span>PT Workflow Index</span>
-      </a>
+      </button>
       <nav class="top-nav" aria-label="页面导航">
         <a href="#overview">AGENT</a>
         <a href="#method">PROMPT</a>
@@ -31,6 +38,55 @@
       </nav>
       <span class="status">Project / 2026</span>
     </header>
+
+    <div class="project-drawer-backdrop" id="projectDrawerBackdrop" aria-hidden="true"></div>
+    <aside
+      class="project-drawer"
+      id="projectDrawer"
+      aria-label="项目目录"
+      aria-hidden="true"
+      inert
+    >
+      <header class="project-drawer-head">
+        <div>
+          <span class="micro">PROJECT INDEX</span>
+          <strong>PT Workflow</strong>
+        </div>
+        <button class="project-drawer-close" id="projectDrawerClose" type="button" aria-label="关闭项目目录">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      <nav class="project-drawer-nav" aria-label="项目内容板块">
+        <button type="button" data-project-section="background">
+          <span>01</span>
+          <strong>项目背景</strong>
+          <small>PROJECT CONTEXT</small>
+          <i data-lucide="arrow-up-right"></i>
+        </button>
+        <button type="button" data-project-section="goal">
+          <span>02</span>
+          <strong>项目目标</strong>
+          <small>PROJECT OBJECTIVE</small>
+          <i data-lucide="arrow-up-right"></i>
+        </button>
+        <button type="button" data-project-section="work">
+          <span>03</span>
+          <strong>主要工作</strong>
+          <small>CORE WORK</small>
+          <i data-lucide="arrow-up-right"></i>
+        </button>
+        <button type="button" data-project-section="result">
+          <span>04</span>
+          <strong>最终成果</strong>
+          <small>FINAL OUTCOME</small>
+          <i data-lucide="arrow-up-right"></i>
+        </button>
+      </nav>
+      <footer class="project-drawer-foot">
+        <span>IMAGE CLASSIFICATION AGENT</span>
+        <span>2026</span>
+      </footer>
+    </aside>
 
     <main id="top">
       <section class="hero shell">
