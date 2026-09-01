@@ -980,8 +980,8 @@ function initContentExplorers() {
         item.setAttribute("aria-selected", String(selected));
       });
       document.querySelector("#promptDetailCode").textContent = section.code;
-      document.querySelector("#promptDetailTitle").textContent = section.title;
-      document.querySelector("#promptDetailSubtitle").textContent = section.subtitle;
+      document.querySelector("#promptDetailTitle").textContent = section.subtitle;
+      document.querySelector("#promptDetailSubtitle").textContent = section.title;
       document.querySelector("#promptDetailIntent").textContent = section.intent;
       replaceList(promptItems, section.items);
     });
@@ -999,8 +999,8 @@ function initContentExplorers() {
       });
       document.querySelector("#rcaDetailCode").textContent = rule.code;
       document.querySelector("#rcaDetailScope").textContent = rule.scope;
-      document.querySelector("#rcaDetailTitle").textContent = rule.title;
-      document.querySelector("#rcaDetailZh").textContent = rule.zh;
+      document.querySelector("#rcaDetailTitle").textContent = rule.zh;
+      document.querySelector("#rcaDetailZh").textContent = rule.title;
       document.querySelector("#rcaDetailRule").textContent = rule.rule;
       document.querySelector("#rcaDetailAction").textContent = rule.action;
       rcaDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });

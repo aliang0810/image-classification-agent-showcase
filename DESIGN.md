@@ -13,8 +13,8 @@ A restrained technical case study for an AI classification workflow. The interfa
 - Surface 2: `#15191b`
 - Surface 3: `#1a1f21`
 - Primary text: `#f2f4f2`
-- Secondary text: `#b4bbb7`
-- Muted text: `#7e8883`
+- Secondary text: `#c4cac6`
+- Muted text: `#98a19c`
 - Accent: `#68d5bd`
 - Hairline: `rgba(242, 244, 242, 0.11)`
 - Strong hairline: `rgba(242, 244, 242, 0.24)`
@@ -24,10 +24,11 @@ Blue, amber, green, and red are reserved for workflow semantics. They must not b
 ### Typography
 
 - Display and body: Manrope with system sans-serif fallbacks.
-- Technical labels and identifiers: DM Mono with system monospace fallbacks.
+- Numbers, error codes, and field names: DM Mono with system monospace fallbacks.
 - Headlines use weight 500 or 600.
 - Body uses weight 400 with generous line height.
-- Monospace is limited to section labels, IDs, status, metrics metadata, and code.
+- Chinese is the primary reading language; English supports technical identity and metadata.
+- Monospace is limited to numbers, error codes, field names, identifiers, and code.
 - Letter spacing is `0` for narrative copy. Small uppercase technical labels may use modest positive tracking.
 
 ### Spacing
@@ -48,6 +49,8 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 - Section headings use a top datum line and a low-contrast oversized index as the shared navigation coordinate.
 - Product and data surfaces use the surface ladder and 1px hairlines.
 - Prefer full-width structured panels over collections of floating cards.
+- Reduce card count by grouping related content with whitespace; reserve enclosing borders for tools and primary data panels.
+- Display titles are approximately 15-20% smaller than the initial visual system.
 - Keep one primary visual or data statement per viewport.
 
 ## Ambient Background
@@ -82,7 +85,7 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 
 ### Metrics
 
-- Use large sans-serif numerals.
+- Use large monospace numerals.
 - Accent only the primary metric or treatment value.
 - Always show metric name, denominator or comparison context, and data-scope notes.
 

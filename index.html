@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-18" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-19" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -184,22 +184,22 @@
           </div>
           <aside class="hero-impact" aria-label="个人角色与项目核心结果">
             <header>
-              <span class="micro">PROJECT ROLE</span>
-              <strong>AI Agent &amp; Prompt Engineer</strong>
-              <small>LIANG ZHONG</small>
+              <span class="micro">个人角色</span>
+              <strong>AI Agent 与 Prompt 工程</strong>
+              <small>LIANG ZHONG · AI AGENT &amp; PROMPT ENGINEER</small>
             </header>
             <div class="hero-results">
               <article>
                 <strong>86.5%</strong>
-                <span>L2 Recall</span>
+                <span>L2 召回率<small>L2 Recall</small></span>
               </article>
               <article>
                 <strong>−8.0%</strong>
-                <span>Average Handling Time</span>
+                <span>平均处理时长<small>Average Handling Time</small></span>
               </article>
               <article>
                 <strong>+1.90 pp</strong>
-                <span>Labeler Accuracy</span>
+                <span>标注准确率<small>Labeler Accuracy</small></span>
               </article>
             </div>
           </aside>
@@ -230,19 +230,19 @@
           <div class="overview-grid" aria-label="Agent 阶段索引">
             <article>
               <span>01 / RECALL</span>
-              <h3>L1 Candidate Recall</h3>
+              <h3>一级候选召回<small>L1 Candidate Recall</small></h3>
               <p>召回一级类目，选择正确的 Taxonomy 子树。</p>
               <strong>高召回 · 多路由 · 可重试</strong>
             </article>
             <article>
               <span>02 / ROUTING</span>
-              <h3>L2 Subtree Routing</h3>
+              <h3>二级子树路由<small>L2 Subtree Routing</small></h3>
               <p>加载子树 Prompt，生成并排序叶子候选。</p>
               <strong>动态 Prompt · 循环执行 · Top-3</strong>
             </article>
             <article>
               <span>03 / DECISION</span>
-              <h3>L3 Final Decision</h3>
+              <h3>三级最终决策<small>L3 Final Decision</small></h3>
               <p>依据定义与优先级完成最终仲裁。</p>
               <strong>规则裁决 · 补偿 · Trace</strong>
             </article>
@@ -251,7 +251,7 @@
             <header>
               <div>
                 <span class="micro">SYSTEM MAP</span>
-                <h3>Candidate-first inference</h3>
+                <h3>候选优先推理<small>Candidate-first inference</small></h3>
               </div>
               <code>INPUT → TOP-3 → HUMAN</code>
             </header>
@@ -421,19 +421,19 @@
         </div>
         <div class="prompt-explorer">
           <div class="prompt-stepper" role="tablist" aria-label="Prompt 结构层级">
-            <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true"><b>01</b><span>Role</span></button>
-            <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false"><b>02</b><span>Process</span></button>
-            <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false"><b>03</b><span>Boundary</span></button>
-            <button class="prompt-tab" data-prompt-index="3" role="tab" aria-selected="false"><b>04</b><span>Recovery</span></button>
-            <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false"><b>05</b><span>Taxonomy</span></button>
-            <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false"><b>06</b><span>Evidence</span></button>
-            <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false"><b>07</b><span>Output</span></button>
+            <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true"><b>01</b><span>角色</span></button>
+            <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false"><b>02</b><span>流程</span></button>
+            <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false"><b>03</b><span>边界</span></button>
+            <button class="prompt-tab" data-prompt-index="3" role="tab" aria-selected="false"><b>04</b><span>修正</span></button>
+            <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false"><b>05</b><span>类目</span></button>
+            <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false"><b>06</b><span>证据</span></button>
+            <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false"><b>07</b><span>输出</span></button>
           </div>
           <article class="prompt-detail" aria-live="polite">
             <header>
               <span class="micro" id="promptDetailCode">01 / ROLE</span>
-              <h3 id="promptDetailTitle">Role Definition</h3>
-              <p id="promptDetailSubtitle">角色定义</p>
+              <h3 id="promptDetailTitle">角色定义</h3>
+              <p id="promptDetailSubtitle">Role Definition</p>
             </header>
             <ul id="promptDetailItems">
               <li>说明模型承担的专业角色与任务目标</li>
@@ -441,7 +441,7 @@
               <li>强调高召回、证据驱动和禁止幻觉</li>
             </ul>
             <div class="prompt-detail-intent">
-              <span>DESIGN INTENT</span>
+              <span>设计意图</span>
               <p id="promptDetailIntent">先固定模型身份和任务边界，避免后续规则建立在模糊目标上。</p>
             </div>
           </article>
@@ -527,25 +527,25 @@
         <div class="rca-explorer">
           <nav class="rca-rule-index" aria-label="九类 RCA 判定规则">
             <section>
-              <h3>Evidence & Data</h3>
-              <p>输入、语言与 GT</p>
-              <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span><strong>System failure</strong><small>系统执行失败</small></span></button>
-              <button class="rca-rule-button" data-rca-index="1"><b>B</b><span><strong>Foreign language</strong><small>语言障碍</small></span></button>
-              <button class="rca-rule-button" data-rca-index="2"><b>C</b><span><strong>Potential GT error</strong><small>潜在标注错误</small></span></button>
+              <h3>证据与数据</h3>
+              <p>Evidence &amp; Data</p>
+              <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span><strong>系统执行失败</strong><small>System failure</small></span></button>
+              <button class="rca-rule-button" data-rca-index="1"><b>B</b><span><strong>语言障碍</strong><small>Foreign language</small></span></button>
+              <button class="rca-rule-button" data-rca-index="2"><b>C</b><span><strong>潜在标注错误</strong><small>Potential GT error</small></span></button>
             </section>
             <section>
-              <h3>Prompt-fixable</h3>
-              <p>可通过规则与提示修复</p>
-              <button class="rca-rule-button" data-rca-index="3"><b>D</b><span><strong>Definition gap</strong><small>定义设计缺口</small></span></button>
-              <button class="rca-rule-button" data-rca-index="4"><b>E</b><span><strong>Priority rule missing</strong><small>优先级规则缺失</small></span></button>
-              <button class="rca-rule-button" data-rca-index="5"><b>F</b><span><strong>Prompt guidance gap</strong><small>Prompt 指导缺口</small></span></button>
-              <button class="rca-rule-button" data-rca-index="6"><b>G</b><span><strong>Candidate noise</strong><small>候选集噪声</small></span></button>
+              <h3>Prompt 可修复问题</h3>
+              <p>Prompt-fixable</p>
+              <button class="rca-rule-button" data-rca-index="3"><b>D</b><span><strong>定义设计缺口</strong><small>Definition gap</small></span></button>
+              <button class="rca-rule-button" data-rca-index="4"><b>E</b><span><strong>优先级规则缺失</strong><small>Priority rule missing</small></span></button>
+              <button class="rca-rule-button" data-rca-index="5"><b>F</b><span><strong>Prompt 指导缺口</strong><small>Prompt guidance gap</small></span></button>
+              <button class="rca-rule-button" data-rca-index="6"><b>G</b><span><strong>候选集噪声</strong><small>Candidate noise</small></span></button>
             </section>
             <section>
-              <h3>Boundary & Capability</h3>
-              <p>规则边界与能力上限</p>
-              <button class="rca-rule-button" data-rca-index="7"><b>H</b><span><strong>True boundary case</strong><small>真实边界案例</small></span></button>
-              <button class="rca-rule-button" data-rca-index="8"><b>I</b><span><strong>Model capability gap</strong><small>模型能力缺口</small></span></button>
+              <h3>边界与能力</h3>
+              <p>Boundary &amp; Capability</p>
+              <button class="rca-rule-button" data-rca-index="7"><b>H</b><span><strong>真实边界案例</strong><small>True boundary case</small></span></button>
+              <button class="rca-rule-button" data-rca-index="8"><b>I</b><span><strong>模型能力缺口</strong><small>Model capability gap</small></span></button>
             </section>
           </nav>
           <article class="rca-detail" aria-live="polite">
@@ -553,17 +553,17 @@
               <b id="rcaDetailCode">A</b>
               <div>
                 <span id="rcaDetailScope">全链路</span>
-                <h3 id="rcaDetailTitle">System failure</h3>
-                <p class="rca-detail-zh" id="rcaDetailZh">系统执行失败</p>
+                <h3 id="rcaDetailTitle">系统执行失败</h3>
+                <p class="rca-detail-zh" id="rcaDetailZh">System failure</p>
               </div>
             </header>
             <div class="rca-detail-body">
               <section class="rca-detail-section">
-                <span>WHEN TO USE</span>
+                <span>适用条件</span>
                 <p id="rcaDetailRule">图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。</p>
               </section>
               <section class="rca-detail-section">
-                <span>NEXT ACTION</span>
+                <span>后续动作</span>
                 <p id="rcaDetailAction">检查输入完整性、资源加载和执行链路，不调用 RCA 模型。</p>
               </section>
             </div>
@@ -580,39 +580,39 @@
 
         <div class="outcome-board">
           <article class="outcome-primary">
-            <span>PRIMARY SUCCESS METRIC</span>
+            <span>核心成功指标</span>
             <strong>86.5%</strong>
-            <h3>L2 Recall</h3>
+            <h3>L2 召回率</h3>
             <p>22,886 / 26,448 个有效样本命中 Tier-3 GT</p>
             <div class="outcome-meter" aria-label="L2 Recall 86.5%"><i></i></div>
           </article>
           <div class="outcome-metrics">
-            <article><strong>80.5%</strong><span>Top-3 Hit</span><small>21,281 / 26,447 ranked cases</small></article>
-            <article><strong>85.4%</strong><span>Top-5 Hit</span><small>22,589 / 26,447 ranked cases</small></article>
-            <article><strong>1.66</strong><span>Avg Hit Rank</span><small>GT 命中时的平均位置</small></article>
-            <article><strong>97.87%</strong><span>Run Success</span><small>26,476 / 27,053 runs</small></article>
+            <article><strong>80.5%</strong><span>Top-3 命中率</span><small>21,281 / 26,447 个排序样本</small></article>
+            <article><strong>85.4%</strong><span>Top-5 命中率</span><small>22,589 / 26,447 个排序样本</small></article>
+            <article><strong>1.66</strong><span>平均命中位置</span><small>GT 命中时的平均排序</small></article>
+            <article><strong>97.87%</strong><span>运行成功率</span><small>26,476 / 27,053 次运行</small></article>
           </div>
         </div>
 
         <section class="ab-result" aria-label="辅助标注效果">
           <div class="ab-result-metrics">
             <article>
-              <header><span>NORTH STAR</span><b>−8.0 pp</b></header>
-              <h4>Average Handling Time</h4>
+              <header><span>核心效率指标</span><b>−8.0 pp</b></header>
+              <h4>平均处理时长</h4>
               <div class="ab-comparison">
-                <div><small>CONTROL</small><strong>31.11s</strong></div>
+                <div><small>对照组</small><strong>31.11s</strong></div>
                 <i data-lucide="arrow-right"></i>
-                <div><small>TREATMENT</small><strong>28.57s</strong></div>
+                <div><small>实验组</small><strong>28.57s</strong></div>
               </div>
               <p>Top-3 推荐缩短类目检索与相似项比较时间。</p>
             </article>
             <article>
-              <header><span>QUALITY GUARDRAIL</span><b>+1.90 pp</b></header>
-              <h4>Labeler Accuracy</h4>
+              <header><span>质量护栏</span><b>+1.90 pp</b></header>
+              <h4>标注准确率</h4>
               <div class="ab-comparison">
-                <div><small>CONTROL</small><strong>71.63%</strong></div>
+                <div><small>对照组</small><strong>71.63%</strong></div>
                 <i data-lucide="arrow-right"></i>
-                <div><small>TREATMENT</small><strong>73.53%</strong></div>
+                <div><small>实验组</small><strong>73.53%</strong></div>
               </div>
               <p>效率提升的同时，分层抽样准确率没有出现下降。</p>
             </article>
@@ -633,26 +633,26 @@
 
         <div class="outcome-notes">
           <article>
-            <span>DEPLOYMENT MODE</span>
-            <h3>Candidate-first Copilot</h3>
+            <span>部署模式</span>
+            <h3>候选优先的辅助标注</h3>
             <p>向标注员展示置信度排序后的候选，减少检索 Taxonomy 和判断相似类目的成本。</p>
           </article>
           <article>
-            <span>WHY L2</span>
-            <h3>Recall before automation</h3>
+            <span>为什么选择 L2</span>
+            <h3>先提高召回，再考虑自动化</h3>
             <p>L3 最终 Top-1 准确率为 52.9%，因此当前阶段应优先保证 GT 进入 L2 候选集，再由人工完成确认。</p>
           </article>
           <article>
-            <span>NEXT OPTIMIZATION</span>
-            <h3>Recover missed GT</h3>
+            <span>下一步优化</span>
+            <h3>持续修复 GT 漏召</h3>
             <p>继续围绕 L2 漏召类别补充 recovery、boundary 和 exclusion 规则，同时控制平均候选数量。</p>
           </article>
         </div>
 
         <div class="outcome-source">
-          <span>DATA SOURCE</span>
+          <span>数据来源</span>
           <code>batch_id = PT_Full_Training_0827</code>
-          <small>Dashboard dataset: PT_FullTraining_0827 · Top-K denominator includes ranked cases only</small>
+          <small>数据集：PT_FullTraining_0827 · Top-K 分母仅包含已排序样本</small>
         </div>
       </section>
     </main>
@@ -663,6 +663,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-18"></script>
+    <script src="./app.js?v=20260901-19"></script>
   </body>
 </html>

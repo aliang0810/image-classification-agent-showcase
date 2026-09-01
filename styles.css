@@ -6,8 +6,8 @@
   --line: rgba(242, 244, 242, 0.11);
   --line-strong: rgba(242, 244, 242, 0.24);
   --text: #f2f4f2;
-  --muted: #b4bbb7;
-  --dim: #7e8883;
+  --muted: #c4cac6;
+  --dim: #98a19c;
   --cyan: #68d5bd;
   --blue: #849fb8;
   --violet: #a28ea5;
@@ -199,7 +199,7 @@ button {
 .status {
   justify-self: end;
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -368,7 +368,7 @@ body.project-menu-open {
   align-self: start;
   color: var(--section-accent, var(--cyan));
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .project-drawer-nav button strong {
@@ -381,8 +381,8 @@ body.project-menu-open {
 .project-drawer-nav button small {
   grid-column: 2;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -482,23 +482,23 @@ body.project-menu-open {
   display: block;
   margin-bottom: 7px;
   color: var(--panel-accent);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
 .project-panel-identity h2 {
   margin: 0;
   font-family: var(--serif);
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 500;
   line-height: 1.08;
 }
 
 .project-panel-identity b {
   color: var(--panel-accent);
-  font-family: var(--serif);
-  font-size: 76px;
+  font-family: var(--mono);
+  font-size: 64px;
   font-weight: 500;
   line-height: 0.78;
   opacity: 0.18;
@@ -535,8 +535,8 @@ body.project-menu-open {
 .project-statement span,
 .project-result-group header span {
   color: var(--panel-accent, var(--cyan));
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
@@ -566,7 +566,7 @@ body.project-menu-open {
 .project-facts dt {
   margin-bottom: 6px;
   color: var(--dim);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .project-facts dd {
@@ -596,7 +596,7 @@ body.project-menu-open {
 .project-work-list > section > b {
   color: var(--panel-accent, var(--cyan));
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
 }
 
@@ -640,7 +640,7 @@ body.project-menu-open {
 
 .project-result-group header small {
   color: var(--dim);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .project-result-grid {
@@ -663,7 +663,7 @@ body.project-menu-open {
 .project-result-grid strong {
   display: block;
   color: var(--text);
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: 22px;
   font-weight: 500;
   line-height: 1.2;
@@ -674,7 +674,7 @@ body.project-menu-open {
   margin-top: 6px;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .project-result-note {
@@ -694,8 +694,8 @@ body.project-menu-open {
   padding: 14px 24px;
   border-top: 1px solid var(--drawer-line);
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -786,7 +786,7 @@ body.project-menu-open {
   padding: 0;
   border-bottom: 1px solid var(--line);
   color: #d5d9e3;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -827,7 +827,7 @@ body.project-menu-open {
 .micro,
 .eyebrow {
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -848,7 +848,7 @@ h1 {
   max-width: none;
   margin-bottom: 34px;
   font-family: var(--serif);
-  font-size: 68px;
+  font-size: 56px;
   font-weight: 500;
   line-height: 1.04;
   letter-spacing: 0;
@@ -904,8 +904,8 @@ h1 em {
 
 .hero-impact header small {
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
@@ -936,6 +936,13 @@ h1 em {
   color: var(--dim);
   font-size: 11px;
   line-height: 1.35;
+}
+
+.hero-results span small {
+  display: block;
+  margin-top: 5px;
+  color: var(--dim);
+  font-size: 10px;
 }
 
 .signal-panel {
@@ -1034,8 +1041,8 @@ footer {
   display: block;
   margin-top: 4px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -1082,7 +1089,7 @@ footer {
   right: 0;
   color: rgba(242, 244, 242, 0.055);
   font-family: var(--mono);
-  font-size: 88px;
+  font-size: 72px;
   font-weight: 500;
   line-height: 1;
   content: attr(data-section-index);
@@ -1100,7 +1107,7 @@ footer {
   grid-column: 2;
   margin: 0 0 18px;
   font-family: var(--serif);
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 500;
   line-height: 1.18;
   letter-spacing: 0;
@@ -1136,13 +1143,15 @@ footer {
 
 .agent-overview-layout .overview-grid {
   display: block;
+  padding: 12px 24px;
   border: 0;
   border-right: 1px solid var(--line);
   border-radius: 0;
 }
 
 .agent-overview-layout .overview-grid article {
-  min-height: 184px;
+  min-height: 160px;
+  padding-inline: 0;
   border-right: 0;
   border-bottom: 1px solid var(--line);
 }
@@ -1152,7 +1161,16 @@ footer {
 }
 
 .agent-overview-layout .overview-grid h3 {
-  margin-top: 24px;
+  margin-top: 18px;
+}
+
+.overview-grid h3 small,
+.agent-architecture h3 small {
+  display: block;
+  margin-top: 5px;
+  color: var(--dim);
+  font-size: 10px;
+  font-weight: 400;
 }
 
 .agent-architecture {
@@ -1185,14 +1203,14 @@ footer {
 .agent-architecture code {
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   white-space: nowrap;
 }
 
 .agent-route {
   display: grid;
   align-content: center;
-  gap: 12px;
+  gap: 0;
   padding: 30px 0;
 }
 
@@ -1201,10 +1219,14 @@ footer {
   grid-template-columns: 58px minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
-  min-height: 78px;
-  padding: 14px 18px;
-  border: 1px solid var(--line);
-  background: rgba(11, 13, 14, 0.72);
+  min-height: 82px;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.agent-route > article:last-of-type {
+  border-bottom: 0;
 }
 
 .agent-route > article > b {
@@ -1219,7 +1241,7 @@ footer {
   display: block;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.07em;
 }
 
@@ -1232,8 +1254,8 @@ footer {
 
 .agent-route small {
   color: var(--muted);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
 }
 
 .agent-route > svg {
@@ -1300,7 +1322,7 @@ footer {
 .overview-grid article > span,
 .method-grid article > span {
   color: var(--cyan);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
   letter-spacing: 0.04em;
 }
@@ -1322,7 +1344,7 @@ footer {
 
 .overview-grid strong {
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 400;
 }
@@ -1553,14 +1575,14 @@ footer svg {
   display: grid;
   gap: 4px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
 .overview-flow-stats b {
   color: var(--text);
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: 28px;
   font-weight: 500;
   line-height: 1;
@@ -1569,6 +1591,7 @@ footer svg {
 .overview-flow-track {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
   padding: 38px 0 32px;
   scrollbar-width: none;
 }
@@ -1581,29 +1604,24 @@ footer svg {
   --phase-color: var(--cyan);
   position: relative;
   min-height: 238px;
-  padding: 22px 22px 20px;
+  padding: 22px 0 20px;
   border-top: 1px solid color-mix(in srgb, var(--phase-color) 62%, transparent);
-  border-bottom: 1px solid var(--line);
-  border-left: 1px solid var(--line);
-  background: var(--surface-2);
-}
-
-.overview-phase:last-child {
-  border-right: 1px solid var(--line);
+  background: transparent;
 }
 
 .overview-phase:not(:last-child)::after {
   position: absolute;
   z-index: 2;
   top: 45px;
-  right: -9px;
-  width: 17px;
-  height: 17px;
-  border-top: 1px solid var(--phase-color);
-  border-right: 1px solid var(--phase-color);
-  background: var(--surface);
-  content: "";
-  transform: rotate(45deg);
+  right: -20px;
+  width: auto;
+  height: auto;
+  border: 0;
+  color: var(--phase-color);
+  background: transparent;
+  content: "→";
+  font-size: 14px;
+  transform: none;
 }
 
 .overview-phase header {
@@ -1611,8 +1629,8 @@ footer svg {
   justify-content: space-between;
   gap: 12px;
   color: var(--phase-color);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
@@ -1639,8 +1657,8 @@ footer svg {
   border: 0;
   color: var(--text);
   background: transparent;
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   cursor: pointer;
 }
 
@@ -1655,8 +1673,8 @@ footer svg {
   gap: 24px;
   align-items: center;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
 }
 
 .overview-lanes span {
@@ -1713,7 +1731,7 @@ footer svg {
 
 .lineage-controls > span {
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
 }
 
@@ -1821,7 +1839,7 @@ footer svg {
 .edge-label {
   fill: var(--muted);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.05em;
   paint-order: stroke;
   stroke: #141719;
@@ -1900,8 +1918,8 @@ footer svg {
   top: 13px;
   left: 16px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.1em;
 }
 
@@ -1931,8 +1949,8 @@ footer svg {
   display: block;
   margin-bottom: 4px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   text-transform: uppercase;
 }
 
@@ -2046,7 +2064,7 @@ footer svg {
 .stage-label {
   margin: 58px 0 8px;
   color: var(--cyan);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2119,8 +2137,8 @@ footer svg {
   display: block;
   margin-bottom: 8px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
@@ -2144,7 +2162,7 @@ footer svg {
   border-radius: 2px;
   color: var(--muted);
   background: rgba(255, 255, 255, 0.025);
-  font-size: 9px;
+  font-size: 10px;
   text-align: left;
   cursor: pointer;
 }
@@ -2163,7 +2181,7 @@ footer svg {
   display: block;
   padding: 8px 0;
   color: var(--dim);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.45;
 }
 
@@ -2245,8 +2263,8 @@ footer svg {
   display: block;
   margin: 34px 0 2px;
   color: var(--cyan);
-  font-family: var(--serif);
-  font-size: 76px;
+  font-family: var(--mono);
+  font-size: 64px;
   font-weight: 500;
   line-height: 1;
 }
@@ -2261,8 +2279,8 @@ footer svg {
   display: block;
   max-width: 160px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   line-height: 1.8;
 }
 
@@ -2389,7 +2407,7 @@ footer svg {
 .rca-steps small {
   display: block;
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
 }
 
@@ -2526,6 +2544,8 @@ footer svg {
 .prompt-stepper {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  padding: 5px 8px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -2534,18 +2554,13 @@ footer svg {
   display: grid;
   gap: 18px;
   min-width: 0;
-  min-height: 82px;
-  padding: 16px;
+  min-height: 72px;
+  padding: 14px 12px;
   border: 0;
-  border-right: 1px solid var(--line);
   color: var(--dim);
   background: transparent;
   text-align: left;
   cursor: pointer;
-}
-
-.prompt-tab:last-child {
-  border-right: 0;
 }
 
 .prompt-tab::after {
@@ -2599,7 +2614,7 @@ footer svg {
 .prompt-detail h3 {
   margin: 16px 0 8px;
   font-family: var(--serif);
-  font-size: 34px;
+  font-size: 29px;
   font-weight: 500;
   line-height: 1.15;
 }
@@ -2653,8 +2668,8 @@ footer svg {
 .prompt-detail-intent span,
 .rca-detail-section span {
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -2685,7 +2700,7 @@ footer svg {
 .prompt-contract b,
 .prompt-contract span {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
 }
 
@@ -2711,34 +2726,30 @@ footer svg {
 .rca-loop {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
   border-top: 1px solid var(--line-strong);
-  border-bottom: 1px solid var(--line-strong);
-  background: var(--surface);
+  background: transparent;
 }
 
 .rca-loop article {
   position: relative;
-  min-height: 222px;
-  padding: 28px 24px;
-  border-right: 1px solid var(--line);
-}
-
-.rca-loop article:last-child {
-  border-right: 0;
+  min-height: 206px;
+  padding: 28px 0;
 }
 
 .rca-loop article::after {
   position: absolute;
-  top: 47px;
-  right: -7px;
+  top: 43px;
+  right: -24px;
   z-index: 1;
-  width: 13px;
-  height: 13px;
-  border-top: 1px solid var(--cyan);
-  border-right: 1px solid var(--cyan);
-  background: var(--surface);
-  content: "";
-  transform: rotate(45deg);
+  width: auto;
+  height: auto;
+  border: 0;
+  color: var(--cyan);
+  background: transparent;
+  content: "→";
+  font-size: 15px;
+  transform: none;
 }
 
 .rca-loop article:last-child::after {
@@ -2747,8 +2758,8 @@ footer svg {
 
 .rca-loop article > span {
   color: var(--cyan);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.07em;
 }
 
@@ -2778,7 +2789,7 @@ footer svg {
   margin-top: 64px;
   border-top: 1px solid var(--line-strong);
   border-bottom: 1px solid var(--line-strong);
-  background: rgba(17, 20, 22, 0.72);
+  background: transparent;
 }
 
 .rca-trigger-panel > header {
@@ -2794,7 +2805,7 @@ footer svg {
 .rca-library-heading h3 {
   margin: 8px 0 0;
   font-family: var(--serif);
-  font-size: 27px;
+  font-size: 23px;
   font-weight: 500;
 }
 
@@ -2831,7 +2842,7 @@ footer svg {
 .rca-trigger-list span {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -2855,7 +2866,7 @@ footer svg {
   color: var(--cyan);
   background: var(--surface-2);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.55;
   text-align: right;
   overflow-wrap: anywhere;
@@ -2901,11 +2912,10 @@ footer svg {
 .rca-rule-index h3 {
   margin: 0;
   color: var(--text);
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .rca-rule-index section > p {
@@ -2956,7 +2966,7 @@ footer svg {
 .rca-rule-button small {
   margin-top: 3px;
   color: var(--dim);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .rca-rule-button:hover,
@@ -2985,23 +2995,23 @@ footer svg {
 
 .rca-detail-heading > b {
   color: var(--cyan);
-  font-family: var(--serif);
-  font-size: 76px;
+  font-family: var(--mono);
+  font-size: 62px;
   font-weight: 500;
   line-height: 0.8;
 }
 
 .rca-detail-heading span {
   color: var(--cyan);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   text-transform: uppercase;
 }
 
 .rca-detail h3 {
   margin: 8px 0 4px;
   font-family: var(--serif);
-  font-size: 31px;
+  font-size: 26px;
   font-weight: 500;
   line-height: 1.15;
 }
@@ -3048,7 +3058,7 @@ footer svg {
 .outcome-header h2 {
   margin: 0;
   font-family: var(--serif);
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 500;
   line-height: 1.14;
 }
@@ -3083,8 +3093,8 @@ footer svg {
 .outcome-notes article > span,
 .outcome-source > span {
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.07em;
 }
 
@@ -3092,8 +3102,8 @@ footer svg {
   display: block;
   margin-top: 52px;
   color: var(--cyan);
-  font-family: var(--serif);
-  font-size: 108px;
+  font-family: var(--mono);
+  font-size: 90px;
   font-weight: 500;
   line-height: 0.9;
 }
@@ -3150,8 +3160,8 @@ footer svg {
 }
 
 .outcome-metrics strong {
-  font-family: var(--serif);
-  font-size: 42px;
+  font-family: var(--mono);
+  font-size: 36px;
   font-weight: 500;
 }
 
@@ -3164,8 +3174,8 @@ footer svg {
 .outcome-metrics small {
   margin-top: 9px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   line-height: 1.5;
 }
 
@@ -3198,8 +3208,7 @@ footer svg {
 
 .ab-result-metrics article > header span,
 .ab-result-metrics article > header b {
-  font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -3209,6 +3218,7 @@ footer svg {
 
 .ab-result-metrics article > header b {
   color: var(--cyan);
+  font-family: var(--mono);
   font-weight: 500;
 }
 
@@ -3237,14 +3247,14 @@ footer svg {
 .ab-comparison small {
   margin-bottom: 7px;
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
   letter-spacing: 0.07em;
 }
 
 .ab-comparison strong {
-  font-family: var(--serif);
-  font-size: 46px;
+  font-family: var(--mono);
+  font-size: 39px;
   font-weight: 500;
   line-height: 1;
 }
@@ -3269,19 +3279,15 @@ footer svg {
 .ab-method {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  border-bottom: 1px solid var(--line-strong);
-  background: rgba(17, 20, 22, 0.64);
+  gap: 28px;
+  padding: 42px 0 34px;
+  background: transparent;
 }
 
 .ab-method article {
   min-width: 0;
-  min-height: 174px;
-  padding: 24px 18px;
-  border-right: 1px solid var(--line);
-}
-
-.ab-method article:last-child {
-  border-right: 0;
+  min-height: 0;
+  padding: 0;
 }
 
 .ab-method b,
@@ -3292,7 +3298,7 @@ footer svg {
 .ab-method b {
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
 }
 
@@ -3312,31 +3318,27 @@ footer svg {
 .ab-result-caveat {
   margin: 0;
   padding: 16px 0;
-  border-bottom: 1px solid var(--line);
   color: var(--dim);
-  font-family: var(--mono);
-  font-size: 9px;
+  font-family: var(--sans);
+  font-size: 10px;
   line-height: 1.6;
 }
 
 .outcome-notes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid var(--line-strong);
+  gap: 48px;
+  padding: 58px 0;
+  border-top: 1px solid var(--line-strong);
 }
 
 .outcome-notes article {
-  min-height: 220px;
-  padding: 34px 28px;
-  border-right: 1px solid var(--line);
-}
-
-.outcome-notes article:last-child {
-  border-right: 0;
+  min-height: 0;
+  padding: 0;
 }
 
 .outcome-notes h3 {
-  margin: 34px 0 12px;
+  margin: 18px 0 12px;
   font-size: 18px;
 }
 
@@ -3372,7 +3374,7 @@ footer {
   min-height: 120px;
   border-top: 1px solid var(--line);
   color: var(--dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
 }
 
@@ -3387,7 +3389,7 @@ footer a {
 @media (max-width: 900px) {
   .section-title::after {
     top: 16px;
-    font-size: 68px;
+    font-size: 58px;
   }
 
   .agent-overview-layout {
@@ -3421,7 +3423,7 @@ footer a {
   }
 
   h1 {
-    font-size: 62px;
+    font-size: 52px;
     white-space: normal;
   }
 
@@ -3538,7 +3540,7 @@ footer a {
 
   .prompt-framework-intro strong {
     margin: 0;
-    font-size: 56px;
+    font-size: 48px;
   }
 
   .prompt-framework-intro p {
@@ -3661,7 +3663,7 @@ footer a {
 
   .section-title::after {
     top: 18px;
-    font-size: 48px;
+    font-size: 42px;
   }
 
   .agent-overview-layout {
@@ -3775,7 +3777,7 @@ footer a {
 
   h1 {
     margin-bottom: 18px;
-    font-size: 46px;
+    font-size: 40px;
     white-space: normal;
   }
 
@@ -3861,7 +3863,7 @@ footer a {
   .prompt-framework-intro strong {
     grid-column: 2;
     grid-row: 1;
-    font-size: 46px;
+    font-size: 40px;
     text-align: right;
   }
 
@@ -3932,7 +3934,7 @@ footer a {
 
   .section-title h2,
   .summary h2 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .workflow-title,
@@ -4074,14 +4076,6 @@ footer a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .rca-loop article:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--line);
-  }
-
-  .rca-loop article:nth-child(2) {
-    border-right: 0;
-  }
-
   .rca-loop article:nth-child(2)::after {
     display: none;
   }
@@ -4151,35 +4145,25 @@ footer a {
 
   .ab-method {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 36px;
   }
 
   .ab-method article {
-    min-height: 144px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .ab-method article:nth-child(2n) {
-    border-right: 0;
+    min-height: 0;
   }
 
   .ab-method article:last-child {
     grid-column: 1 / -1;
     min-height: 0;
-    border-bottom: 0;
   }
 
   .outcome-notes {
     grid-template-columns: 1fr;
+    gap: 36px;
   }
 
   .outcome-notes article {
     min-height: 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .outcome-notes article:last-child {
-    border-bottom: 0;
   }
 
   .outcome-source {
@@ -4212,7 +4196,7 @@ footer a {
   }
 
   .prompt-detail h3 {
-    font-size: 29px;
+    font-size: 25px;
   }
 
   .prompt-detail-intent {
@@ -4224,13 +4208,14 @@ footer a {
 
   .rca-loop {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 
   .rca-loop article,
   .rca-loop article:nth-child(2) {
     min-height: 0;
     border-right: 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 0;
   }
 
   .rca-loop article:last-child {
@@ -4290,7 +4275,7 @@ footer a {
   }
 
   .rca-detail h3 {
-    font-size: 30px;
+    font-size: 25px;
   }
 
   .rca-detail-heading {
@@ -4321,7 +4306,7 @@ footer a {
   }
 
   .outcome-header h2 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .outcome-primary {
@@ -4330,7 +4315,7 @@ footer a {
   }
 
   .outcome-primary strong {
-    font-size: 72px;
+    font-size: 62px;
   }
 
   .outcome-metrics {
@@ -4369,11 +4354,12 @@ footer a {
   }
 
   .ab-comparison strong {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .ab-method {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .ab-method article,
@@ -4382,10 +4368,6 @@ footer a {
     grid-column: auto;
     min-height: 0;
     border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .ab-method article:last-child {
     border-bottom: 0;
   }
 }
