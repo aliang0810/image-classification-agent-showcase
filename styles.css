@@ -168,19 +168,20 @@ body.project-menu-open {
 }
 
 .project-drawer {
+  --drawer-line: rgba(239, 237, 230, 0.1);
   position: fixed;
   z-index: 40;
   inset: 0 auto 0 0;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  width: min(420px, calc(100vw - 24px));
-  border-right: 1px solid var(--line-strong);
+  width: min(390px, calc(100vw - 24px));
+  border-right: 1px solid var(--drawer-line);
   background:
-    linear-gradient(rgba(114, 184, 178, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(114, 184, 178, 0.025) 1px, transparent 1px),
+    linear-gradient(rgba(114, 184, 178, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(114, 184, 178, 0.018) 1px, transparent 1px),
     rgba(17, 19, 21, 0.985);
-  background-size: 42px 42px;
-  box-shadow: 28px 0 80px rgba(0, 0, 0, 0.48);
+  background-size: 48px 48px;
+  box-shadow: 24px 0 72px rgba(0, 0, 0, 0.42);
   transform: translateX(-102%);
   visibility: hidden;
   transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 300ms;
@@ -196,25 +197,25 @@ body.project-menu-open {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 98px;
-  padding: 22px 26px;
-  border-bottom: 1px solid var(--line);
+  min-height: 88px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--drawer-line);
 }
 
 .project-drawer-head strong {
   display: block;
-  margin-top: 5px;
-  font-size: 18px;
+  margin-top: 3px;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .project-drawer-close {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   padding: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--drawer-line);
   border-radius: 2px;
   color: var(--muted);
   background: rgba(255, 255, 255, 0.025);
@@ -227,15 +228,15 @@ body.project-menu-open {
 }
 
 .project-drawer-close svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .project-drawer-nav {
   display: grid;
   grid-auto-flow: row;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(4, minmax(116px, 1fr));
+  grid-template-rows: repeat(4, minmax(100px, 1fr));
   overflow-y: auto;
 }
 
@@ -243,16 +244,16 @@ body.project-menu-open {
   appearance: none;
   position: relative;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
-  gap: 2px 12px;
+  gap: 2px 10px;
   align-content: center;
   width: 100%;
-  min-height: 116px;
-  padding: 24px 26px;
+  min-height: 100px;
+  padding: 20px 24px;
   overflow: hidden;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--drawer-line);
   color: var(--text);
   background-color: #15181a;
   text-align: left;
@@ -272,7 +273,7 @@ body.project-menu-open {
 
 .project-drawer-nav button:hover,
 .project-drawer-nav button.active {
-  background: rgba(114, 184, 178, 0.07);
+  background: rgba(114, 184, 178, 0.05);
 }
 
 .project-drawer-nav button:hover::before,
@@ -285,13 +286,13 @@ body.project-menu-open {
   align-self: start;
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .project-drawer-nav button strong {
   align-self: end;
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: 19px;
   font-weight: 500;
 }
 
@@ -299,16 +300,16 @@ body.project-menu-open {
   grid-column: 2;
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: 8px;
+  letter-spacing: 0.06em;
 }
 
 .project-drawer-nav button > svg {
   grid-column: 3;
   grid-row: 1 / 3;
   align-self: center;
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   color: var(--dim);
   transition: color 180ms ease, transform 180ms ease;
 }
@@ -323,13 +324,13 @@ body.project-menu-open {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 54px;
-  padding: 18px 26px;
-  border-top: 1px solid var(--line);
+  min-height: 48px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--drawer-line);
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: 8px;
+  letter-spacing: 0.06em;
 }
 
 .hero {
@@ -2646,21 +2647,21 @@ footer a {
   }
 
   .project-drawer-head {
-    min-height: 82px;
-    padding: 18px 20px;
+    min-height: 76px;
+    padding: 16px 20px;
   }
 
   .project-drawer-nav {
-    grid-template-rows: repeat(4, minmax(104px, 1fr));
+    grid-template-rows: repeat(4, minmax(94px, 1fr));
   }
 
   .project-drawer-nav button {
-    min-height: 104px;
-    padding: 20px;
+    min-height: 94px;
+    padding: 18px 20px;
   }
 
   .project-drawer-nav button strong {
-    font-size: 21px;
+    font-size: 18px;
   }
 
   .project-drawer-foot {
