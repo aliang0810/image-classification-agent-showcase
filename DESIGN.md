@@ -44,7 +44,6 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 - Content width: maximum 1180px.
 - Major sections: AGENT, PROMPT, RCA, RESULT.
 - The first viewport prioritizes the contributor's role and the three outcome metrics: L2 Recall, AHT change, and Labeler Accuracy change.
-- Immediately after the hero, show the contributor's four core responsibilities as an unframed numbered list.
 - Engineering scale such as node counts and RCA category counts belongs in implementation sections, not the hero.
 - Every section starts with the same two-column heading pattern: technical eyebrow on the left, title and summary on the right.
 - Section headings use a top datum line and a low-contrast oversized index as the shared navigation coordinate.
