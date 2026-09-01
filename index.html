@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-6" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -484,6 +484,51 @@
           </div>
         </div>
 
+        <section class="ab-result" aria-labelledby="abResultTitle">
+          <header class="ab-result-header">
+            <div>
+              <span class="micro">ONLINE VALIDATION · RULE B</span>
+              <h3 id="abResultTitle">辅助标注 A/B Test</h3>
+            </div>
+            <p>实验组向标注员展示 AIA Top-3 推荐，对照组沿用基线标注流程；用 AHT 判断效率收益，以准确率确认质量不劣化。</p>
+          </header>
+
+          <div class="ab-result-metrics">
+            <article>
+              <header><span>NORTH STAR</span><b>−8.0 pp</b></header>
+              <h4>Average Handling Time</h4>
+              <div class="ab-comparison">
+                <div><small>CONTROL</small><strong>31.11s</strong></div>
+                <i data-lucide="arrow-right"></i>
+                <div><small>TREATMENT</small><strong>28.57s</strong></div>
+              </div>
+              <p>Top-3 推荐缩短类目检索与相似项比较时间。</p>
+            </article>
+            <article>
+              <header><span>QUALITY GUARDRAIL</span><b>+1.90 pp</b></header>
+              <h4>Labeler Accuracy</h4>
+              <div class="ab-comparison">
+                <div><small>CONTROL</small><strong>71.63%</strong></div>
+                <i data-lucide="arrow-right"></i>
+                <div><small>TREATMENT</small><strong>73.53%</strong></div>
+              </div>
+              <p>效率提升的同时，分层抽样准确率没有出现下降。</p>
+            </article>
+          </div>
+
+          <div class="ab-method">
+            <article><b>01</b><span>准入</span><p>通过 Top-1、Top-3 与 Rule B 阈值筛选实验任务。</p></article>
+            <article><b>02</b><span>分流</span><p>按 item_id 随机进入实验组或对照组。</p></article>
+            <article><b>03</b><span>执行</span><p>标注员按平衡顺序分 block 处理专用队列。</p></article>
+            <article><b>04</b><span>记录</span><p>采集 AHT、最终标签、推荐采用和 QA 结果。</p></article>
+            <article><b>05</b><span>判定</span><p>AHT 下降且质量护栏稳定，才支持扩大覆盖。</p></article>
+          </div>
+
+          <p class="ab-result-caveat">
+            注：Accuracy 来源于辅助标注分层抽样，样本结构不同于业务大盘，用于衡量 AIA 增益。
+          </p>
+        </section>
+
         <div class="outcome-notes">
           <article>
             <span>DEPLOYMENT MODE</span>
@@ -516,6 +561,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-5"></script>
+    <script src="./app.js?v=20260901-6"></script>
   </body>
 </html>

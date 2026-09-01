@@ -2640,6 +2640,177 @@ footer svg {
   line-height: 1.5;
 }
 
+.ab-result {
+  margin-top: 76px;
+}
+
+.ab-result-header {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: end;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ab-result-header h3 {
+  margin: 10px 0 0;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 500;
+}
+
+.ab-result-header p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.ab-result-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ab-result-metrics > article {
+  min-width: 0;
+  padding: 32px 34px 34px;
+}
+
+.ab-result-metrics > article + article {
+  border-left: 1px solid var(--line);
+}
+
+.ab-result-metrics article > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ab-result-metrics article > header span,
+.ab-result-metrics article > header b {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.ab-result-metrics article > header span {
+  color: var(--dim);
+}
+
+.ab-result-metrics article > header b {
+  color: var(--cyan);
+  font-weight: 500;
+}
+
+.ab-result-metrics h4 {
+  margin: 42px 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ab-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.ab-comparison div {
+  min-width: 0;
+}
+
+.ab-comparison small,
+.ab-comparison strong {
+  display: block;
+}
+
+.ab-comparison small {
+  margin-bottom: 7px;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.07em;
+}
+
+.ab-comparison strong {
+  font-family: var(--serif);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ab-comparison div:last-child strong {
+  color: var(--cyan);
+}
+
+.ab-comparison > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--dim);
+}
+
+.ab-result-metrics article > p {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.ab-method {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ab-method article {
+  min-width: 0;
+  min-height: 174px;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+}
+
+.ab-method article:last-child {
+  border-right: 0;
+}
+
+.ab-method b,
+.ab-method span {
+  display: block;
+}
+
+.ab-method b {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.ab-method span {
+  margin-top: 24px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ab-method p {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.ab-result-caveat {
+  margin: 0;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.6;
+}
+
 .outcome-notes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3272,6 +3443,30 @@ footer a {
     border-bottom: 1px solid var(--line);
   }
 
+  .ab-result-header {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .ab-method {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ab-method article {
+    min-height: 144px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ab-method article:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .ab-method article:last-child {
+    grid-column: 1 / -1;
+    min-height: 0;
+    border-bottom: 0;
+  }
+
   .outcome-notes {
     grid-template-columns: 1fr;
   }
@@ -3381,6 +3576,48 @@ footer a {
   }
 
   .outcome-metrics article:last-child {
+    border-bottom: 0;
+  }
+
+  .ab-result {
+    margin-top: 54px;
+  }
+
+  .ab-result-header h3 {
+    font-size: 29px;
+  }
+
+  .ab-result-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ab-result-metrics > article {
+    padding: 28px 20px;
+  }
+
+  .ab-result-metrics > article + article {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .ab-comparison strong {
+    font-size: 36px;
+  }
+
+  .ab-method {
+    grid-template-columns: 1fr;
+  }
+
+  .ab-method article,
+  .ab-method article:nth-child(2n),
+  .ab-method article:last-child {
+    grid-column: auto;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ab-method article:last-child {
     border-bottom: 0;
   }
 }
