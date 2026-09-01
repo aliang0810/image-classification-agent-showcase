@@ -3331,36 +3331,13 @@ footer svg {
 }
 
 .ab-result {
-  margin-top: 76px;
-}
-
-.ab-result-header {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1fr);
-  gap: 48px;
-  align-items: end;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--line-strong);
-}
-
-.ab-result-header h3 {
-  margin: 10px 0 0;
-  font-family: var(--serif);
-  font-size: 34px;
-  font-weight: 500;
-}
-
-.ab-result-header p {
-  max-width: 620px;
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.75;
+  margin-top: 56px;
 }
 
 .ab-result-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line-strong);
   border-bottom: 1px solid var(--line-strong);
   background: var(--surface);
 }
@@ -4292,11 +4269,6 @@ footer a {
     border-bottom: 1px solid var(--line);
   }
 
-  .ab-result-header {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
   .ab-method {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4501,10 +4473,6 @@ footer a {
 
   .ab-result {
     margin-top: 54px;
-  }
-
-  .ab-result-header h3 {
-    font-size: 29px;
   }
 
   .ab-result-metrics {
