@@ -1287,34 +1287,57 @@ function initAmbientCanvas() {
     if (heroFade <= 0.01) return;
 
     const compact = width < 720;
-    const centerX = width * (compact ? 0.72 : 0.77);
-    const centerY = height * (compact ? 0.34 : 0.38);
-    const radius = Math.min(width, height) * (compact ? 0.2 : 0.24);
-    const angle = time * 0.00022;
+    const centerX = width * (compact ? 0.73 : 0.79);
+    const centerY = height * (compact ? 0.34 : 0.39);
+    const radius = Math.min(width, height) * (compact ? 0.24 : 0.31);
+    const angle = time * 0.00018;
 
     ctx.save();
-    ctx.globalAlpha = heroFade;
+    ctx.globalAlpha = heroFade * 0.9;
     ctx.translate(centerX, centerY);
-    ctx.strokeStyle = "rgba(104, 213, 189, 0.12)";
-    ctx.lineWidth = 0.7;
-    [0.42, 0.68, 1].forEach((scale) => {
+
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.16)";
+    ctx.lineWidth = 0.8;
+    [0.48, 0.72, 1].forEach((scale, index) => {
       ctx.beginPath();
-      ctx.arc(0, 0, radius * scale, 0, Math.PI * 2);
+      ctx.setLineDash(index === 2 ? [3, 9] : []);
+      ctx.arc(0, 0, radius * scale, -Math.PI * 0.12, Math.PI * (1.18 + index * 0.18));
       ctx.stroke();
     });
+    ctx.setLineDash([]);
+
+    for (let tick = 0; tick < 48; tick += 1) {
+      const tickAngle = (Math.PI * 2 * tick) / 48 + angle * 0.22;
+      const major = tick % 6 === 0;
+      const inner = radius * (major ? 0.91 : 0.96);
+      const outer = radius * (major ? 1.04 : 1.01);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(tickAngle) * inner, Math.sin(tickAngle) * inner);
+      ctx.lineTo(Math.cos(tickAngle) * outer, Math.sin(tickAngle) * outer);
+      ctx.strokeStyle = major ? "rgba(104, 213, 189, 0.34)" : "rgba(180, 187, 183, 0.12)";
+      ctx.lineWidth = major ? 1 : 0.6;
+      ctx.stroke();
+    }
+
     ctx.beginPath();
-    ctx.moveTo(-radius, 0);
-    ctx.lineTo(radius, 0);
-    ctx.moveTo(0, -radius);
-    ctx.lineTo(0, radius);
+    ctx.moveTo(-radius * 0.82, 0);
+    ctx.lineTo(radius * 0.82, 0);
+    ctx.moveTo(0, -radius * 0.82);
+    ctx.lineTo(0, radius * 0.82);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.1)";
     ctx.stroke();
 
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(radius, 0);
-    ctx.strokeStyle = "rgba(104, 213, 189, 0.54)";
-    ctx.lineWidth = 1;
+    ctx.lineTo(radius * 0.94, 0);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.58)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.94, -0.14, 0.14);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.38)";
+    ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
   }
@@ -1351,100 +1374,125 @@ function initAmbientCanvas() {
     if (heroFade <= 0.01) return;
 
     const compact = width < 720;
-    const radius = Math.min(width, height) * (compact ? 0.31 : 0.38);
+    const radius = Math.min(width, height) * (compact ? 0.22 : 0.28);
     const centerX =
-      width * (compact ? 0.72 : 0.77) + (pointer.x - width / 2) * 0.028;
+      width * (compact ? 0.73 : 0.79) + (pointer.x - width / 2) * 0.022;
     const centerY =
-      height * (compact ? 0.34 : 0.38) + (pointer.y - height / 2) * 0.018;
-    const rotation = time * 0.00008;
+      height * (compact ? 0.34 : 0.39) + (pointer.y - height / 2) * 0.014;
+    const rotation = time * 0.00012;
+
+    function polygon(sides, polygonRadius, offset = 0) {
+      ctx.beginPath();
+      for (let side = 0; side <= sides; side += 1) {
+        const angle = offset + (Math.PI * 2 * side) / sides;
+        const x = Math.cos(angle) * polygonRadius;
+        const y = Math.sin(angle) * polygonRadius;
+        if (side === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+    }
 
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.globalAlpha = heroFade;
 
-    ctx.save();
-    ctx.rotate(rotation * 0.7);
-    for (let latitude = -3; latitude <= 3; latitude += 1) {
-      const latitudeAngle = (latitude / 7) * Math.PI;
-      const latitudeRadius = Math.cos(latitudeAngle) * radius * 0.52;
-      const latitudeY = Math.sin(latitudeAngle) * radius * 0.27;
-      ctx.beginPath();
-      ctx.ellipse(0, latitudeY, Math.abs(latitudeRadius), Math.abs(latitudeRadius) * 0.34, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = latitude === 0 ? "rgba(104, 213, 189, 0.34)" : "rgba(104, 213, 189, 0.12)";
-      ctx.lineWidth = latitude === 0 ? 1.1 : 0.65;
-      ctx.stroke();
-    }
-    for (let longitude = 0; longitude < 10; longitude += 1) {
-      const angle = (longitude / 10) * Math.PI;
+    // Three deliberate orbital planes replace the previous dense wire bundle.
+    const orbitPlanes = [
+      { angle: -0.42, scaleY: 0.34, size: 0.92, speed: 1 },
+      { angle: 0.48, scaleY: 0.28, size: 0.78, speed: -0.72 },
+      { angle: Math.PI / 2, scaleY: 0.24, size: 0.66, speed: 0.52 },
+    ];
+    orbitPlanes.forEach((orbit, index) => {
       ctx.save();
-      ctx.rotate(angle);
+      ctx.rotate(orbit.angle + rotation * orbit.speed);
+      ctx.scale(1, orbit.scaleY);
       ctx.beginPath();
-      ctx.ellipse(0, 0, radius * 0.52, radius * 0.18, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = longitude % 3 === 0 ? "rgba(104, 213, 189, 0.2)" : "rgba(180, 187, 183, 0.08)";
-      ctx.lineWidth = 0.65;
+      ctx.ellipse(0, 0, radius * orbit.size, radius * orbit.size, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = index === 0 ? "rgba(104, 213, 189, 0.58)" : "rgba(104, 213, 189, 0.28)";
+      ctx.lineWidth = index === 0 ? 1.6 : 0.9;
       ctx.stroke();
       ctx.restore();
+
+      const nodeAngle = rotation * (2.4 + index * 0.45) + index * 2.1;
+      const cosAngle = Math.cos(nodeAngle);
+      const sinAngle = Math.sin(nodeAngle);
+      const orbitX = cosAngle * radius * orbit.size;
+      const orbitY = sinAngle * radius * orbit.size * orbit.scaleY;
+      const cosRotation = Math.cos(orbit.angle);
+      const sinRotation = Math.sin(orbit.angle);
+      const x = orbitX * cosRotation - orbitY * sinRotation;
+      const y = orbitX * sinRotation + orbitY * cosRotation;
+
+      ctx.beginPath();
+      ctx.arc(x, y, index === 0 ? 4 : 2.8, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(104, 213, 189, 0.82)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(242, 244, 242, 0.38)";
+      ctx.strokeRect(x - 7, y - 7, 14, 14);
+    });
+
+    // Segmented rings create a precise instrument-like silhouette.
+    for (let ring = 0; ring < 4; ring += 1) {
+      const ringRadius = radius * (0.46 + ring * 0.13);
+      const segmentCount = 5 + ring;
+      for (let segment = 0; segment < segmentCount; segment += 1) {
+        const start =
+          rotation * (ring % 2 === 0 ? 0.8 : -0.62) +
+          (Math.PI * 2 * segment) / segmentCount;
+        const span = (Math.PI * 1.34) / segmentCount;
+        ctx.beginPath();
+        ctx.arc(0, 0, ringRadius, start, start + span);
+        ctx.strokeStyle =
+          ring === 1
+            ? "rgba(104, 213, 189, 0.5)"
+            : "rgba(180, 187, 183, 0.2)";
+        ctx.lineWidth = ring === 1 ? 1.5 : 0.8;
+        ctx.stroke();
+      }
+    }
+
+    // A counter-rotating hexagonal reactor gives the form a clear visual center.
+    ctx.save();
+    ctx.rotate(-rotation * 1.4 + Math.PI / 6);
+    polygon(6, radius * 0.34);
+    ctx.strokeStyle = "rgba(242, 244, 242, 0.5)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    polygon(6, radius * 0.24, Math.PI / 6);
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.72)";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    for (let spoke = 0; spoke < 6; spoke += 1) {
+      const angle = (Math.PI * 2 * spoke) / 6;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * radius * 0.11, Math.sin(angle) * radius * 0.11);
+      ctx.lineTo(Math.cos(angle) * radius * 0.34, Math.sin(angle) * radius * 0.34);
+      ctx.strokeStyle = "rgba(104, 213, 189, 0.34)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
     }
     ctx.restore();
 
-    ctx.rotate(rotation);
-    for (let ring = 0; ring < 16; ring += 1) {
-      const ringRadius = radius * (0.34 + ring * 0.047);
-      const phase = rotation * (ring % 2 === 0 ? 1.8 : -1.25) + ring * 0.53;
-      const span = Math.PI * (0.58 + (ring % 4) * 0.16);
+    const corePulse = 0.84 + Math.sin(time * 0.0022) * 0.08;
+    ctx.save();
+    ctx.scale(corePulse, corePulse);
+    polygon(6, radius * 0.13, Math.PI / 6);
+    ctx.fillStyle = "rgba(104, 213, 189, 0.1)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(242, 244, 242, 0.76)";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.038, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(104, 213, 189, 0.9)";
+    ctx.fill();
+    ctx.restore();
 
-      ctx.save();
-      ctx.rotate(phase);
-      ctx.scale(1, 0.48 + (ring % 3) * 0.07);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, ringRadius, ringRadius, 0, -span * 0.5, span * 0.5);
-      ctx.strokeStyle =
-        ring % 4 === 0
-          ? "rgba(104, 213, 189, 0.52)"
-          : ring % 4 === 1
-            ? "rgba(104, 213, 189, 0.24)"
-            : "rgba(180, 187, 183, 0.14)";
-      ctx.lineWidth = ring % 5 === 0 ? 1.7 : 0.8;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    for (let spoke = 0; spoke < 12; spoke += 1) {
-      const angle = (Math.PI * 2 * spoke) / 12 - rotation * 1.6;
-      const inner = radius * 0.32;
-      const outer = radius * (0.62 + (spoke % 3) * 0.09);
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner * 0.52);
-      ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer * 0.52);
-      ctx.strokeStyle = "rgba(114, 184, 178, 0.16)";
-      ctx.lineWidth = 0.75;
-      ctx.stroke();
-    }
-
-    for (let shard = 0; shard < 14; shard += 1) {
-      const angle = (Math.PI * 2 * shard) / 14 + rotation * (1.4 + (shard % 3) * 0.15);
-      const orbit = radius * (0.72 + (shard % 5) * 0.055);
-      const x = Math.cos(angle) * orbit;
-      const y = Math.sin(angle) * orbit * 0.52;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(angle);
-      ctx.fillStyle =
-        shard % 3 === 0
-          ? "rgba(104, 213, 189, 0.4)"
-          : shard % 3 === 1
-            ? "rgba(104, 213, 189, 0.24)"
-            : "rgba(180, 187, 183, 0.18)";
-      ctx.fillRect(-3, -0.5, 6 + (shard % 4) * 2, 1);
-      ctx.restore();
-    }
-
-    ctx.rotate(-rotation * 2.4);
-    ctx.strokeStyle = "rgba(239, 255, 253, 0.34)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-radius * 0.13, -radius * 0.13, radius * 0.26, radius * 0.26);
-    ctx.fillStyle = "rgba(114, 184, 178, 0.12)";
-    ctx.fillRect(-radius * 0.09, -radius * 0.09, radius * 0.18, radius * 0.18);
+    ctx.fillStyle = "rgba(180, 187, 183, 0.42)";
+    ctx.font = "8px DM Mono, monospace";
+    ctx.fillText("CORE / 03", radius * 0.4, -radius * 0.34);
+    ctx.fillText("SYNC 98.7", -radius * 0.82, radius * 0.58);
     ctx.restore();
   }
 

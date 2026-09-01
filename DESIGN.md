@@ -54,6 +54,7 @@ Major sections use 112px vertical spacing on desktop and 72px on mobile.
 - Add bounded radar rings, labelled topology nodes, moving data packets, and one compact signal scope to imply live system activity.
 - Edge telemetry may show terse system codes and counts; it stays decorative, non-interactive, and below content contrast.
 - Reserve the wireframe kinetic core for the first viewport and fade it as the page scrolls.
+- Build the core from three orbital planes, segmented instrument rings, radial calibration ticks, and a counter-rotating hexagonal reactor. Avoid dense random ellipses.
 - Keep the background monochromatic and low contrast behind long-form content.
 - Do not combine topographic waves, colorful particles, and decorative blocks in the same scene.
 
