@@ -1481,6 +1481,7 @@ function initProjectDrawer() {
   const backdrop = document.querySelector("#projectDrawerBackdrop");
   const closeButton = document.querySelector("#projectDrawerClose");
   const sectionButtons = [...document.querySelectorAll("[data-project-section]")];
+  const sectionPanels = [...document.querySelectorAll("[data-project-panel]")];
 
   function setOpen(open) {
     toggle.setAttribute("aria-expanded", String(open));
@@ -1505,16 +1506,23 @@ function initProjectDrawer() {
   closeButton.addEventListener("click", () => setOpen(false));
   backdrop.addEventListener("click", () => setOpen(false));
 
-  sectionButtons.forEach((button) => {
-    button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", () => {
-      sectionButtons.forEach((item) => {
-        const active = item === button;
-        item.classList.toggle("active", active);
-        item.setAttribute("aria-pressed", String(active));
-      });
+  function selectSection(section) {
+    sectionButtons.forEach((button) => {
+      const active = button.dataset.projectSection === section;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
     });
+    sectionPanels.forEach((panel) => {
+      const active = panel.dataset.projectPanel === section;
+      panel.classList.toggle("active", active);
+      panel.hidden = !active;
+    });
+  }
+
+  sectionButtons.forEach((button) => {
+    button.addEventListener("click", () => selectSection(button.dataset.projectSection));
   });
+  selectSection("background");
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {

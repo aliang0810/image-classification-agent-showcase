@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-4" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-5" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -56,32 +56,99 @@
           <i data-lucide="x"></i>
         </button>
       </header>
-      <nav class="project-drawer-nav" aria-label="项目内容板块">
-        <button type="button" data-project-section="background">
-          <span>01</span>
-          <strong>项目背景</strong>
-          <small>PROJECT CONTEXT</small>
-          <i data-lucide="arrow-up-right"></i>
-        </button>
-        <button type="button" data-project-section="goal">
-          <span>02</span>
-          <strong>项目目标</strong>
-          <small>PROJECT OBJECTIVE</small>
-          <i data-lucide="arrow-up-right"></i>
-        </button>
-        <button type="button" data-project-section="work">
-          <span>03</span>
-          <strong>主要工作</strong>
-          <small>CORE WORK</small>
-          <i data-lucide="arrow-up-right"></i>
-        </button>
-        <button type="button" data-project-section="result">
-          <span>04</span>
-          <strong>最终成果</strong>
-          <small>FINAL OUTCOME</small>
-          <i data-lucide="arrow-up-right"></i>
-        </button>
-      </nav>
+      <div class="project-drawer-body">
+        <nav class="project-drawer-nav" aria-label="项目内容板块">
+          <button class="active" type="button" data-project-section="background" aria-controls="projectPanelBackground">
+            <span>01</span>
+            <strong>项目背景</strong>
+            <small>PROJECT CONTEXT</small>
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <button type="button" data-project-section="goal" aria-controls="projectPanelGoal">
+            <span>02</span>
+            <strong>项目目标</strong>
+            <small>PROJECT OBJECTIVE</small>
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <button type="button" data-project-section="work" aria-controls="projectPanelWork">
+            <span>03</span>
+            <strong>主要工作</strong>
+            <small>CORE WORK</small>
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <button type="button" data-project-section="result" aria-controls="projectPanelResult">
+            <span>04</span>
+            <strong>最终成果</strong>
+            <small>FINAL OUTCOME</small>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </nav>
+
+        <div class="project-drawer-content" aria-live="polite">
+          <article class="project-panel active" id="projectPanelBackground" data-project-panel="background">
+            <span class="project-panel-code">01 / CONTEXT</span>
+            <h2>从人工检索，走向候选驱动的分类决策。</h2>
+            <p class="project-panel-lead">
+              Photo Taxonomy 5.0 类目层级深、相似边界多。标注员需要反复检索规则并比较近似类目，判断成本高，结果也容易受到经验差异影响。
+            </p>
+            <div class="project-statement">
+              <span>核心判断</span>
+              <p>模型暂不适合直接替代人工，但可以先缩小候选范围，把复杂的开放式检索转化为更高效的有限选择。</p>
+            </div>
+            <dl class="project-facts">
+              <div><dt>分类结构</dt><dd>L1 → L2 → L3</dd></div>
+              <div><dt>推荐方式</dt><dd>Top-3 Candidate</dd></div>
+              <div><dt>决策角色</dt><dd>Human in the loop</dd></div>
+            </dl>
+          </article>
+
+          <article class="project-panel" id="projectPanelGoal" data-project-panel="goal" hidden>
+            <span class="project-panel-code">02 / OBJECTIVE</span>
+            <h2>先保证正确答案进入候选，再提升标注效率。</h2>
+            <p class="project-panel-lead">
+              项目不以无人审核的全自动分类为当前目标，而是构建稳定的辅助标注 Copilot，在质量不劣化的前提下缩短单条任务的判断路径。
+            </p>
+            <div class="project-objectives">
+              <section><b>01</b><strong>Recall First</strong><p>以 L2 Recall 为首要模型指标，优先降低正确类目的漏召风险。</p></section>
+              <section><b>02</b><strong>Human Control</strong><p>输出经过排序的 Top-3 候选，由标注员保留最终决策权。</p></section>
+              <section><b>03</b><strong>Closed Loop</strong><p>将错误自动归因并转化为 Prompt 与边界规则的下一轮迭代输入。</p></section>
+            </div>
+          </article>
+
+          <article class="project-panel" id="projectPanelWork" data-project-panel="work" hidden>
+            <span class="project-panel-code">03 / CORE WORK</span>
+            <h2>从数据、Agent 到实验验证的完整建设链路。</h2>
+            <div class="project-work-list">
+              <section><b>01</b><div><strong>数据与类目治理</strong><p>清洗训练数据，确定高优类目，并建立固定集与滚动集的双周评估机制。</p></div></section>
+              <section><b>02</b><div><strong>分层 Agent 架构</strong><p>搭建 L1 召回、L2 候选生成和 L3 冲突仲裁，并补齐异常、重试与上报链路。</p></div></section>
+              <section><b>03</b><div><strong>Prompt 与自动 RCA</strong><p>建立七层 Prompt 规则框架和九类 RCA 体系，让 Bad Case 持续回流为修正规则。</p></div></section>
+              <section><b>04</b><div><strong>离线评测与 A/B Test</strong><p>以 Recall 验证候选质量，再以 AHT 为核心指标、质量指标为护栏验证辅助标注收益。</p></div></section>
+            </div>
+          </article>
+
+          <article class="project-panel" id="projectPanelResult" data-project-panel="result" hidden>
+            <span class="project-panel-code">04 / OUTCOME</span>
+            <h2>模型候选能力与人机协同收益均得到验证。</h2>
+            <div class="project-result-group">
+              <header><span>OFFLINE EVALUATION</span><small>Candidate quality</small></header>
+              <div class="project-result-grid">
+                <div><strong>86.5%</strong><span>L2 Recall</span></div>
+                <div><strong>80.5%</strong><span>Top-3 Hit</span></div>
+                <div><strong>97.87%</strong><span>Run Success</span></div>
+              </div>
+            </div>
+            <div class="project-result-group">
+              <header><span>ASSISTED LABELING</span><small>Business impact</small></header>
+              <div class="project-result-grid">
+                <div><strong>−8.0 pp</strong><span>AHT</span></div>
+                <div><strong>+1.90 pp</strong><span>Accuracy</span></div>
+                <div><strong>82.47%</strong><span>Top-3 Adoption</span></div>
+              </div>
+            </div>
+            <p class="project-result-note">当前最适合 Candidate-first Copilot：模型负责高召回推荐，标注员负责最终判断。</p>
+          </article>
+        </div>
+      </div>
       <footer class="project-drawer-foot">
         <span>IMAGE CLASSIFICATION AGENT</span>
         <span>2026</span>
@@ -449,6 +516,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-4"></script>
+    <script src="./app.js?v=20260901-5"></script>
   </body>
 </html>
