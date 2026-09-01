@@ -988,6 +988,7 @@ function initContentExplorers() {
   });
 
   const rcaButtons = [...document.querySelectorAll(".rca-rule-button")];
+  const rcaDetail = document.querySelector(".rca-detail");
   rcaButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const rule = rcaRules[Number(button.dataset.rcaIndex)];
@@ -1002,7 +1003,11 @@ function initContentExplorers() {
       document.querySelector("#rcaDetailZh").textContent = rule.zh;
       document.querySelector("#rcaDetailRule").textContent = rule.rule;
       document.querySelector("#rcaDetailAction").textContent = rule.action;
+      rcaDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
+  });
+  rcaButtons.forEach((button, index) => {
+    button.setAttribute("aria-pressed", String(index === 0));
   });
 }
 
