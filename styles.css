@@ -416,16 +416,32 @@ footer {
 
 .section-title {
   display: grid;
-  grid-template-columns: 170px minmax(0, 720px);
+  grid-template-columns: 188px minmax(0, 820px);
   column-gap: 54px;
   max-width: none;
   margin-bottom: 54px;
 }
 
 .section-title > .micro {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  align-content: start;
   grid-column: 1;
   grid-row: 1 / span 2;
   padding-top: 18px;
+  line-height: 1.6;
+}
+
+.section-title > .micro b {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.section-title > .micro span {
+  padding-left: 12px;
+  border-left: 1px solid rgba(114, 184, 178, 0.36);
 }
 
 .section-title h2,
@@ -433,14 +449,33 @@ footer {
   grid-column: 2;
   margin: 0 0 18px;
   font-family: var(--serif);
-  font-size: clamp(34px, 4.2vw, 52px);
+  font-size: clamp(38px, 4.4vw, 60px);
   font-weight: 500;
-  line-height: 1.18;
+  line-height: 1.12;
   letter-spacing: 0;
+}
+
+.section-title h2 em {
+  position: relative;
+  color: var(--cyan);
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.section-title h2 em::after {
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  width: 42%;
+  height: 1px;
+  background: var(--cyan);
+  content: "";
+  opacity: 0.58;
 }
 
 .section-title p {
   grid-column: 2;
+  max-width: 760px;
   color: var(--muted);
   font-size: 15px;
   line-height: 1.8;
@@ -1748,6 +1783,10 @@ footer a {
   .section-title > .micro {
     grid-row: auto;
     padding-top: 0;
+  }
+
+  .section-title h2 {
+    font-size: clamp(38px, 7vw, 54px);
   }
 
   .workflow-title {
