@@ -1,0 +1,963 @@
+const STAGES = {
+  entry: { label: "入口", color: "#63d6af", icon: "play" },
+  input: { label: "输入准备", color: "#42d4e8", icon: "braces" },
+  decision: { label: "条件判断", color: "#e6b763", icon: "split" },
+  context: { label: "规则上下文", color: "#8eb0ff", icon: "database" },
+  prompt: { label: "Prompt 组装", color: "#a569e8", icon: "file-text" },
+  inference: { label: "模型推理", color: "#ff8ca1", icon: "sparkles" },
+  result: { label: "结果整合", color: "#70d9c0", icon: "git-merge" },
+  report: { label: "上报收尾", color: "#96a5bd", icon: "activity" },
+};
+
+const n = (id, name, stage, x, y, description, input, output, note = "") => ({
+  id, name, stage, x, y, description, input, output, note,
+});
+
+const workflows = {
+  main: {
+    title: "T5_Photo_Copilot_Offline · 总控链路",
+    subtitle: "编排三级分类、统一错误处理、辅助标注实验、RCA 与运行上报。",
+    nodes: [
+      n("main-start", "开始节点", "entry", 30, 300, "接收图片分类任务及全局运行参数。", "item_info / batch_id / Prompt 配置", "启动信号"),
+      n("main-init", "init", "input", 240, 300, "解析 item_info，提取 item_id、图片列表、标题并记录入口时间。", "item_info / batch_id", "item_id / imageUrlList / entry_start_time"),
+      n("main-item-check", "CheckItemId", "decision", 450, 300, "item_id 非空时继续，否则生成输入错误。", "item_id", "继续 / 缺失分支"),
+      n("main-item-error", "ItemIdMissingError", "result", 660, 540, "生成缺少 item_id 的标准错误。", "缺失分支", "1001 / INPUT_NO_ITEM_ID"),
+      n("main-image-check", "CheckImageUrlList", "decision", 660, 300, "图片列表有效时继续，否则生成空图片错误。", "has_image_url_list", "继续 / 缺失分支"),
+      n("main-image-error", "ImageUrlListMissingError", "result", 870, 560, "生成图片列表为空的标准错误。", "缺失分支", "1002 / INPUT_EMPTY_IMAGE_URL_LIST"),
+      n("main-config", "T5_Agent_Config", "context", 870, 300, "按 agent_key 和版本读取整条链路使用的 Prompt 配置。", "agent_key / agent_version", "configRawData / agent_config_error"),
+      n("main-config-check", "checkAgentError", "decision", 1080, 300, "配置读取无错误时进入解析，否则提前结束。", "agent_config_error", "继续 / 结束"),
+      n("main-config-extract", "extractConfigData", "context", 1290, 300, "提取 L1、L3 System、L3 Rules 的 Prompt key 与版本。", "configRawData", "configData / Prompt 引用"),
+      n("main-l1", "PT_DEV_L1", "inference", 1500, 300, "调用 L1 V7，生成一级类目候选和 L1 诊断字段。", "图片 / L1 Prompt / GT", "L1Answer / L1_error"),
+      n("main-l1-check", "CheckLayer1Result", "decision", 1710, 300, "L1 无错误时继续 L2，否则进入统一错误聚合。", "L1_err_reason", "L2 / 错误"),
+      n("main-l2", "PT_DEV_L2", "inference", 1920, 300, "调用 L2 V7，按一级类目循环召回并排序叶子候选。", "L1Answer / configData / 图片", "L2Answerlist / recommendation"),
+      n("main-l2-check", "CheckLayer2Result", "decision", 2130, 300, "L2 无错误时继续 L3，否则进入统一错误聚合。", "L2_error", "L3 / 错误"),
+      n("main-l3", "PT_DEV_L3", "inference", 2340, 300, "调用 L3 V4，在多个叶子候选之间裁决最终 Top-1。", "L2Answerlist / L3 Prompt", "top1 / candidateList / L3_error"),
+      n("main-error", "ErrorCodeAggregate", "result", 2760, 480, "聚合输入和三层错误，并补充空答案兜底错误 3099。", "各层 error / answer", "error_code / err_reason / detail"),
+      n("main-assist", "AssignIsAssistedLabeling", "result", 2970, 480, "对白名单叶子类目做 50/50 辅助标注实验分组。", "agent_recommendation", "isAssistedlabeling"),
+      n("main-metric", "BuildMetricPayload", "report", 3180, 560, "组装整条链路的错误、延迟、排队时长和实验组指标。", "错误 / 时间 / 实验组", "MetricReportData"),
+      n("main-report-metric", "ReportMetric", "report", 3390, 560, "将总链路运行指标发送到监控服务。", "MetricReportData", "上报状态"),
+      n("main-rca-prompt", "RCAPrompt", "prompt", 2550, 80, "定位 L1/L2/L3 失败层；正确样本、系统错误或缺图时跳过模型 RCA。", "三层结果 / Prompt / GT / 图片", "skip_rca / RCA Prompt / rca_layer"),
+      n("main-rca-check", "checkRCASKip", "decision", 2760, 80, "仅当 skip_rca=false 时进入模型根因分析。", "skip_rca", "RCA / 跳过"),
+      n("main-rca-model", "rca_model", "context", 2970, 80, "准备 RCA 模型参数，当前固定使用 gemini_3f。", "item_id / model_name / operator", "模型配置"),
+      n("main-rca-call", "AIA_ModelCall", "inference", 3180, 80, "结合图片、分类证据和 Prompt 规则生成标准 RCA JSON。", "RCA System / User Prompt", "rca_answer / raw response"),
+      n("main-rca-post", "RCAPostProcess", "result", 3390, 80, "清洗 RCA JSON、补充 rca_layer 并组装 Trace payload。", "RCA 响应 / 样本上下文", "RCAResutData"),
+      n("main-trace", "ReportTrace", "report", 3600, 80, "将 RCA 结论和证据写入 AIA Trace。", "RCAResutData", "上报状态"),
+      n("main-end", "结束节点", "entry", 3810, 300, "返回分类、候选、实验组、Trace 和统一错误字段。", "主结果与旁路状态", "top1 / recommendation / error"),
+    ],
+    edges: [
+      ["main-start", "main-init"], ["main-init", "main-item-check"],
+      ["main-item-check", "main-image-check"], ["main-item-check", "main-item-error"],
+      ["main-image-check", "main-config"], ["main-image-check", "main-image-error"],
+      ["main-item-error", "main-error"], ["main-image-error", "main-error"],
+      ["main-config", "main-config-check"], ["main-config-check", "main-config-extract"],
+      ["main-config-check", "main-end"], ["main-config-extract", "main-l1"],
+      ["main-l1", "main-l1-check"], ["main-l1-check", "main-l2"],
+      ["main-l1-check", "main-error"], ["main-l2", "main-l2-check"],
+      ["main-l2-check", "main-l3"], ["main-l2-check", "main-error"],
+      ["main-l3", "main-error"], ["main-l3", "main-rca-prompt"],
+      ["main-error", "main-assist"], ["main-assist", "main-end"],
+      ["main-assist", "main-metric"], ["main-metric", "main-report-metric"],
+      ["main-report-metric", "main-end"], ["main-rca-prompt", "main-rca-check"],
+      ["main-rca-check", "main-end"], ["main-rca-check", "main-rca-model"],
+      ["main-rca-model", "main-rca-call"], ["main-rca-call", "main-rca-post"],
+      ["main-rca-post", "main-end"], ["main-rca-post", "main-trace"],
+      ["main-trace", "main-end"],
+    ],
+  },
+  l1: {
+    title: "PT_Layer1 · 一级召回链路",
+    subtitle: "从图片信号中召回一级类目，优先保证正确子树不被漏掉。",
+    nodes: [
+      n("l1-start", "开始节点", "entry", 30, 270, "接收一次新的一级分类任务。", "运行请求", "启动信号"),
+      n("l1-init", "init", "entry", 240, 270, "记录工作流开始时间与入口时间。", "初始上下文", "start_time / entry_start_time"),
+      n("l1-input", "prepInputs", "input", 450, 270, "标准化 item_id 与图片 URL 列表。", "item_id / imageUrlList", "标准输入"),
+      n("l1-item", "checkItemId", "decision", 660, 270, "校验 item_id 是否存在。", "item_id", "继续 / 异常"),
+      n("l1-image", "checkImageUrlList", "decision", 870, 270, "校验图片列表是否为空。", "imageUrlList", "继续 / 异常"),
+      n("l1-model", "modelConfig", "context", 1080, 130, "选择模型及推理参数，默认使用 gemini_3f。", "item_id / model_name / operator", "模型配置"),
+      n("l1-aia", "AiaPrompt", "context", 1080, 410, "按 Prompt Key 与版本读取 L1 System Prompt。", "L1 Prompt 引用", "L1_system_prompt"),
+      n("l1-prompt-check", "checkL1System", "decision", 1290, 410, "检查 Prompt 是否成功加载。", "L1_system_prompt", "继续 / 异常"),
+      n("l1-compose", "prepTier1Prompt", "prompt", 1500, 210, "将图片和标题组装为多模态用户消息。", "图片 / 标题 / 模型名", "L1_user_message"),
+      n("l1-call", "AIA_ModelCall", "inference", 1710, 210, "执行第一轮一级分类推理。", "System + User Prompt", "首轮模型响应"),
+      n("l1-probe", "probeL1Parse", "decision", 1920, 210, "按正式解析规则检查首轮结果是否可用。", "首轮 answer / raw response", "usable / parse_error"),
+      n("l1-retry-check", "checkL1RawResp", "decision", 2130, 210, "结果可解析则通过，否则进入补偿调用。", "L1_r1_usable", "首轮 / 重试"),
+      n("l1-retry", "AIA_ModelCall_retry", "inference", 2130, 420, "首轮为空或不可解析时，再调用一次模型。", "相同 Prompt 与配置", "第二轮响应"),
+      n("l1-merge", "mergeL1LLM", "result", 2340, 270, "优先采用可用首轮结果，否则使用重试结果。", "两轮结果", "统一 L1 模型结果"),
+      n("l1-final-check", "checkL1FinalRaw", "decision", 2550, 270, "确认最终模型响应非空。", "L1_raw_resp", "继续 / 异常"),
+      n("l1-result-check", "checkLayer1Result", "decision", 2760, 270, "检查 L1_error，成功时进入标准类目映射。", "L1_error", "映射 / 异常"),
+      n("l1-taxonomy", "TAXONOMY_DATA", "context", 2970, 100, "提供 Tier-3 到 Tier-1 的标准映射表。", "静态 taxonomy", "TAXONOMY_DATA"),
+      n("l1-extract", "extractLayer1Exact", "result", 3180, 190, "解析 JSON 数组，并从 GT 反查标准 L1 类目。", "模型答案 / taxonomy / GT", "L1Answer / L1_gt"),
+      n("l1-preout", "preOutput", "result", 3390, 300, "统一整理结果、错误、Prompt 与 Trace payload。", "分类结果与运行上下文", "L1 输出 / reportData"),
+      n("l1-error", "ErrorCodeNormalize", "result", 3600, 300, "将缺图、解析和模型异常归一为标准错误码。", "L1 错误与答案", "error_code / err_reason"),
+      n("l1-metric", "BuildMetricPayload", "report", 3810, 420, "计算耗时、排队时间并构造指标数据。", "错误码 / 时间", "MetricReportData"),
+      n("l1-report-metric", "ReportMetric", "report", 4020, 420, "将运行指标发送到监控系统。", "MetricReportData", "上报状态"),
+      n("l1-trace", "ReportTrace", "report", 3600, 120, "记录 L1 Prompt、模型结果和执行上下文。", "reportData", "Trace 状态"),
+      n("l1-end", "结束节点", "entry", 4230, 270, "返回一级候选、错误信息和 Trace 字段。", "结果与上报状态", "L1Answer / L1_gt / error"),
+    ],
+    edges: [
+      ["l1-start", "l1-init"], ["l1-init", "l1-input"], ["l1-input", "l1-item"],
+      ["l1-item", "l1-image"], ["l1-item", "l1-preout"], ["l1-image", "l1-model"],
+      ["l1-image", "l1-aia"], ["l1-image", "l1-preout"], ["l1-model", "l1-compose"],
+      ["l1-aia", "l1-prompt-check"], ["l1-prompt-check", "l1-compose"], ["l1-prompt-check", "l1-preout"],
+      ["l1-compose", "l1-call"], ["l1-call", "l1-probe"], ["l1-probe", "l1-retry-check"],
+      ["l1-retry-check", "l1-merge"], ["l1-retry-check", "l1-retry"], ["l1-retry", "l1-merge"],
+      ["l1-merge", "l1-final-check"], ["l1-final-check", "l1-result-check"], ["l1-final-check", "l1-preout"],
+      ["l1-result-check", "l1-taxonomy"], ["l1-taxonomy", "l1-extract"], ["l1-extract", "l1-preout"],
+      ["l1-result-check", "l1-preout"], ["l1-preout", "l1-error"], ["l1-preout", "l1-trace"],
+      ["l1-error", "l1-metric"], ["l1-metric", "l1-report-metric"], ["l1-trace", "l1-end"],
+      ["l1-report-metric", "l1-end"],
+    ],
+  },
+  l2: {
+    title: "PT_Layer2 · 二级细分类链路",
+    subtitle: "按 L1 路由循环加载专属 Prompt，在受限子树中召回叶子候选。",
+    nodes: [
+      n("l2-start", "开始节点", "entry", 30, 270, "接收 L1 结果、图片和 Prompt 配置。", "L1Answer / configData", "启动信号"),
+      n("l2-init", "init", "entry", 240, 390, "记录 L2 的开始时间。", "运行上下文", "entry_start_time"),
+      n("l2-image", "checkImageUrlList", "decision", 450, 270, "图片存在才进入模型主链。", "imageUrlList", "继续 / 跳过"),
+      n("l2-model", "modelConfig", "context", 660, 120, "准备模型 endpoint、名称和推理参数。", "item_id / model_name", "模型配置"),
+      n("l2-map", "L2_PromptConfig", "prompt", 660, 390, "将每个 L1 类目映射到对应 L2 Prompt key 和版本。", "L1Answer / configData", "L2PromptList"),
+      n("l2-route", "checkLayer1Result", "decision", 870, 270, "Prompt 数量大于 0 才进入循环细分。", "L2PromptLength", "循环 / 直接输出"),
+      n("l2-loop", "循环节点", "inference", 1080, 270, "逐个处理 L1 类目对应的 L2 Prompt。", "L2PromptList", "L2_output_list"),
+      n("l2-extract", "extractL2Prompt", "prompt", 1290, 120, "提取当前循环项的 key、version、env 和类目名。", "当前 Prompt 项", "Prompt 引用"),
+      n("l2-aia", "AiaPrompt", "context", 1500, 120, "获取当前 L1 子树对应的 L2 System Prompt。", "Prompt 引用", "L2_system_prompt"),
+      n("l2-prompt-check", "checkPromptResult", "decision", 1710, 120, "Prompt 非空才进入模型调用。", "L2_system_prompt", "调用 / 错误"),
+      n("l2-input", "layer2_input", "input", 1920, 120, "将图片和标题构造成多模态输入。", "图片 / 标题", "L2_user_prompt"),
+      n("l2-call", "AIA_ModelCall", "inference", 2130, 120, "生成当前子树的叶子候选。", "L2 Prompt / 模型配置", "首轮候选"),
+      n("l2-probe", "probeL2Parse", "decision", 2340, 120, "验证首轮结果是否满足最终解析契约。", "answer / raw response", "usable / parse_error"),
+      n("l2-retry-check", "checkL2RawResp", "decision", 2550, 120, "首轮不可用时进入补偿调用。", "L2_r1_usable", "首轮 / 重试"),
+      n("l2-retry", "AIA_ModelCall_retry", "inference", 2550, 350, "重新执行当前子树的模型推理。", "相同 Prompt 与配置", "第二轮候选"),
+      n("l2-merge", "mergeL2LLM", "result", 2760, 230, "选择首个可解析结果并统一错误信息。", "两轮结果", "最终单路结果"),
+      n("l2-output", "layer2_output", "result", 2970, 230, "封装单个 L1 子树的候选、Prompt、usage 和错误。", "单路模型结果", "L2_output"),
+      n("l2-taxonomy", "TaxonomyData", "context", 1080, 520, "提供叶子类目元数据，供聚合与推荐使用。", "静态 taxonomy", "taxonomyData"),
+      n("l2-final", "FinalOutput", "result", 3210, 270, "聚合循环结果、按置信度排序并生成 Top-3 推荐。", "循环结果 / taxonomy", "候选与推荐"),
+      n("l2-error", "ErrorCodeNormalize", "result", 3420, 270, "统一模型、Prompt 和候选错误码。", "L2_error / L2Answerlist", "error_code / err_reason"),
+      n("l2-metric", "BuildMetricPayload", "report", 3630, 410, "构造 L2 运行指标。", "错误码 / 时间", "MetricReportData"),
+      n("l2-report-metric", "ReportMetric", "report", 3840, 410, "上报 L2 运行指标。", "MetricReportData", "上报状态"),
+      n("l2-trace", "ReportTrace", "report", 3420, 100, "记录各子树的 Prompt、响应和聚合结果。", "reportData", "Trace 状态"),
+      n("l2-end", "结束节点", "entry", 4050, 270, "返回候选列表、排序结果和辅助标注推荐。", "结果与上报状态", "L2Answerlist / recommendation"),
+    ],
+    edges: [
+      ["l2-start", "l2-init"], ["l2-start", "l2-taxonomy"], ["l2-init", "l2-image"],
+      ["l2-image", "l2-model"], ["l2-image", "l2-final"], ["l2-model", "l2-map"],
+      ["l2-map", "l2-route"], ["l2-route", "l2-loop"], ["l2-route", "l2-final"],
+      ["l2-loop", "l2-extract"], ["l2-extract", "l2-aia"], ["l2-aia", "l2-prompt-check"],
+      ["l2-prompt-check", "l2-input"], ["l2-prompt-check", "l2-output"], ["l2-input", "l2-call"],
+      ["l2-call", "l2-probe"], ["l2-probe", "l2-retry-check"], ["l2-retry-check", "l2-merge"],
+      ["l2-retry-check", "l2-retry"], ["l2-retry", "l2-merge"], ["l2-merge", "l2-output"],
+      ["l2-output", "l2-loop"], ["l2-loop", "l2-final"], ["l2-taxonomy", "l2-final"],
+      ["l2-final", "l2-error"], ["l2-final", "l2-trace"], ["l2-error", "l2-metric"],
+      ["l2-metric", "l2-report-metric"], ["l2-trace", "l2-end"], ["l2-report-metric", "l2-end"],
+    ],
+  },
+  l3: {
+    title: "PT_Layer3 · 最终仲裁链路",
+    subtitle: "在候选定义与优先级规则约束下，收敛到唯一 Top-1。",
+    nodes: [
+      n("l3-start", "开始节点", "entry", 30, 270, "接收 L2 候选和最终分类上下文。", "L2Answerlist / 图片", "启动信号"),
+      n("l3-init", "init", "entry", 240, 410, "记录 L3 开始时间。", "运行上下文", "entry_start_time"),
+      n("l3-process", "L2AnswerProcess", "input", 450, 270, "过滤无效项并按 confidence 排序，提取候选名称。", "L2Answerlist", "candidateList / skipL3"),
+      n("l3-skip", "checkSkipL3", "decision", 660, 270, "候选数大于 1 才调用 L3；单候选直接返回。", "skipL3", "仲裁 / 直出"),
+      n("l3-cards", "categoryCards", "context", 870, 40, "提供候选叶子类目的标准定义。", "静态类目卡", "categoryCards"),
+      n("l3-model", "modelConfig", "context", 870, 180, "准备最终仲裁模型配置。", "item_id / operator", "模型配置"),
+      n("l3-system", "AiaPrompt · System", "context", 870, 320, "按版本获取 L3 System Prompt。", "System Prompt 引用", "l3_system_prompt"),
+      n("l3-rules", "AiaPrompt · Rules", "context", 870, 460, "获取类目优先级和冲突规则。", "Rules Prompt 引用", "规则 JSON"),
+      n("l3-valid", "validPrompt", "decision", 1080, 390, "验证 Prompt 状态、必填内容及规则 JSON。", "System / Rules", "priorityRules / error"),
+      n("l3-rules-check", "checkL3Rules", "decision", 1290, 390, "规则合法才进入 Prompt 组装。", "l3_prompt_error", "继续 / 异常"),
+      n("l3-prompt", "prompt", "prompt", 1500, 220, "仅抽取候选相关定义和冲突规则，并附加图片。", "候选 / 类目卡 / 规则", "L3_system / L3_user"),
+      n("l3-call", "AIA_ModelCall", "inference", 1710, 220, "执行首轮 Top-1 仲裁。", "L3 Prompt / 模型配置", "首轮结果"),
+      n("l3-raw-check", "checkL3RawResp", "decision", 1920, 220, "首轮 raw response 为空时触发重试。", "L3_raw_resp_r1", "首轮 / 重试"),
+      n("l3-retry", "AIA_ModelCall_retry", "inference", 1920, 430, "补偿执行一次 L3 推理。", "相同 Prompt 与配置", "第二轮结果"),
+      n("l3-merge", "mergeL3LLM", "result", 2130, 300, "重试有响应则优先重试，否则保留首轮。", "两轮响应", "统一 L3 结果"),
+      n("l3-final", "FinalOut", "result", 2340, 300, "解析 Top-1；单候选直接采用，并校验结果属于候选集。", "候选 / 模型结果", "top1 / reportData"),
+      n("l3-error", "ErrorCodeNormalize", "result", 2550, 300, "归一化候选、Prompt 和模型错误。", "L3_error / candidateList", "error_code / err_reason"),
+      n("l3-metric", "BuildMetricPayload", "report", 2760, 430, "构造 L3 延迟和错误指标。", "错误码 / 时间", "MetricReportData"),
+      n("l3-report-metric", "ReportMetric", "report", 2970, 430, "上报 L3 运行指标。", "MetricReportData", "上报状态"),
+      n("l3-trace", "ReportTrace", "report", 2550, 100, "记录最终仲裁 Prompt、候选和响应。", "reportData", "Trace 状态"),
+      n("l3-end", "结束节点", "entry", 3180, 270, "输出最终 Top-1、候选、Prompt 和错误字段。", "结果与上报状态", "top1 / L3_error"),
+    ],
+    edges: [
+      ["l3-start", "l3-init"], ["l3-start", "l3-process"], ["l3-init", "l3-process"],
+      ["l3-process", "l3-skip"], ["l3-skip", "l3-final"], ["l3-skip", "l3-cards"],
+      ["l3-skip", "l3-model"], ["l3-skip", "l3-system"], ["l3-skip", "l3-rules"],
+      ["l3-cards", "l3-prompt"], ["l3-model", "l3-prompt"], ["l3-system", "l3-valid"],
+      ["l3-rules", "l3-valid"], ["l3-valid", "l3-rules-check"], ["l3-rules-check", "l3-prompt"],
+      ["l3-rules-check", "l3-final"], ["l3-prompt", "l3-call"], ["l3-call", "l3-raw-check"],
+      ["l3-raw-check", "l3-merge"], ["l3-raw-check", "l3-retry"], ["l3-retry", "l3-merge"],
+      ["l3-merge", "l3-final"], ["l3-final", "l3-error"], ["l3-final", "l3-trace"],
+      ["l3-error", "l3-metric"], ["l3-metric", "l3-report-metric"], ["l3-trace", "l3-end"],
+      ["l3-report-metric", "l3-end"],
+    ],
+  },
+};
+
+const nodeLayer = document.querySelector("#nodeLayer");
+const edgeLayer = document.querySelector("#edgeLayer");
+const canvasStage = document.querySelector("#canvasStage");
+const canvasViewport = document.querySelector("#canvasViewport");
+const stageFilters = document.querySelector("#stageFilters");
+const layerTabs = [...document.querySelectorAll(".layer-tab")];
+const inspector = {
+  index: document.querySelector("#inspectorIndex"),
+  stage: document.querySelector("#inspectorStage"),
+  title: document.querySelector("#inspectorTitle"),
+  description: document.querySelector("#inspectorDescription"),
+  input: document.querySelector("#inspectorInput"),
+  output: document.querySelector("#inspectorOutput"),
+  note: document.querySelector("#inspectorNote"),
+};
+
+let activeLayer = "main";
+let activeStage = "all";
+let selectedNode = null;
+let scale = 0.8;
+let panX = 20;
+let panY = 45;
+let dragging = false;
+let dragStart = null;
+
+function getWorkflow() {
+  return workflows[activeLayer];
+}
+
+function getNode(id) {
+  return getWorkflow().nodes.find((node) => node.id === id);
+}
+
+function stageNames() {
+  return [...new Set(getWorkflow().nodes.map((node) => node.stage))];
+}
+
+function renderFilters() {
+  stageFilters.innerHTML = [
+    `<button class="stage-filter active" data-stage="all">全部阶段</button>`,
+    ...stageNames().map(
+      (key) =>
+        `<button class="stage-filter" data-stage="${key}" style="--stage-color:${STAGES[key].color}">${STAGES[key].label}</button>`,
+    ),
+  ].join("");
+
+  stageFilters.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeStage = button.dataset.stage;
+      stageFilters.querySelectorAll("button").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      renderGraph();
+    });
+  });
+}
+
+function renderGraph() {
+  const workflow = getWorkflow();
+  const maxX = Math.max(...workflow.nodes.map((node) => node.x)) + 230;
+  const maxY = Math.max(...workflow.nodes.map((node) => node.y)) + 120;
+  canvasStage.style.width = `${maxX}px`;
+  canvasStage.style.height = `${Math.max(620, maxY)}px`;
+  edgeLayer.setAttribute("viewBox", `0 0 ${maxX} ${Math.max(620, maxY)}`);
+  document.querySelector("#canvasTitle").textContent = workflow.title;
+  document.querySelector("#nodeCount").textContent = `${workflow.nodes.length} nodes`;
+
+  nodeLayer.innerHTML = workflow.nodes
+    .map((node, index) => {
+      const stage = STAGES[node.stage];
+      const dimmed = activeStage !== "all" && activeStage !== node.stage;
+      return `
+        <button
+          class="flow-node${selectedNode === node.id ? " selected" : ""}${dimmed ? " dimmed" : ""}"
+          data-node-id="${node.id}"
+          style="left:${node.x}px;top:${node.y}px;--node-color:${stage.color}"
+          aria-label="${node.name}"
+        >
+          <span class="flow-node-icon"><i data-lucide="${stage.icon}"></i></span>
+          <span><small>${String(index + 1).padStart(2, "0")} · ${stage.label}</small><strong>${node.name}</strong></span>
+        </button>`;
+    })
+    .join("");
+
+  edgeLayer.innerHTML = workflow.edges
+    .map(([fromId, toId]) => {
+      const from = workflow.nodes.find((node) => node.id === fromId);
+      const to = workflow.nodes.find((node) => node.id === toId);
+      if (!from || !to) return "";
+      const x1 = from.x + 176;
+      const y1 = from.y + 34;
+      const x2 = to.x;
+      const y2 = to.y + 34;
+      const bend = Math.max(45, Math.abs(x2 - x1) * 0.42);
+      const active = selectedNode && (fromId === selectedNode || toId === selectedNode);
+      const hidden =
+        activeStage !== "all" &&
+        from.stage !== activeStage &&
+        to.stage !== activeStage;
+      return `<path class="edge-path${active ? " active" : ""}" style="opacity:${hidden ? 0.08 : 1}" d="M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}" />`;
+    })
+    .join("");
+
+  nodeLayer.querySelectorAll(".flow-node").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      selectedNode = button.dataset.nodeId;
+      updateInspector();
+      renderGraph();
+    });
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+  applyTransform();
+}
+
+function updateInspector() {
+  const workflow = getWorkflow();
+  const node = getNode(selectedNode) || workflow.nodes[0];
+  const index = workflow.nodes.indexOf(node) + 1;
+  inspector.index.textContent = String(index).padStart(2, "0");
+  inspector.stage.textContent = STAGES[node.stage].label;
+  inspector.stage.style.color = STAGES[node.stage].color;
+  inspector.title.textContent = node.name;
+  inspector.description.textContent = node.description;
+  inspector.input.textContent = node.input;
+  inspector.output.textContent = node.output;
+  inspector.note.textContent =
+    node.note || `当前节点位于“${STAGES[node.stage].label}”阶段。`;
+}
+
+function applyTransform() {
+  canvasStage.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  document.querySelector("#zoomValue").textContent = `${Math.round(scale * 100)}%`;
+}
+
+function fitView() {
+  const workflow = getWorkflow();
+  const maxX = Math.max(...workflow.nodes.map((node) => node.x)) + 220;
+  const maxY = Math.max(...workflow.nodes.map((node) => node.y)) + 100;
+  const bounds = canvasViewport.getBoundingClientRect();
+  scale = Math.min(0.84, (bounds.width - 30) / maxX, (bounds.height - 30) / maxY);
+  scale = Math.max(0.2, scale);
+  panX = 14;
+  panY = Math.max(14, (bounds.height - maxY * scale) / 2);
+  applyTransform();
+}
+
+function changeLayer(layer) {
+  activeLayer = layer;
+  activeStage = "all";
+  selectedNode = getWorkflow().nodes[0].id;
+  layerTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.layer === layer));
+  renderFilters();
+  updateInspector();
+  renderGraph();
+  requestAnimationFrame(fitView);
+}
+
+layerTabs.forEach((tab) => tab.addEventListener("click", () => changeLayer(tab.dataset.layer)));
+
+document.querySelector("#zoomIn").addEventListener("click", () => {
+  scale = Math.min(1.35, scale + 0.1);
+  applyTransform();
+});
+
+document.querySelector("#zoomOut").addEventListener("click", () => {
+  scale = Math.max(0.2, scale - 0.1);
+  applyTransform();
+});
+
+document.querySelector("#fitView").addEventListener("click", fitView);
+
+canvasViewport.addEventListener(
+  "wheel",
+  (event) => {
+    event.preventDefault();
+    scale = Math.max(0.2, Math.min(1.35, scale + (event.deltaY < 0 ? 0.08 : -0.08)));
+    applyTransform();
+  },
+  { passive: false },
+);
+
+canvasViewport.addEventListener("pointerdown", (event) => {
+  if (event.target.closest(".flow-node, button")) return;
+  dragging = true;
+  dragStart = { x: event.clientX - panX, y: event.clientY - panY };
+  canvasViewport.classList.add("dragging");
+  canvasViewport.setPointerCapture(event.pointerId);
+});
+
+canvasViewport.addEventListener("pointermove", (event) => {
+  if (!dragging) return;
+  panX = event.clientX - dragStart.x;
+  panY = event.clientY - dragStart.y;
+  applyTransform();
+});
+
+canvasViewport.addEventListener("pointerup", () => {
+  dragging = false;
+  canvasViewport.classList.remove("dragging");
+});
+
+document.querySelector("#downloadSvg").addEventListener("click", () => {
+  const workflow = getWorkflow();
+  const width = Math.max(...workflow.nodes.map((node) => node.x)) + 220;
+  const height = Math.max(...workflow.nodes.map((node) => node.y)) + 120;
+  const lines = workflow.edges
+    .map(([fromId, toId]) => {
+      const from = workflow.nodes.find((node) => node.id === fromId);
+      const to = workflow.nodes.find((node) => node.id === toId);
+      return `<line x1="${from.x + 176}" y1="${from.y + 34}" x2="${to.x}" y2="${to.y + 34}" stroke="#4b5d7c" stroke-width="2"/>`;
+    })
+    .join("");
+  const boxes = workflow.nodes
+    .map((node) => {
+      const color = STAGES[node.stage].color;
+      return `<g><rect x="${node.x}" y="${node.y}" width="176" height="68" rx="7" fill="#151d30" stroke="${color}"/><text x="${node.x + 14}" y="${node.y + 27}" fill="#8290a8" font-family="monospace" font-size="9">${STAGES[node.stage].label}</text><text x="${node.x + 14}" y="${node.y + 49}" fill="#f7f8fb" font-family="sans-serif" font-size="12">${node.name.replaceAll("&", "&amp;")}</text></g>`;
+    })
+    .join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#070a13"/>${lines}${boxes}</svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${activeLayer}-workflow.svg`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+});
+
+window.addEventListener("resize", fitView);
+
+selectedNode = workflows.main.nodes[0].id;
+renderFilters();
+updateInspector();
+renderGraph();
+requestAnimationFrame(fitView);
+if (window.lucide) window.lucide.createIcons();
+
+const promptSections = [
+  {
+    code: "01 / ROLE",
+    title: "Role Definition",
+    subtitle: "角色定义",
+    items: [
+      "说明模型承担的专业角色与任务目标",
+      "明确任务是多标签还是单标签分类",
+      "强调高召回、证据驱动和禁止幻觉",
+    ],
+    intent: "先固定模型身份和任务边界，避免后续规则建立在模糊目标上。",
+  },
+  {
+    code: "02 / PROCESS",
+    title: "Reasoning Workflow",
+    subtitle: "工作流程",
+    items: [
+      "先整体理解图片内容，再逐个类别独立判断",
+      "允许多个类别同时成立",
+      "最后按证据强度组装并排序输出",
+    ],
+    intent: "把识别过程拆成稳定步骤，降低遗漏类别和过早下结论的概率。",
+  },
+  {
+    code: "03 / BOUNDARY",
+    title: "High-priority Boundaries",
+    subtitle: "高优先级边界规则",
+    items: [
+      "先判断是否属于目标大类，再区分核心子类型",
+      "Residual / Other 不能作为无依据的兜底类别",
+      "处理内容格式与真实意图之间的冲突",
+      "明确相似类别发生冲突时的优先级",
+    ],
+    intent: "优先处理最容易造成误召和排序错误的决策边界。",
+  },
+  {
+    code: "04 / RECOVERY",
+    title: "Bad Case Recovery",
+    subtitle: "RCA / Bad Case 修正",
+    items: [
+      "基于历史错误明确重点复查对象",
+      "漏召类别增加 recovery 规则",
+      "误召类别增加 boundary / exclusion 规则",
+      "排序错误增加 re-ranking，并执行 final check",
+    ],
+    intent: "将历史错误转化为可执行规则，让 Prompt 随评测持续收敛。",
+  },
+  {
+    code: "05 / TAXONOMY",
+    title: "Category Schema",
+    subtitle: "类目定义区",
+    items: [
+      "Definition：类别是什么",
+      "Signals：哪些可观察证据支持命中",
+      "Exclusions：哪些情况明确不能命中",
+      "Priority：与相似类别冲突时如何排序",
+    ],
+    intent: "所有类目使用同一模板，保证定义完整且具备可比较性。",
+  },
+  {
+    code: "06 / EVIDENCE",
+    title: "Evidence Scoring",
+    subtitle: "证据打分规则",
+    items: [
+      "每个类别独立打分，并设置统一输出阈值",
+      "定义强、中、弱证据对应的分数区间",
+      "共享背景证据不能重复支撑多个类别",
+      "允许多标签，但每个标签必须有独立证据",
+    ],
+    intent: "让多标签输出建立在独立、可追溯的证据上，而不是整体印象。",
+  },
+  {
+    code: "07 / OUTPUT",
+    title: "Output Contract",
+    subtitle: "输出约束",
+    items: [
+      "严格限定可输出的类别白名单",
+      "规定输出数量范围并按置信度排序",
+      "Reason 必须引用图片中的可观察证据",
+      "固定为可稳定解析的 JSON Array 格式",
+    ],
+    intent: "用稳定的数据契约连接解析、重试、评测和下游消费。",
+  },
+];
+
+const rcaRules = [
+  {
+    code: "A",
+    title: "System failure",
+    zh: "系统执行失败",
+    scope: "全链路",
+    rule: "图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。",
+    action: "检查输入完整性、资源加载和执行链路，不调用 RCA 模型。",
+  },
+  {
+    code: "B",
+    title: "Foreign language",
+    zh: "语言障碍",
+    scope: "全链路",
+    rule: "关键证据依赖某种语言，模型无法可靠理解该语言，且语言理解是分类错误的主要障碍。",
+    action: "补充对应语言的 OCR、翻译或多语言理解能力。",
+  },
+  {
+    code: "C",
+    title: "Potential GT error",
+    zh: "潜在标注错误",
+    scope: "全链路",
+    rule: "类目定义清晰，但完整图片证据稳定支持其他类目，且几乎没有决定性证据支持当前 GT。",
+    action: "回查人工标注和证据链，确认后修订 GT。",
+  },
+  {
+    code: "D",
+    title: "Definition gap",
+    zh: "定义设计缺口",
+    scope: "L1 / L2",
+    rule: "定义缺少纳入、排除或区分标准，或相邻类目重叠、模糊；错误更适合由 Taxonomy 设计解释。",
+    action: "修改 Definition、Signals 或 Exclusions，明确相邻类目的分界。",
+  },
+  {
+    code: "E",
+    title: "Priority rule missing",
+    zh: "优先级规则缺失",
+    scope: "L3",
+    rule: "多个候选都合理，但 L3 缺少明确的优先级、平局处理或冲突消解规则。",
+    action: "在 L3 增加显式 Priority 或 tie-breaker 规则。",
+  },
+  {
+    code: "F",
+    title: "Prompt guidance gap",
+    zh: "Prompt 指导缺口",
+    scope: "L1–L3",
+    rule: "定义和优先级原则基本充分，但缺少操作步骤、约束、正反例或决策清单，导致执行路径漂移。",
+    action: "补充 ordered checks、示例、反例或 final check。",
+  },
+  {
+    code: "G",
+    title: "Candidate noise",
+    zh: "候选集噪声",
+    scope: "L2",
+    rule: "GT 仍在 L2 候选中，但同时输出过多弱相关、重复或偏离候选；GT 缺失时不得使用该标签。",
+    action: "收紧 L2 候选生成和 reducer 规则，降低无效候选数量。",
+  },
+  {
+    code: "H",
+    title: "True boundary case",
+    zh: "真实边界案例",
+    scope: "全链路",
+    rule: "定义已经合理，且不存在现实可行的 Prompt、规则或定义修改能稳定区分；图片确实支持多个类目。",
+    action: "沉淀到 Hard Case Library，作为边界评测样本持续跟踪。",
+  },
+  {
+    code: "I",
+    title: "Model capability gap",
+    zh: "模型能力缺口",
+    scope: "最后兜底",
+    rule: "A–H 均不适用，定义、规则和 Prompt 已充分，但模型仍无法感知、提取或推理关键证据。",
+    action: "评估模型升级、工具增强或专用识别模块，不继续堆叠 Prompt。",
+  },
+];
+
+function replaceList(element, items) {
+  element.replaceChildren(
+    ...items.map((item) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = item;
+      return listItem;
+    }),
+  );
+}
+
+function initContentExplorers() {
+  const promptTabs = [...document.querySelectorAll(".prompt-tab")];
+  const promptItems = document.querySelector("#promptDetailItems");
+
+  promptTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const section = promptSections[Number(tab.dataset.promptIndex)];
+      promptTabs.forEach((item) => {
+        const selected = item === tab;
+        item.classList.toggle("active", selected);
+        item.setAttribute("aria-selected", String(selected));
+      });
+      document.querySelector("#promptDetailCode").textContent = section.code;
+      document.querySelector("#promptDetailTitle").textContent = section.title;
+      document.querySelector("#promptDetailSubtitle").textContent = section.subtitle;
+      document.querySelector("#promptDetailIntent").textContent = section.intent;
+      replaceList(promptItems, section.items);
+    });
+  });
+
+  const rcaButtons = [...document.querySelectorAll(".rca-rule-button")];
+  rcaButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const rule = rcaRules[Number(button.dataset.rcaIndex)];
+      rcaButtons.forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("active", selected);
+        item.setAttribute("aria-pressed", String(selected));
+      });
+      document.querySelector("#rcaDetailCode").textContent = rule.code;
+      document.querySelector("#rcaDetailScope").textContent = rule.scope;
+      document.querySelector("#rcaDetailTitle").textContent = rule.title;
+      document.querySelector("#rcaDetailZh").textContent = rule.zh;
+      document.querySelector("#rcaDetailRule").textContent = rule.rule;
+      document.querySelector("#rcaDetailAction").textContent = rule.action;
+    });
+  });
+}
+
+initContentExplorers();
+
+function initAmbientCanvas() {
+  const canvas = document.querySelector("#ambientCanvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const palette = [
+    [66, 212, 232],
+    [86, 140, 255],
+    [99, 214, 175],
+    [165, 105, 232],
+  ];
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let particles = [];
+  let pulses = [];
+  let frameId = 0;
+  let lastTime = 0;
+  let scrollY = window.scrollY;
+  const pointer = { x: 0, y: 0 };
+
+  function buildParticles() {
+    const count = Math.min(104, Math.max(42, Math.floor((width * height) / 15000)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.24,
+      vy: (Math.random() - 0.5) * 0.18,
+      size: index % 5 === 0 ? 2 : 1,
+      depth: 0.3 + Math.random() * 0.7,
+      color: palette[index % palette.length],
+    }));
+    pulses = Array.from({ length: 12 }, (_, index) => ({
+      lane: index % 3,
+      offset: (index / 12) * (width + 260),
+      speed: 0.035 + (index % 4) * 0.008,
+      length: 32 + (index % 3) * 14,
+    }));
+  }
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    pointer.x = width / 2;
+    pointer.y = height / 2;
+    buildParticles();
+  }
+
+  function drawPerspectiveGrid(time) {
+    const horizon = height * 0.22;
+    const offset = (time * 0.012) % 56;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(126, 163, 205, 0.1)";
+
+    for (let y = horizon + offset; y < height + 56; y += 56) {
+      const progress = (y - horizon) / Math.max(1, height - horizon);
+      ctx.globalAlpha = 0.25 + progress * 0.75;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 0.72;
+    const vanishingX = width * 0.58 + (pointer.x - width / 2) * 0.025;
+    for (let x = -width; x <= width * 2; x += 96) {
+      ctx.beginPath();
+      ctx.moveTo(vanishingX + (x - vanishingX) * 0.12, horizon);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawDataLanes(time) {
+    const laneColors = [
+      "rgba(66, 212, 232, 0.24)",
+      "rgba(99, 214, 175, 0.17)",
+      "rgba(165, 105, 232, 0.19)",
+    ];
+
+    laneColors.forEach((color, lane) => {
+      const baseY = height * (0.2 + lane * 0.26);
+      ctx.beginPath();
+      for (let x = -20; x <= width + 20; x += 18) {
+        const y =
+          baseY +
+          Math.sin(x * 0.006 + time * 0.00035 + lane * 1.7) * (24 + lane * 8) +
+          Math.sin(x * 0.014 - time * 0.00018) * 9;
+        if (x === -20) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.setLineDash([2, 11]);
+      ctx.lineDashOffset = -(time * 0.025 + lane * 18);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.15;
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+  }
+
+  function drawKineticCore(time) {
+    const heroFade = Math.max(0, 1 - scrollY / Math.max(1, height * 1.05));
+    if (heroFade <= 0.01) return;
+
+    const compact = width < 720;
+    const radius = Math.min(width, height) * (compact ? 0.31 : 0.38);
+    const centerX =
+      width * (compact ? 0.72 : 0.77) + (pointer.x - width / 2) * 0.028;
+    const centerY =
+      height * (compact ? 0.34 : 0.38) + (pointer.y - height / 2) * 0.018;
+    const rotation = time * 0.00008;
+
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(rotation);
+    ctx.globalAlpha = heroFade;
+
+    for (let ring = 0; ring < 16; ring += 1) {
+      const ringRadius = radius * (0.34 + ring * 0.047);
+      const phase = rotation * (ring % 2 === 0 ? 1.8 : -1.25) + ring * 0.53;
+      const span = Math.PI * (0.58 + (ring % 4) * 0.16);
+
+      ctx.save();
+      ctx.rotate(phase);
+      ctx.scale(1, 0.48 + (ring % 3) * 0.07);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, ringRadius, ringRadius, 0, -span * 0.5, span * 0.5);
+      ctx.strokeStyle =
+        ring % 4 === 0
+          ? "rgba(112, 228, 222, 0.52)"
+          : ring % 4 === 1
+            ? "rgba(150, 178, 222, 0.27)"
+            : "rgba(181, 134, 221, 0.2)";
+      ctx.lineWidth = ring % 5 === 0 ? 1.7 : 0.8;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    for (let spoke = 0; spoke < 12; spoke += 1) {
+      const angle = (Math.PI * 2 * spoke) / 12 - rotation * 1.6;
+      const inner = radius * 0.32;
+      const outer = radius * (0.62 + (spoke % 3) * 0.09);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner * 0.52);
+      ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer * 0.52);
+      ctx.strokeStyle = "rgba(114, 184, 178, 0.16)";
+      ctx.lineWidth = 0.75;
+      ctx.stroke();
+    }
+
+    for (let shard = 0; shard < 28; shard += 1) {
+      const angle = (Math.PI * 2 * shard) / 28 + rotation * (1.4 + (shard % 3) * 0.15);
+      const orbit = radius * (0.72 + (shard % 5) * 0.055);
+      const x = Math.cos(angle) * orbit;
+      const y = Math.sin(angle) * orbit * 0.52;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.fillStyle =
+        shard % 3 === 0
+          ? "rgba(108, 238, 239, 0.65)"
+          : shard % 3 === 1
+            ? "rgba(126, 234, 188, 0.45)"
+            : "rgba(189, 138, 239, 0.42)";
+      ctx.fillRect(-4, -1, 8 + (shard % 4) * 3, shard % 4 === 0 ? 3 : 1.5);
+      ctx.restore();
+    }
+
+    ctx.rotate(-rotation * 2.4);
+    ctx.strokeStyle = "rgba(239, 255, 253, 0.34)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-radius * 0.13, -radius * 0.13, radius * 0.26, radius * 0.26);
+    ctx.fillStyle = "rgba(114, 184, 178, 0.12)";
+    ctx.fillRect(-radius * 0.09, -radius * 0.09, radius * 0.18, radius * 0.18);
+    ctx.restore();
+  }
+
+  function drawNetwork(delta) {
+    const parallaxX = (pointer.x - width / 2) * 0.012;
+    const parallaxY = (pointer.y - height / 2) * 0.008;
+
+    particles.forEach((particle) => {
+      particle.x += particle.vx * delta;
+      particle.y += particle.vy * delta;
+      if (particle.x < -20) particle.x = width + 20;
+      if (particle.x > width + 20) particle.x = -20;
+      if (particle.y < -20) particle.y = height + 20;
+      if (particle.y > height + 20) particle.y = -20;
+    });
+
+    for (let i = 0; i < particles.length; i += 1) {
+      const a = particles[i];
+      for (let j = i + 1; j < particles.length; j += 1) {
+        const b = particles[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance > 136) continue;
+        ctx.strokeStyle = `rgba(90, 181, 214, ${0.16 * (1 - distance / 136)})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(a.x + parallaxX * a.depth, a.y + parallaxY * a.depth);
+        ctx.lineTo(b.x + parallaxX * b.depth, b.y + parallaxY * b.depth);
+        ctx.stroke();
+      }
+    }
+
+    particles.forEach((particle, index) => {
+      const [r, g, b] = particle.color;
+      const x = particle.x + parallaxX * particle.depth;
+      const y = particle.y + parallaxY * particle.depth;
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${index % 5 === 0 ? 0.82 : 0.5})`;
+      ctx.fillRect(x, y, particle.size * 2.8, particle.size * 1.15);
+    });
+  }
+
+  function lanePoint(x, lane, time) {
+    const baseY = height * (0.2 + lane * 0.26);
+    return (
+      baseY +
+      Math.sin(x * 0.006 + time * 0.00035 + lane * 1.7) * (24 + lane * 8) +
+      Math.sin(x * 0.014 - time * 0.00018) * 9
+    );
+  }
+
+  function drawPulses(time) {
+    const colors = [
+      "rgba(108, 238, 239, 0.92)",
+      "rgba(126, 234, 188, 0.82)",
+      "rgba(189, 138, 239, 0.82)",
+    ];
+
+    pulses.forEach((pulse) => {
+      const travel = width + 260;
+      const x = (time * pulse.speed + pulse.offset) % travel - 130;
+      const y = lanePoint(x, pulse.lane, time);
+      const previousX = x - pulse.length;
+      const previousY = lanePoint(previousX, pulse.lane, time);
+
+      ctx.strokeStyle = colors[pulse.lane];
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(previousX, previousY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      ctx.fillStyle = colors[pulse.lane];
+      ctx.fillRect(x - 3, y - 2, 7, 4);
+      ctx.strokeStyle = "rgba(239, 255, 253, 0.7)";
+      ctx.strokeRect(x - 6, y - 5, 13, 10);
+    });
+  }
+
+  function drawScan(time) {
+    const x = (time * 0.035) % (width + 240) - 120;
+    const y = (time * 0.022) % (height + 180) - 90;
+    ctx.fillStyle = "rgba(66, 212, 232, 0.12)";
+    ctx.fillRect(x, 0, 1, height);
+    ctx.fillStyle = "rgba(99, 214, 175, 0.035)";
+    ctx.fillRect(x - 42, 0, 42, height);
+    ctx.fillStyle = "rgba(165, 105, 232, 0.08)";
+    ctx.fillRect(0, y, width, 1);
+    ctx.fillStyle = "rgba(165, 105, 232, 0.022)";
+    ctx.fillRect(0, y - 24, width, 24);
+  }
+
+  function render(time = 0) {
+    const delta = Math.min(32, time - lastTime || 16);
+    lastTime = time;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    drawPerspectiveGrid(time);
+    drawDataLanes(time);
+    drawKineticCore(time);
+    drawNetwork(delta);
+    drawPulses(time);
+    drawScan(time);
+    ctx.globalCompositeOperation = "source-over";
+
+    if (!reducedMotion.matches && !document.hidden) {
+      frameId = window.requestAnimationFrame(render);
+    }
+  }
+
+  function restart() {
+    window.cancelAnimationFrame(frameId);
+    lastTime = 0;
+    render(performance.now());
+  }
+
+  window.addEventListener("resize", () => {
+    resize();
+    restart();
+  });
+  window.addEventListener("pointermove", (event) => {
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      scrollY = window.scrollY;
+    },
+    { passive: true },
+  );
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) restart();
+  });
+  reducedMotion.addEventListener("change", restart);
+
+  resize();
+  render(0);
+}
+
+initAmbientCanvas();

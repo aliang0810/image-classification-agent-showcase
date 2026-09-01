@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Image Classification Agent 的 L1、L2、L3 工作流可视化与节点说明。"
+    />
+    <title>Image Classification Agent · Workflow Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="回到顶部">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>PT Workflow Index</span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="#overview">AGENT</a>
+        <a href="#method">PROMPT</a>
+        <a href="#rca">RCA</a>
+        <a href="#outcome">RESULT</a>
+      </nav>
+      <span class="status">Project / 2026</span>
+    </header>
+
+    <main id="top">
+      <section class="hero shell">
+        <div class="hero-kicker">
+          <span>PROJECT FILE</span>
+          <span class="kicker-track"><b>01</b> / Image Classification Workflow</span>
+          <span class="hero-credit">LIANG ZHONG</span>
+        </div>
+
+        <div class="hero-copy">
+          <p class="eyebrow">Image classification workflow</p>
+          <h1>Image Classification <em>AGENT</em></h1>
+          <div class="hero-summary">
+            <p class="hero-lead">
+              Agent 执行分层分类，Prompt 约束判断过程，RCA 将错误转化为下一版规则。
+            </p>
+            <div class="hero-facts" aria-label="项目规模">
+              <div><strong>03</strong><span>System stages</span></div>
+              <div><strong>94</strong><span>Nodes</span></div>
+              <div><strong>09</strong><span>RCA types</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="signal-panel" aria-label="系统处理阶段">
+          <div class="panel-heading">
+            <div>
+              <span class="micro">链路概览</span>
+              <h2>从执行到规则回流</h2>
+            </div>
+            <span class="live-pill">运行中</span>
+          </div>
+          <div class="signal-list">
+            <a class="signal" href="#overview"><b>01</b><span>AGENT<small>L1 · L2 · L3 execution</small></span><i></i></a>
+            <a class="signal" href="#method"><b>02</b><span>PROMPT<small>role · rules · evidence</small></span><i></i></a>
+            <a class="signal" href="#rca"><b>03</b><span>RCA<small>evaluate · diagnose · patch</small></span><i></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="overview shell" id="overview">
+        <div class="section-title">
+          <span class="micro">01 / AGENT · ARCHITECTURE</span>
+          <h2>分层完成分类决策</h2>
+          <p>三个子 Agent 各自承担单一职责，并通过稳定字段协议组成完整分类链。</p>
+        </div>
+        <div class="overview-grid">
+          <article>
+            <span>01 / RECALL</span>
+            <h3>L1 Candidate Recall</h3>
+            <p>从图片和标题中召回一级类目，为后续细分选择正确的 Taxonomy 子树。</p>
+            <strong>高召回 · 多路由 · 可重试</strong>
+          </article>
+          <article>
+            <span>02 / ROUTING</span>
+            <h3>L2 Subtree Routing</h3>
+            <p>按 L1 类目循环加载专属 Prompt，在受限范围内生成并排序叶子候选。</p>
+            <strong>动态 Prompt · 循环执行 · Top-3</strong>
+          </article>
+          <article>
+            <span>03 / DECISION</span>
+            <h3>L3 Final Decision</h3>
+            <p>结合候选定义与优先级规则完成最终仲裁，并对异常结果进行自动补偿。</p>
+            <strong>规则裁决 · 单候选跳过 · Trace</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="workflow shell" id="workflow">
+        <div class="section-title workflow-title">
+          <div>
+            <span class="micro">01.2 / AGENT · WORKFLOW</span>
+            <h2>逐节点拆解 Agent 工作流</h2>
+          </div>
+          <p>点击节点查看职责，拖动画布探索链路，滚轮缩放视图。</p>
+        </div>
+
+        <div class="workspace">
+          <div class="workspace-toolbar">
+            <div class="layer-tabs" role="tablist" aria-label="选择工作流层级">
+              <button class="layer-tab active" data-layer="main" role="tab">总链路</button>
+              <button class="layer-tab" data-layer="l1" role="tab">PT_Layer1</button>
+              <button class="layer-tab" data-layer="l2" role="tab">PT_Layer2</button>
+              <button class="layer-tab" data-layer="l3" role="tab">PT_Layer3</button>
+            </div>
+            <div class="toolbar-actions">
+              <button class="icon-button" id="fitView" title="适配视图" aria-label="适配视图">
+                <i data-lucide="scan"></i>
+              </button>
+              <button class="icon-button" id="downloadSvg" title="下载 SVG" aria-label="下载 SVG">
+                <i data-lucide="download"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="stage-filters" id="stageFilters" aria-label="阶段筛选"></div>
+
+          <div class="canvas-grid">
+            <div class="canvas-wrap" id="canvasWrap">
+              <div class="canvas-head">
+                <div>
+                  <span class="micro">WORKFLOW CANVAS</span>
+                  <h3 id="canvasTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
+                </div>
+                <span id="nodeCount">25 nodes</span>
+              </div>
+              <div class="canvas-viewport" id="canvasViewport">
+                <div class="canvas-stage" id="canvasStage">
+                  <svg id="edgeLayer" aria-hidden="true"></svg>
+                  <div id="nodeLayer"></div>
+                </div>
+                <div class="canvas-hint">
+                  <i data-lucide="move"></i>
+                  <span>拖拽探索 · 滚轮缩放</span>
+                </div>
+                <div class="zoom-control">
+                  <button id="zoomOut" aria-label="缩小"><i data-lucide="minus"></i></button>
+                  <output id="zoomValue">80%</output>
+                  <button id="zoomIn" aria-label="放大"><i data-lucide="plus"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <aside class="inspector" id="inspector">
+              <span class="micro">NODE INSPECTOR</span>
+              <div class="inspector-index" id="inspectorIndex">01</div>
+              <p class="stage-label" id="inspectorStage">入口</p>
+              <h3 id="inspectorTitle">开始节点</h3>
+              <p id="inspectorDescription">接收一次新的图片分类任务并启动工作流。</p>
+              <dl>
+                <div><dt>输入</dt><dd id="inspectorInput">执行请求 / 运行上下文</dd></div>
+                <div><dt>输出</dt><dd id="inspectorOutput">启动信号 / 初始状态</dd></div>
+              </dl>
+              <div class="inspector-note">
+                <i data-lucide="corner-down-right"></i>
+                <span id="inspectorNote">这是整个链路的起点。</span>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="method shell" id="method">
+        <div class="section-title">
+          <span class="micro">02 / PROMPT · RULE SYSTEM</span>
+          <h2>七层 Prompt 规则框架</h2>
+          <p>从角色、推理流程和边界规则开始，到类目证据、置信度与 JSON 契约结束；每一层都有明确职责。</p>
+        </div>
+        <div class="prompt-explorer">
+          <div class="prompt-stepper" role="tablist" aria-label="Prompt 结构层级">
+            <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true"><b>01</b><span>Role</span></button>
+            <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false"><b>02</b><span>Process</span></button>
+            <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false"><b>03</b><span>Boundary</span></button>
+            <button class="prompt-tab" data-prompt-index="3" role="tab" aria-selected="false"><b>04</b><span>Recovery</span></button>
+            <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false"><b>05</b><span>Taxonomy</span></button>
+            <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false"><b>06</b><span>Evidence</span></button>
+            <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false"><b>07</b><span>Output</span></button>
+          </div>
+          <article class="prompt-detail" aria-live="polite">
+            <header>
+              <span class="micro" id="promptDetailCode">01 / ROLE</span>
+              <h3 id="promptDetailTitle">Role Definition</h3>
+              <p id="promptDetailSubtitle">角色定义</p>
+            </header>
+            <ul id="promptDetailItems">
+              <li>说明模型承担的专业角色与任务目标</li>
+              <li>明确任务是多标签还是单标签分类</li>
+              <li>强调高召回、证据驱动和禁止幻觉</li>
+            </ul>
+            <div class="prompt-detail-intent">
+              <span>DESIGN INTENT</span>
+              <p id="promptDetailIntent">先固定模型身份和任务边界，避免后续规则建立在模糊目标上。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="rca shell" id="rca">
+        <div class="section-title">
+          <span class="micro">03 / RCA · FEEDBACK LOOP</span>
+          <h2>让每次错误都成为下一版规则</h2>
+        </div>
+        <div class="rca-cycle" aria-label="RCA 迭代闭环">
+          <span><b>01</b>Offline Eval</span><i>→</i>
+          <span><b>02</b>Diff Review</span><i>→</i>
+          <span><b>03</b>RCA Code</span><i>→</i>
+          <span><b>04</b>Prompt Patch</span><i>→</i>
+          <span><b>05</b>Focus Retest</span><i>→</i>
+          <span><b>06</b>Baseline</span>
+        </div>
+
+        <div class="rca-trigger-table">
+          <header><span>检测层</span><span>触发条件</span><span>系统动作</span></header>
+          <article>
+            <b>L1 / L2</b>
+            <p>GT 未召回、GT 不是 Top-1，或候选数超过 3</p>
+            <code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code>
+          </article>
+          <article>
+            <b>L3</b>
+            <p>预测 Top-1 与最终叶子 GT 不一致</p>
+            <code>RUN RCA MODEL</code>
+          </article>
+          <article>
+            <b>SKIP</b>
+            <p>当前层结果正确，或系统异常已能直接归因</p>
+            <code>SKIP / SYSTEM FAILURE</code>
+          </article>
+        </div>
+
+        <div class="rca-explorer">
+          <nav class="rca-rule-index" aria-label="九类 RCA 判定规则">
+            <section>
+              <h3>Evidence & Data</h3>
+              <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span>System failure</span></button>
+              <button class="rca-rule-button" data-rca-index="1"><b>B</b><span>Foreign language</span></button>
+              <button class="rca-rule-button" data-rca-index="2"><b>C</b><span>Potential GT error</span></button>
+            </section>
+            <section>
+              <h3>Prompt-fixable</h3>
+              <button class="rca-rule-button" data-rca-index="3"><b>D</b><span>Definition gap</span></button>
+              <button class="rca-rule-button" data-rca-index="4"><b>E</b><span>Priority rule missing</span></button>
+              <button class="rca-rule-button" data-rca-index="5"><b>F</b><span>Prompt guidance gap</span></button>
+              <button class="rca-rule-button" data-rca-index="6"><b>G</b><span>Candidate noise</span></button>
+            </section>
+            <section>
+              <h3>Boundary & Capability</h3>
+              <button class="rca-rule-button" data-rca-index="7"><b>H</b><span>True boundary case</span></button>
+              <button class="rca-rule-button" data-rca-index="8"><b>I</b><span>Model capability gap</span></button>
+            </section>
+          </nav>
+          <article class="rca-detail" aria-live="polite">
+            <div class="rca-detail-meta">
+              <b id="rcaDetailCode">A</b>
+              <span id="rcaDetailScope">全链路</span>
+            </div>
+            <h3 id="rcaDetailTitle">System failure</h3>
+            <p class="rca-detail-zh" id="rcaDetailZh">系统执行失败</p>
+            <div class="rca-detail-section">
+              <span>WHEN TO USE</span>
+              <p id="rcaDetailRule">图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。</p>
+            </div>
+            <div class="rca-detail-section">
+              <span>NEXT ACTION</span>
+              <p id="rcaDetailAction">检查输入完整性、资源加载和执行链路，不调用 RCA 模型。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="outcome shell" id="outcome">
+        <header class="outcome-header">
+          <span class="micro">04 / RESULT · ASSISTED LABELING</span>
+          <h2>让模型提供高召回候选，<br />让标注员完成最终判断。</h2>
+          <p>项目目标不是直接替代人工，而是用 L2 候选集缩小判断范围。当前结果更适合候选推荐式辅助标注，而非无人审的全自动分类。</p>
+        </header>
+
+        <div class="outcome-board">
+          <article class="outcome-primary">
+            <span>PRIMARY SUCCESS METRIC</span>
+            <strong>86.5%</strong>
+            <h3>L2 Recall</h3>
+            <p>22,886 / 26,448 个有效样本命中 Tier-3 GT</p>
+            <div class="outcome-meter" aria-label="L2 Recall 86.5%"><i></i></div>
+          </article>
+          <div class="outcome-metrics">
+            <article><strong>80.5%</strong><span>Top-3 Hit</span><small>21,281 / 26,447 ranked cases</small></article>
+            <article><strong>85.4%</strong><span>Top-5 Hit</span><small>22,589 / 26,447 ranked cases</small></article>
+            <article><strong>1.66</strong><span>Avg Hit Rank</span><small>GT 命中时的平均位置</small></article>
+            <article><strong>97.87%</strong><span>Run Success</span><small>26,476 / 27,053 runs</small></article>
+          </div>
+        </div>
+
+        <div class="outcome-notes">
+          <article>
+            <span>DEPLOYMENT MODE</span>
+            <h3>Candidate-first Copilot</h3>
+            <p>向标注员展示置信度排序后的候选，减少检索 Taxonomy 和判断相似类目的成本。</p>
+          </article>
+          <article>
+            <span>WHY L2</span>
+            <h3>Recall before automation</h3>
+            <p>L3 最终 Top-1 准确率为 52.9%，因此当前阶段应优先保证 GT 进入 L2 候选集，再由人工完成确认。</p>
+          </article>
+          <article>
+            <span>NEXT OPTIMIZATION</span>
+            <h3>Recover missed GT</h3>
+            <p>继续围绕 L2 漏召类别补充 recovery、boundary 和 exclusion 规则，同时控制平均候选数量。</p>
+          </article>
+        </div>
+
+        <div class="outcome-source">
+          <span>DATA SOURCE</span>
+          <code>batch_id = PT_Full_Training_0827</code>
+          <small>Dashboard dataset: PT_FullTraining_0827 · Top-K denominator includes ranked cases only</small>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <span>AI Agent Workflow / PT_Layer 工作流图谱</span>
+      <a href="#top">回到顶部 <i data-lucide="arrow-up"></i></a>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
