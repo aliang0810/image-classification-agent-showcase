@@ -1018,12 +1018,13 @@ function initAmbientCanvas() {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  const staticPreview = new URLSearchParams(window.location.search).has("static");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const palette = [
-    [66, 212, 232],
-    [86, 140, 255],
-    [99, 214, 175],
-    [165, 105, 232],
+    [104, 213, 189],
+    [78, 170, 153],
+    [130, 166, 158],
+    [91, 126, 120],
   ];
   let width = 0;
   let height = 0;
@@ -1032,6 +1033,7 @@ function initAmbientCanvas() {
   let pulses = [];
   let frameId = 0;
   let lastTime = 0;
+  let staticScrollTimer = 0;
   let scrollY = window.scrollY;
   const pointer = { x: 0, y: 0 };
 
@@ -1098,7 +1100,7 @@ function initAmbientCanvas() {
     const horizon = height * 0.22;
     const offset = (time * 0.012) % 56;
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "rgba(126, 163, 205, 0.1)";
+    ctx.strokeStyle = "rgba(104, 213, 189, 0.09)";
 
     for (let y = horizon + offset; y < height + 56; y += 56) {
       const progress = (y - horizon) / Math.max(1, height - horizon);
@@ -1122,9 +1124,9 @@ function initAmbientCanvas() {
 
   function drawCircuitTraces(time) {
     const traceColors = [
-      "rgba(104, 210, 208, 0.18)",
-      "rgba(126, 160, 214, 0.13)",
-      "rgba(168, 125, 205, 0.11)",
+      "rgba(104, 213, 189, 0.2)",
+      "rgba(104, 213, 189, 0.12)",
+      "rgba(180, 187, 183, 0.08)",
     ];
 
     for (let route = 0; route < 9; route += 1) {
@@ -1214,7 +1216,7 @@ function initAmbientCanvas() {
       const latitudeY = Math.sin(latitudeAngle) * radius * 0.27;
       ctx.beginPath();
       ctx.ellipse(0, latitudeY, Math.abs(latitudeRadius), Math.abs(latitudeRadius) * 0.34, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = latitude === 0 ? "rgba(115, 222, 219, 0.3)" : "rgba(129, 167, 190, 0.14)";
+      ctx.strokeStyle = latitude === 0 ? "rgba(104, 213, 189, 0.34)" : "rgba(104, 213, 189, 0.12)";
       ctx.lineWidth = latitude === 0 ? 1.1 : 0.65;
       ctx.stroke();
     }
@@ -1224,7 +1226,7 @@ function initAmbientCanvas() {
       ctx.rotate(angle);
       ctx.beginPath();
       ctx.ellipse(0, 0, radius * 0.52, radius * 0.18, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = longitude % 3 === 0 ? "rgba(118, 190, 211, 0.2)" : "rgba(130, 151, 177, 0.1)";
+      ctx.strokeStyle = longitude % 3 === 0 ? "rgba(104, 213, 189, 0.2)" : "rgba(180, 187, 183, 0.08)";
       ctx.lineWidth = 0.65;
       ctx.stroke();
       ctx.restore();
@@ -1244,10 +1246,10 @@ function initAmbientCanvas() {
       ctx.ellipse(0, 0, ringRadius, ringRadius, 0, -span * 0.5, span * 0.5);
       ctx.strokeStyle =
         ring % 4 === 0
-          ? "rgba(112, 228, 222, 0.52)"
+          ? "rgba(104, 213, 189, 0.52)"
           : ring % 4 === 1
-            ? "rgba(150, 178, 222, 0.27)"
-            : "rgba(181, 134, 221, 0.2)";
+            ? "rgba(104, 213, 189, 0.24)"
+            : "rgba(180, 187, 183, 0.14)";
       ctx.lineWidth = ring % 5 === 0 ? 1.7 : 0.8;
       ctx.stroke();
       ctx.restore();
@@ -1275,10 +1277,10 @@ function initAmbientCanvas() {
       ctx.rotate(angle);
       ctx.fillStyle =
         shard % 3 === 0
-          ? "rgba(108, 238, 239, 0.4)"
+          ? "rgba(104, 213, 189, 0.4)"
           : shard % 3 === 1
-            ? "rgba(126, 234, 188, 0.28)"
-            : "rgba(189, 138, 239, 0.26)";
+            ? "rgba(104, 213, 189, 0.24)"
+            : "rgba(180, 187, 183, 0.18)";
       ctx.fillRect(-3, -0.5, 6 + (shard % 4) * 2, 1);
       ctx.restore();
     }
@@ -1373,13 +1375,13 @@ function initAmbientCanvas() {
   function drawScan(time) {
     const x = (time * 0.035) % (width + 240) - 120;
     const y = (time * 0.022) % (height + 180) - 90;
-    ctx.fillStyle = "rgba(66, 212, 232, 0.12)";
+    ctx.fillStyle = "rgba(104, 213, 189, 0.1)";
     ctx.fillRect(x, 0, 1, height);
-    ctx.fillStyle = "rgba(99, 214, 175, 0.035)";
+    ctx.fillStyle = "rgba(104, 213, 189, 0.025)";
     ctx.fillRect(x - 42, 0, 42, height);
-    ctx.fillStyle = "rgba(165, 105, 232, 0.08)";
+    ctx.fillStyle = "rgba(104, 213, 189, 0.05)";
     ctx.fillRect(0, y, width, 1);
-    ctx.fillStyle = "rgba(165, 105, 232, 0.022)";
+    ctx.fillStyle = "rgba(104, 213, 189, 0.015)";
     ctx.fillRect(0, y - 24, width, 24);
   }
 
@@ -1428,22 +1430,17 @@ function initAmbientCanvas() {
   }
 
   function render(time = 0) {
-    const delta = Math.min(32, time - lastTime || 16);
     lastTime = time;
     ctx.clearRect(0, 0, width, height);
     ctx.globalCompositeOperation = "screen";
-    drawTopographicField(time);
     drawPerspectiveGrid(time);
     drawCircuitTraces(time);
-    drawDataLanes(time);
     drawKineticCore(time);
-    drawNetwork(delta);
-    drawPulses(time);
     drawScan(time);
     drawCalibrationFrame(time);
     ctx.globalCompositeOperation = "source-over";
 
-    if (!reducedMotion.matches && !document.hidden) {
+    if (!staticPreview && !reducedMotion.matches && !document.hidden) {
       frameId = window.requestAnimationFrame(render);
     }
   }
@@ -1466,6 +1463,10 @@ function initAmbientCanvas() {
     "scroll",
     () => {
       scrollY = window.scrollY;
+      if (staticPreview) {
+        window.clearTimeout(staticScrollTimer);
+        staticScrollTimer = window.setTimeout(() => render(performance.now()), 80);
+      }
     },
     { passive: true },
   );
@@ -1539,3 +1540,47 @@ function initProjectDrawer() {
 }
 
 initProjectDrawer();
+
+function initSectionNavigation() {
+  const links = [...document.querySelectorAll(".top-nav a[href^='#']")];
+  const sections = links
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  const workflowSection = document.querySelector("#workflow");
+  if (workflowSection) sections.push(workflowSection);
+
+  function setActive(sectionId) {
+    links.forEach((link) => {
+      const active = link.getAttribute("href") === `#${sectionId}`;
+      link.classList.toggle("active", active);
+      if (active) {
+        link.setAttribute("aria-current", "true");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (visible[0]) {
+        setActive(visible[0].target.id === "workflow" ? "overview" : visible[0].target.id);
+      }
+    },
+    { rootMargin: "-28% 0px -58% 0px", threshold: [0, 0.1, 0.35] },
+  );
+
+  sections.forEach((section) => observer.observe(section));
+  const initialSection = window.location.hash.slice(1);
+  if (initialSection) {
+    setActive(initialSection === "workflow" ? "overview" : initialSection);
+  }
+  links.forEach((link) => {
+    link.addEventListener("click", () => setActive(link.getAttribute("href").slice(1)));
+  });
+}
+
+initSectionNavigation();

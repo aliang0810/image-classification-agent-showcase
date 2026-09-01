@@ -11,13 +11,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260901-9" />
+    <link rel="stylesheet" href="./styles.css?v=20260901-13" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
+    <div class="ambient-hud" aria-hidden="true">
+      <span class="ambient-hud-left">SYS / PT5 / 001</span>
+      <span class="ambient-hud-right">LAT 31.2304 / LON 121.4737</span>
+    </div>
     <header class="site-header">
       <button
         class="brand"
@@ -207,35 +211,69 @@
       </section>
 
       <section class="overview shell" id="overview">
-        <div class="section-title">
+        <div class="section-title" data-section-index="01">
           <span class="micro">01 / AGENT · ARCHITECTURE</span>
           <h2>分层完成分类决策</h2>
           <p>三个子 Agent 各自承担单一职责，并通过稳定字段协议组成完整分类链。</p>
         </div>
-        <div class="overview-grid">
-          <article>
-            <span>01 / RECALL</span>
-            <h3>L1 Candidate Recall</h3>
-            <p>从图片和标题中召回一级类目，为后续细分选择正确的 Taxonomy 子树。</p>
-            <strong>高召回 · 多路由 · 可重试</strong>
-          </article>
-          <article>
-            <span>02 / ROUTING</span>
-            <h3>L2 Subtree Routing</h3>
-            <p>按 L1 类目循环加载专属 Prompt，在受限范围内生成并排序叶子候选。</p>
-            <strong>动态 Prompt · 循环执行 · Top-3</strong>
-          </article>
-          <article>
-            <span>03 / DECISION</span>
-            <h3>L3 Final Decision</h3>
-            <p>结合候选定义与优先级规则完成最终仲裁，并对异常结果进行自动补偿。</p>
-            <strong>规则裁决 · 单候选跳过 · Trace</strong>
-          </article>
+        <div class="agent-overview-layout">
+          <div class="overview-grid" aria-label="Agent 阶段索引">
+            <article>
+              <span>01 / RECALL</span>
+              <h3>L1 Candidate Recall</h3>
+              <p>召回一级类目，选择正确的 Taxonomy 子树。</p>
+              <strong>高召回 · 多路由 · 可重试</strong>
+            </article>
+            <article>
+              <span>02 / ROUTING</span>
+              <h3>L2 Subtree Routing</h3>
+              <p>加载子树 Prompt，生成并排序叶子候选。</p>
+              <strong>动态 Prompt · 循环执行 · Top-3</strong>
+            </article>
+            <article>
+              <span>03 / DECISION</span>
+              <h3>L3 Final Decision</h3>
+              <p>依据定义与优先级完成最终仲裁。</p>
+              <strong>规则裁决 · 补偿 · Trace</strong>
+            </article>
+          </div>
+          <div class="agent-architecture" aria-label="三级 Agent 架构">
+            <header>
+              <div>
+                <span class="micro">SYSTEM MAP</span>
+                <h3>Candidate-first inference</h3>
+              </div>
+              <code>INPUT → TOP-3 → HUMAN</code>
+            </header>
+            <div class="agent-route">
+              <article>
+                <b>L1</b>
+                <div><span>SEARCH SPACE</span><strong>一级候选召回</strong></div>
+                <small>Image + caption</small>
+              </article>
+              <i data-lucide="arrow-down"></i>
+              <article>
+                <b>L2</b>
+                <div><span>CANDIDATE SET</span><strong>子树路由与排序</strong></div>
+                <small>Ranked Top-3</small>
+              </article>
+              <i data-lucide="arrow-down"></i>
+              <article>
+                <b>L3</b>
+                <div><span>FINAL ARBITRATION</span><strong>规则冲突仲裁</strong></div>
+                <small>Top-1 + trace</small>
+              </article>
+            </div>
+            <footer>
+              <span>OUTPUT CONTRACT</span>
+              <p>候选、置信度、证据与运行状态通过统一字段协议进入辅助标注。</p>
+            </footer>
+          </div>
         </div>
       </section>
 
       <section class="workflow shell" id="workflow">
-        <div class="section-title workflow-title">
+        <div class="section-title workflow-title" data-section-index="01.2">
           <div>
             <span class="micro">01.2 / AGENT · WORKFLOW</span>
             <h2>先看链路，再看节点</h2>
@@ -366,7 +404,7 @@
       </section>
 
       <section class="method shell" id="method">
-        <div class="section-title">
+        <div class="section-title" data-section-index="02">
           <span class="micro">02 / PROMPT · RULE SYSTEM</span>
           <h2>七层 Prompt 规则框架</h2>
           <p>从角色、推理流程和边界规则开始，到类目证据、置信度与 JSON 契约结束；每一层都有明确职责。</p>
@@ -397,11 +435,18 @@
               <p id="promptDetailIntent">先固定模型身份和任务边界，避免后续规则建立在模糊目标上。</p>
             </div>
           </article>
+          <div class="prompt-contract" aria-label="Prompt 输出链">
+            <div><b>01</b><span>EVIDENCE</span><strong>可观察证据</strong></div>
+            <i data-lucide="arrow-right"></i>
+            <div><b>02</b><span>SCORE</span><strong>独立置信度</strong></div>
+            <i data-lucide="arrow-right"></i>
+            <div><b>03</b><span>OUTPUT</span><strong>白名单 JSON</strong></div>
+          </div>
         </div>
       </section>
 
       <section class="rca shell" id="rca">
-        <div class="section-title">
+        <div class="section-title" data-section-index="03">
           <span class="micro">03 / RCA · FEEDBACK LOOP</span>
           <h2>自动 RCA 驱动规则迭代</h2>
           <p>从评测差异中识别失败层、归因根因并生成修正动作，经定向回归验证后进入下一版基线。</p>
@@ -517,7 +562,7 @@
       </section>
 
       <section class="outcome shell" id="outcome">
-        <header class="outcome-header">
+        <header class="outcome-header section-title" data-section-index="04">
           <span class="micro">04 / RESULT · ASSISTED LABELING</span>
           <h2>让模型提供高召回候选，<br />让标注员完成最终判断。</h2>
           <p>项目目标不是直接替代人工，而是用 L2 候选集缩小判断范围。当前结果更适合候选推荐式辅助标注，而非无人审的全自动分类。</p>
@@ -616,6 +661,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260901-9"></script>
+    <script src="./app.js?v=20260901-13"></script>
   </body>
 </html>
