@@ -1086,13 +1086,6 @@ h1 em {
   line-height: 1.35;
 }
 
-.hero-results span small {
-  display: block;
-  margin-top: 5px;
-  color: var(--dim);
-  font-size: 10px;
-}
-
 .signal-panel {
   position: relative;
   z-index: 1;
