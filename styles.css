@@ -2414,15 +2414,16 @@ footer svg {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   border-bottom: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .rca-loop article {
-  position: relative;
   display: grid;
-  grid-template-columns: 26px minmax(0, 1fr);
-  gap: 4px 12px;
-  min-height: 112px;
-  padding: 18px 20px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 88px;
+  padding: 18px;
   border-right: 1px solid var(--line);
 }
 
@@ -2431,23 +2432,14 @@ footer svg {
 }
 
 .rca-loop article > span {
-  grid-column: 1 / -1;
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 9px;
-}
-
-.rca-loop svg {
-  width: 19px;
-  height: 19px;
-  margin-top: 2px;
-  color: var(--cyan);
-  stroke-width: 1.4;
+  font-size: 11px;
 }
 
 .rca-loop h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -2459,20 +2451,42 @@ footer svg {
 
 .rca-trigger-strip {
   display: grid;
-  grid-template-columns: 88px 1.35fr 0.8fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border-bottom: 1px solid var(--line);
   background: var(--surface-2);
 }
 
-.rca-trigger-strip > .micro {
-  align-self: center;
-  padding: 20px;
+.rca-trigger-strip > header {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.rca-trigger-strip > header span {
+  color: var(--dim);
+  font-size: 10px;
+}
+
+.rca-trigger-strip > header strong {
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .rca-trigger-strip article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 16px;
   min-width: 0;
-  padding: 16px 18px;
+  min-height: 98px;
+  padding: 17px 20px;
   border-left: 1px solid var(--line);
+}
+
+.rca-trigger-strip article:first-of-type {
+  border-left: 0;
 }
 
 .rca-trigger-strip b {
@@ -2483,12 +2497,14 @@ footer svg {
 }
 
 .rca-trigger-strip p {
+  grid-column: 1 / -1;
   margin: 5px 0 7px;
   color: var(--text);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .rca-trigger-strip code {
+  grid-column: 1;
   display: block;
   color: var(--dim);
   font-family: var(--mono);
@@ -2497,10 +2513,20 @@ footer svg {
   overflow-wrap: anywhere;
 }
 
+.rca-trigger-strip article > strong {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: end;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .rca-explorer {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  min-height: 510px;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 470px;
 }
 
 .rca-rule-index {
@@ -2511,9 +2537,14 @@ footer svg {
 
 .rca-rule-index > header {
   display: grid;
-  gap: 7px;
+  gap: 6px;
   padding: 20px;
   border-bottom: 1px solid var(--line);
+}
+
+.rca-rule-index > header span {
+  color: var(--dim);
+  font-size: 10px;
 }
 
 .rca-rule-index > header strong {
@@ -2543,7 +2574,7 @@ footer svg {
   grid-template-columns: 26px minmax(0, 1fr);
   gap: 8px;
   width: 100%;
-  min-height: 43px;
+  min-height: 39px;
   padding: 7px 8px;
   border: 0;
   border-bottom: 1px solid var(--line);
@@ -2564,8 +2595,7 @@ footer svg {
   min-width: 0;
 }
 
-.rca-rule-button strong,
-.rca-rule-button small {
+.rca-rule-button strong {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2575,12 +2605,6 @@ footer svg {
 .rca-rule-button strong {
   font-size: 12px;
   font-weight: 500;
-}
-
-.rca-rule-button small {
-  margin-top: 2px;
-  color: var(--dim);
-  font-size: 9px;
 }
 
 .rca-rule-button:hover,
@@ -2595,14 +2619,14 @@ footer svg {
 
 .rca-detail {
   align-self: center;
-  min-height: 350px;
+  min-height: 330px;
   padding: 38px 44px;
 }
 
 .rca-detail-heading {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 22px;
   align-items: end;
   padding-bottom: 28px;
   border-bottom: 1px solid var(--line);
@@ -2611,7 +2635,7 @@ footer svg {
 .rca-detail-heading > b {
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 62px;
+  font-size: 44px;
   font-weight: 500;
   line-height: 0.8;
 }
@@ -2624,17 +2648,11 @@ footer svg {
 }
 
 .rca-detail h3 {
-  margin: 8px 0 4px;
+  margin: 8px 0 0;
   font-family: var(--serif);
   font-size: 26px;
   font-weight: 500;
   line-height: 1.15;
-}
-
-.rca-detail-zh {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
 }
 
 .rca-detail-body {
@@ -3558,12 +3576,6 @@ footer a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .rca-trigger-strip > .micro {
-    grid-column: 1 / -1;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--line);
-  }
-
   .rca-trigger-strip article:first-of-type {
     border-left: 0;
   }
@@ -3694,8 +3706,8 @@ footer a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .rca-trigger-strip > .micro {
-    padding: 12px 14px;
+  .rca-trigger-strip > header {
+    padding: 14px 16px;
   }
 
   .rca-trigger-strip article {
@@ -3729,10 +3741,6 @@ footer a {
     grid-template-columns: 20px minmax(0, 1fr);
     gap: 5px;
     padding-inline: 5px;
-  }
-
-  .rca-rule-button small {
-    display: none;
   }
 
   .rca-detail {
@@ -3833,7 +3841,7 @@ footer a {
     display: block;
   }
 
-  .rca-trigger-strip > .micro {
+  .rca-trigger-strip > header {
     display: block;
   }
 
@@ -3846,6 +3854,7 @@ footer a {
   }
 
   .rca-trigger-strip p {
+    grid-column: 2;
     margin: 0;
   }
 

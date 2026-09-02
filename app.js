@@ -996,75 +996,66 @@ const promptSections = [
 const rcaRules = [
   {
     code: "A",
-    title: "System failure",
     zh: "系统执行失败",
     scope: "全链路",
-    rule: "图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。",
-    action: "检查输入完整性、资源加载和执行链路，不调用 RCA 模型。",
+    rule: "图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、类目规则或模型能力。",
+    action: "检查输入完整性、资源加载和执行链路，无需进入模型归因。",
   },
   {
     code: "B",
-    title: "Foreign language",
     zh: "语言障碍",
     scope: "全链路",
     rule: "关键证据依赖某种语言，模型无法可靠理解该语言，且语言理解是分类错误的主要障碍。",
-    action: "补充对应语言的 OCR、翻译或多语言理解能力。",
+    action: "补充文字识别、翻译或多语言理解能力。",
   },
   {
     code: "C",
-    title: "Potential GT error",
     zh: "潜在标注错误",
     scope: "全链路",
-    rule: "类目定义清晰，但完整图片证据稳定支持其他类目，且几乎没有决定性证据支持当前 GT。",
-    action: "回查人工标注和证据链，确认后修订 GT。",
+    rule: "类目定义清晰，但完整图片证据稳定支持其他类目，且几乎没有决定性证据支持当前人工标签。",
+    action: "回查人工标注和证据链，确认后修订标签。",
   },
   {
     code: "D",
-    title: "Definition gap",
     zh: "定义设计缺口",
     scope: "L1 / L2",
-    rule: "定义缺少纳入、排除或区分标准，或相邻类目重叠、模糊；错误更适合由 Taxonomy 设计解释。",
-    action: "修改 Definition、Signals 或 Exclusions，明确相邻类目的分界。",
+    rule: "定义缺少纳入、排除或区分标准，或相邻类目重叠、模糊；错误更适合由类目体系设计解释。",
+    action: "补充类目定义、识别证据与排除条件，明确相邻类目的分界。",
   },
   {
     code: "E",
-    title: "Priority rule missing",
     zh: "优先级规则缺失",
     scope: "L3",
     rule: "多个候选都合理，但 L3 缺少明确的优先级、平局处理或冲突消解规则。",
-    action: "在 L3 增加显式 Priority 或 tie-breaker 规则。",
+    action: "在 L3 增加明确的优先级和冲突裁决规则。",
   },
   {
     code: "F",
-    title: "Prompt guidance gap",
     zh: "Prompt 指导缺口",
     scope: "L1–L3",
     rule: "定义和优先级原则基本充分，但缺少操作步骤、约束、正反例或决策清单，导致执行路径漂移。",
-    action: "补充 ordered checks、示例、反例或 final check。",
+    action: "补充顺序化检查、正反例和最终复核。",
   },
   {
     code: "G",
-    title: "Candidate noise",
     zh: "候选集噪声",
     scope: "L2",
     rule: "GT 仍在 L2 候选中，但同时输出过多弱相关、重复或偏离候选；GT 缺失时不得使用该标签。",
-    action: "收紧 L2 候选生成和 reducer 规则，降低无效候选数量。",
+    action: "收紧 L2 候选生成与聚合规则，降低无效候选数量。",
   },
   {
     code: "H",
-    title: "True boundary case",
     zh: "真实边界案例",
     scope: "全链路",
-    rule: "定义已经合理，且不存在现实可行的 Prompt、规则或定义修改能稳定区分；图片确实支持多个类目。",
-    action: "沉淀到 Hard Case Library，作为边界评测样本持续跟踪。",
+    rule: "定义已经合理，且不存在现实可行的提示词、规则或定义修改能稳定区分；图片确实支持多个类目。",
+    action: "沉淀到边界案例库，作为专项评测样本持续跟踪。",
   },
   {
     code: "I",
-    title: "Model capability gap",
     zh: "模型能力缺口",
     scope: "最后兜底",
-    rule: "A–H 均不适用，定义、规则和 Prompt 已充分，但模型仍无法感知、提取或推理关键证据。",
-    action: "评估模型升级、工具增强或专用识别模块，不继续堆叠 Prompt。",
+    rule: "A–H 均不适用，定义、规则和提示词已充分，但模型仍无法感知、提取或推理关键证据。",
+    action: "评估模型升级、工具增强或专用识别模块，不再继续堆叠提示词。",
   },
 ];
 
@@ -1111,7 +1102,6 @@ function initContentExplorers() {
       document.querySelector("#rcaDetailCode").textContent = rule.code;
       document.querySelector("#rcaDetailScope").textContent = rule.scope;
       document.querySelector("#rcaDetailTitle").textContent = rule.zh;
-      document.querySelector("#rcaDetailZh").textContent = rule.title;
       document.querySelector("#rcaDetailRule").textContent = rule.rule;
       document.querySelector("#rcaDetailAction").textContent = rule.action;
       rcaDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
