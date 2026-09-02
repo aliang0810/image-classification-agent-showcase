@@ -1213,10 +1213,7 @@ footer {
 }
 
 .workflow-title {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 60px;
-  align-items: end;
+  display: block;
   max-width: none;
 }
 
@@ -1227,11 +1224,6 @@ footer {
 
 .workflow-title > div h2 {
   margin-bottom: 0;
-}
-
-.workflow-title p {
-  max-width: 370px;
-  margin: 0;
 }
 
 .workspace {
@@ -3075,11 +3067,6 @@ footer a {
     padding-top: 0;
   }
 
-  .workflow-title {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
   .workspace-navigation {
     align-items: flex-start;
     flex-direction: column;
@@ -3446,7 +3433,6 @@ footer a {
     font-size: 32px;
   }
 
-  .workflow-title,
   .panel-heading {
     align-items: flex-start;
   }
