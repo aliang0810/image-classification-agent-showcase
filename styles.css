@@ -945,8 +945,10 @@ h1 em {
 .hero-impact header {
   display: grid;
   gap: 7px;
+  justify-items: center;
   padding-bottom: 22px;
   border-bottom: 1px solid var(--line);
+  text-align: center;
 }
 
 .hero-impact header strong,
@@ -956,7 +958,7 @@ h1 em {
 
 .hero-impact header strong {
   color: var(--text);
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
 }
 
@@ -972,8 +974,8 @@ h1 em {
   grid-template-columns: minmax(130px, auto) 1fr;
   gap: 18px;
   align-items: baseline;
-  min-height: 72px;
-  padding: 18px 0;
+  min-height: 84px;
+  padding: 22px 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -982,25 +984,28 @@ h1 em {
 }
 
 .hero-results strong {
-  color: var(--cyan);
+  color: #7ee8d1;
   font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 36px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
 }
 
 .hero-results span {
-  color: var(--dim);
-  font-size: 11px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.35;
 }
 
 .hero-results span small {
   display: block;
   margin-top: 5px;
-  color: var(--dim);
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 400;
 }
 
 .signal-panel {
@@ -3874,11 +3879,20 @@ footer a {
 
   .hero-results article {
     display: grid;
-    grid-template-columns: minmax(125px, auto) 1fr;
+    grid-template-columns: minmax(140px, auto) 1fr;
+    gap: 14px;
     min-height: 64px;
     padding: 16px 0;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .hero-results strong {
+    font-size: 32px;
+  }
+
+  .hero-results span {
+    font-size: 11px;
   }
 
   .hero-results article:last-child {
