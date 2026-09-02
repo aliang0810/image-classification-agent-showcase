@@ -1759,8 +1759,6 @@ function initSectionNavigation() {
   const sections = links
     .map((link) => document.querySelector(link.getAttribute("href")))
     .filter(Boolean);
-  const workflowSection = document.querySelector("#workflow");
-  if (workflowSection) sections.push(workflowSection);
   const orderedSections = [...sections].sort(
     (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top,
   );
@@ -1803,8 +1801,7 @@ function initSectionNavigation() {
       }
     });
 
-    const sectionId = activeSection.id === "workflow" ? "overview" : activeSection.id;
-    setActive(sectionId);
+    setActive(activeSection.id);
   }
 
   function scheduleActiveUpdate() {

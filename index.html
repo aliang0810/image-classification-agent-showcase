@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-09" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-10" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -233,85 +233,31 @@
         </div>
       </section>
 
-      <section class="overview shell" id="overview">
-        <div class="section-title" data-section-index="01">
-          <span class="micro">01 / AGENT · ARCHITECTURE</span>
-          <h2>分层完成分类决策</h2>
-          <p>三个子 Agent 各自承担单一职责，并通过稳定字段协议组成完整分类链。</p>
-        </div>
-        <div class="agent-overview-layout">
-          <div class="overview-grid" aria-label="Agent 阶段索引">
-            <article>
-              <span>01 / RECALL</span>
-              <h3>一级候选召回<small>L1 Candidate Recall</small></h3>
-              <p>召回一级类目，选择正确的 Taxonomy 子树。</p>
-              <strong>高召回 · 多路由 · 可重试</strong>
-            </article>
-            <article>
-              <span>02 / ROUTING</span>
-              <h3>二级子树路由<small>L2 Subtree Routing</small></h3>
-              <p>加载子树 Prompt，生成并排序叶子候选。</p>
-              <strong>动态 Prompt · 循环执行 · Top-3</strong>
-            </article>
-            <article>
-              <span>03 / DECISION</span>
-              <h3>三级最终决策<small>L3 Final Decision</small></h3>
-              <p>依据定义与优先级完成最终仲裁。</p>
-              <strong>规则裁决 · 补偿 · Trace</strong>
-            </article>
-          </div>
-          <div class="agent-architecture" aria-label="三级 Agent 架构">
-            <header>
-              <div>
-                <span class="micro">SYSTEM MAP</span>
-                <h3>候选优先推理<small>Candidate-first inference</small></h3>
-              </div>
-              <code>INPUT → TOP-3 → HUMAN</code>
-            </header>
-            <div class="agent-route">
-              <article>
-                <b>L1</b>
-                <div><span>SEARCH SPACE</span><strong>一级候选召回</strong></div>
-                <small>Image + caption</small>
-              </article>
-              <i data-lucide="arrow-down"></i>
-              <article>
-                <b>L2</b>
-                <div><span>CANDIDATE SET</span><strong>子树路由与排序</strong></div>
-                <small>Ranked Top-3</small>
-              </article>
-              <i data-lucide="arrow-down"></i>
-              <article>
-                <b>L3</b>
-                <div><span>FINAL ARBITRATION</span><strong>规则冲突仲裁</strong></div>
-                <small>Top-1 + trace</small>
-              </article>
-            </div>
-            <footer>
-              <span>OUTPUT CONTRACT</span>
-              <p>候选、置信度、证据与运行状态通过统一字段协议进入辅助标注。</p>
-            </footer>
-          </div>
-        </div>
-      </section>
-
-      <section class="workflow shell" id="workflow">
-        <div class="section-title workflow-title" data-section-index="01.2">
+      <section class="workflow shell" id="overview">
+        <div class="section-title workflow-title" data-section-index="01">
           <div>
-            <span class="micro">01.2 / AGENT · WORKFLOW</span>
-            <h2>先看链路，再看节点</h2>
+            <span class="micro">01 / AGENT · WORKFLOW</span>
+            <h2>分层链路与节点</h2>
           </div>
-          <p>总链路用五阶段理解系统，L1–L3 聚焦各自关键路径；需要深入时再进入三泳道节点图。</p>
+          <p>候选优先完成 L1 召回、L2 路由与 Top-3 排序、L3 规则仲裁；切换层级即可查看关键路径与完整节点。</p>
         </div>
 
         <div class="workspace">
           <div class="workspace-toolbar">
             <div class="workspace-navigation">
               <div class="layer-tabs" role="tablist" aria-label="选择工作流层级">
-                <button class="layer-tab active" data-layer="main" role="tab">总链路</button>
-                <button class="layer-tab" data-layer="l1" role="tab">PT_Layer1</button>
-                <button class="layer-tab" data-layer="l2" role="tab">PT_Layer2</button>
-                <button class="layer-tab" data-layer="l3" role="tab">PT_Layer3</button>
+                <button class="layer-tab active" data-layer="main" role="tab">
+                  <b>总链路</b><span>系统编排</span>
+                </button>
+                <button class="layer-tab" data-layer="l1" role="tab">
+                  <b>L1</b><span>一级候选召回</span>
+                </button>
+                <button class="layer-tab" data-layer="l2" role="tab">
+                  <b>L2</b><span>子树路由 · Top-3</span>
+                </button>
+                <button class="layer-tab" data-layer="l3" role="tab">
+                  <b>L3</b><span>规则仲裁 · Top-1</span>
+                </button>
               </div>
               <div class="view-tabs" role="tablist" aria-label="选择工作流视图">
                 <button class="view-tab active" data-view="overview" role="tab" aria-selected="true">
@@ -676,6 +622,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260902-09"></script>
+    <script src="./app.js?v=20260902-10"></script>
   </body>
 </html>
