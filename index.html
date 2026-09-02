@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Image Classification Agent 的 L1、L2、L3 工作流可视化与节点说明。"
+      content="基于分层 Agent 的 Candidate-first 图片分类候选辅助标注方案。"
     />
-    <title>Image Classification Agent · Workflow Index</title>
+    <title>Photo Taxonomy Candidate Copilot · Project Case</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-15" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-16" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -28,7 +28,7 @@
         aria-expanded="false"
       >
         <span class="brand-mark" aria-hidden="true"></span>
-        <span>PT Workflow Index</span>
+        <span>Photo Taxonomy Candidate Copilot</span>
       </button>
       <nav class="top-nav" aria-label="页面导航">
         <a href="#overview">AGENT</a>
@@ -49,8 +49,8 @@
     >
       <header class="project-drawer-head">
         <div>
-          <span class="micro">PROJECT INDEX</span>
-          <strong>PT Workflow</strong>
+          <span class="micro">项目索引</span>
+          <strong>Photo Taxonomy Candidate Copilot</strong>
         </div>
         <button class="project-drawer-close" id="projectDrawerClose" type="button" aria-label="关闭项目目录">
           <i data-lucide="x"></i>
@@ -61,25 +61,25 @@
           <button class="active" type="button" data-project-section="background" aria-controls="projectPanelBackground">
             <span>01</span>
             <strong>项目背景</strong>
-            <small>PROJECT CONTEXT</small>
+            <small>发现 Top-3 Recall 瓶颈</small>
             <i data-lucide="arrow-right"></i>
           </button>
           <button type="button" data-project-section="goal" aria-controls="projectPanelGoal">
             <span>02</span>
             <strong>项目目标</strong>
-            <small>PROJECT OBJECTIVE</small>
+            <small>从自动分类转向候选辅助</small>
             <i data-lucide="arrow-right"></i>
           </button>
           <button type="button" data-project-section="work" aria-controls="projectPanelWork">
             <span>03</span>
             <strong>主要工作</strong>
-            <small>CORE WORK</small>
+            <small>定位、决策、设计与验证</small>
             <i data-lucide="arrow-right"></i>
           </button>
           <button type="button" data-project-section="result" aria-controls="projectPanelResult">
             <span>04</span>
             <strong>最终成果</strong>
-            <small>FINAL OUTCOME</small>
+            <small>效率与准确率同步改善</small>
             <i data-lucide="arrow-right"></i>
           </button>
         </nav>
@@ -87,96 +87,99 @@
         <div class="project-drawer-content" aria-live="polite">
           <article class="project-panel active" id="projectPanelBackground" data-project-panel="background">
             <header class="project-panel-identity">
-              <div><span>PROJECT CONTEXT</span><h2>项目背景</h2></div>
+              <div><span>01 / 项目背景</span><h2>项目背景</h2></div>
               <b>01</b>
             </header>
-            <h3 class="project-panel-title">端到端 Top-1 暂不足以支撑全自动分类。</h3>
-            <p class="project-panel-lead">
-              Photo Taxonomy 5.0 类目层级深、相似边界多。标注员需要反复检索规则并比较近似类目，判断成本高，结果也容易受到经验差异影响。
-            </p>
-            <div class="project-decision-evidence" aria-label="方案判断依据">
-              <div>
-                <strong>52.9%</strong>
-                <span>L3 Top-1 Accuracy</span>
-                <small>不满足无人审核要求</small>
-              </div>
-              <i data-lucide="arrow-right"></i>
-              <div>
-                <strong>86.5%</strong>
-                <span>L2 Candidate Recall</span>
-                <small>适合候选辅助标注</small>
-              </div>
+            <h3 class="project-panel-title">Top-3 Recall 偏低，限制候选辅助标注落地</h3>
+            <div class="project-panel-copy">
+              <p>Photo Taxonomy 5.0 类目层级深、相邻类目边界模糊。标注员需要反复检索规则、比较近似类目，标注效率和结果一致性容易受到个人经验影响。</p>
+              <p>前期评测显示，正确类目经常未进入 Top-3，候选召回成为影响后续判断的关键瓶颈。模型尚不适合直接完成 Top-1 自动分类，但已经具备缩小类目搜索范围的能力。</p>
+              <p>因此，我推动项目转向 Candidate-first 辅助标注：优先提升候选召回质量，由模型推荐少量高相关候选，保留标注员完成最终决策。</p>
             </div>
-            <div class="project-statement">
-              <span>核心判断</span>
-              <p>保留人工最终决策，将模型能力用于缩小候选范围，把开放式类目检索转化为更高效的有限选择。</p>
+            <div class="project-judgment-grid" aria-label="项目判断">
+              <section><span>前期问题</span><p>正确类目未稳定进入 Top-3，候选结果不足以支持快速决策。</p></section>
+              <section><span>方向调整</span><p>从模型直接给出唯一答案，转向模型缩小范围、人工最终确认。</p></section>
+              <section><span>核心判断</span><p>现阶段模型更适合承担候选召回，而不是替代人工完成分类。</p></section>
             </div>
             <dl class="project-facts">
-              <div><dt>分类结构</dt><dd>L1 → L2 → L3</dd></div>
-              <div><dt>推荐方式</dt><dd>Top-3 Candidate</dd></div>
-              <div><dt>决策角色</dt><dd>Human in the loop</dd></div>
+              <div><dt>业务场景</dt><dd>图片内容分类与辅助标注</dd></div>
+              <div><dt>核心瓶颈</dt><dd>Top-3 Candidate Recall</dd></div>
+              <div><dt>方案定位</dt><dd>Human in the Loop</dd></div>
             </dl>
           </article>
 
           <article class="project-panel" id="projectPanelGoal" data-project-panel="goal" hidden>
             <header class="project-panel-identity">
-              <div><span>PROJECT OBJECTIVE</span><h2>项目目标</h2></div>
+              <div><span>02 / 项目目标</span><h2>项目目标</h2></div>
               <b>02</b>
             </header>
-            <h3 class="project-panel-title">构建 Candidate-first 分层方案，并验证辅助标注收益。</h3>
+            <h3 class="project-panel-title">建立高召回、可解释、可持续迭代的候选辅助标注方案</h3>
             <p class="project-panel-lead">
-              以 L2 高召回候选集作为生产落点，L3 Top-1 用于能力评测与错误分析；通过结构化规则、稳定执行链路和对照评测，验证候选推荐是否真正降低人工判断成本。
+              项目不以短期实现全自动分类为目标，而是优先解决候选覆盖不足的问题，让模型在可控风险下真正改善标注流程。
             </p>
             <div class="project-objectives">
-              <section><b>01</b><strong>候选优先</strong><p>建立 L1 召回、L2 Top-3 候选与人工最终判断的分层分类路径。</p></section>
-              <section><b>02</b><strong>稳定执行</strong><p>通过七层 Prompt、结构化输出、解析校验与补偿重试约束结果质量。</p></section>
-              <section><b>03</b><strong>对照评测</strong><p>区分离线评测与标注实验样本，以 AHT 衡量效率，以 Accuracy 作为质量护栏。</p></section>
-              <section><b>04</b><strong>RCA 回流</strong><p>将评测错例归入九类根因，生成规则修正，并用 Focus Set 完成定向回归。</p></section>
+              <section><b>01</b><div><strong>提高候选覆盖</strong><span>让正确类目稳定进入候选集</span></div><p>围绕 Top-3 Recall 优化分类链路，减少一级漏召、子树路由错误和候选噪声。</p></section>
+              <section><b>02</b><div><strong>降低标注成本</strong><span>将开放式检索转化为有限选择</span></div><p>提供少量高相关候选，减少搜索 Taxonomy、阅读规则和比较相邻类目的时间。</p></section>
+              <section><b>03</b><div><strong>保留质量控制</strong><span>由标注员承担最终决策</span></div><p>在 Top-1 能力尚不足时保留 Human in the Loop，避免错误结果直接进入生产数据。</p></section>
+              <section><b>04</b><div><strong>支持持续迭代</strong><span>让每个错例对应修复方向</span></div><p>将错误拆解到数据、定义、Prompt、候选集、工作流或模型能力。</p></section>
             </div>
+            <dl class="project-facts project-goal-metrics">
+              <div><dt>模型目标</dt><dd>提升 Top-3 Recall</dd></div>
+              <div><dt>业务目标</dt><dd>降低 Average Handling Time</dd></div>
+              <div><dt>质量目标</dt><dd>保持或提升 Labeler Accuracy</dd></div>
+            </dl>
           </article>
 
           <article class="project-panel" id="projectPanelWork" data-project-panel="work" hidden>
             <header class="project-panel-identity">
-              <div><span>CORE WORK</span><h2>主要工作</h2></div>
+              <div><span>03 / 主要工作</span><h2>主要工作</h2></div>
               <b>03</b>
             </header>
-            <h3 class="project-panel-title">从数据、Agent 到实验验证的完整建设链路。</h3>
+            <h3 class="project-panel-title">从瓶颈识别到方案验证，完成 Candidate-first 全链路设计</h3>
+            <p class="project-panel-lead">我的主要贡献不只是搭建分类工作流，而是通过评测识别项目瓶颈、调整方案方向，并建立从候选生成到效果验证的完整闭环。</p>
             <div class="project-work-list">
-              <section><b>01</b><div><strong>数据与类目治理</strong><p>清洗训练数据，确定高优类目，并建立固定集与滚动集的双周评估机制。</p></div></section>
-              <section><b>02</b><div><strong>分层 Agent 架构</strong><p>搭建 L1 召回、L2 候选生成和 L3 冲突仲裁，并补齐异常、重试与上报链路。</p></div></section>
-              <section><b>03</b><div><strong>Prompt 与自动 RCA</strong><p>建立七层 Prompt 规则框架和九类 RCA 体系，让 Bad Case 持续回流为修正规则。</p></div></section>
-              <section><b>04</b><div><strong>离线评测与 A/B Test</strong><p>以 Recall 验证候选质量，再以 AHT 为核心指标、质量指标为护栏验证辅助标注收益。</p></div></section>
+              <section><b>01</b><div><strong>定位召回瓶颈，推动方向调整</strong><p>通过离线评测和错例分析，确认 Top-3 Recall 是影响辅助标注体验的关键指标，并提出 Candidate-first 落地方式。</p><small>核心指标定义 · 候选缺失归因 · 人工最终决策</small></div></section>
+              <section><b>02</b><div><strong>设计 L1–L3 分层分类工作流</strong><p>L1 召回一级类目，L2 在候选子树内生成 Top-3，L3 完成候选仲裁；统一输入输出、异常、重试、错误码与 Trace。</p></div></section>
+              <section><b>03</b><div><strong>建立结构化 Prompt 规则体系</strong><p>拆分任务边界、类目范围、纳入排除、冲突优先级、证据要求和 JSON 输出契约，让判断与执行约束各司其职。</p></div></section>
+              <section><b>04</b><div><strong>建立评测与 RCA 闭环</strong><p>按固定顺序归因系统、标注、定义、规则、候选噪声和模型能力问题，并通过定向回测验证修正。</p></div></section>
+              <section><b>05</b><div><strong>设计候选辅助标注实验</strong><p>将 Top-3 接入标注流程，对比实验组与基线组的处理时长、标注准确率及候选命中体验。</p></div></section>
             </div>
+            <dl class="project-capabilities">
+              <div><dt>问题诊断</dt><dd>识别核心瓶颈</dd></div>
+              <div><dt>方案判断</dt><dd>平衡自动化与风险</dd></div>
+              <div><dt>系统设计</dt><dd>分层工作流与字段协议</dd></div>
+              <div><dt>效果验证</dt><dd>连接模型与业务指标</dd></div>
+            </dl>
           </article>
 
           <article class="project-panel" id="projectPanelResult" data-project-panel="result" hidden>
             <header class="project-panel-identity">
-              <div><span>FINAL OUTCOME</span><h2>最终成果</h2></div>
+              <div><span>04 / 最终成果</span><h2>最终成果</h2></div>
               <b>04</b>
             </header>
-            <h3 class="project-panel-title">模型候选能力与人机协同收益均得到验证。</h3>
-            <div class="project-result-group">
-              <header><span>OFFLINE EVALUATION</span><small>Candidate quality</small></header>
-              <div class="project-result-grid">
-                <div><strong>86.5%</strong><span>L2 Recall</span></div>
-                <div><strong>80.5%</strong><span>Top-3 Hit</span></div>
-                <div><strong>97.87%</strong><span>Run Success</span></div>
-              </div>
+            <h3 class="project-panel-title">验证 Candidate-first 的可行性，并形成可持续迭代的分类体系</h3>
+            <p class="project-panel-lead">候选辅助将开放式类目检索转化为有限选择，在保留人工质量控制的同时，改善了标注效率和准确率。</p>
+            <div class="project-outcome-grid">
+              <section><strong>86.5%</strong><h3>L2 Top-3 Recall</h3><p>正确类目能够较稳定地进入候选范围，为辅助标注提供基础。</p></section>
+              <section><strong>31.11s → 28.57s</strong><h3>标注员平均处理时长</h3><p>候选辅助降低检索与比较成本，平均处理时长下降约 8.2%。</p></section>
+              <section><strong>71.63% → 73.53%</strong><h3>标注准确率</h3><p>效率提升的同时，准确率提升 1.90 个百分点。</p></section>
+              <section class="boundary"><strong>52.9%</strong><h3>L3 Top-1 Accuracy</h3><p>作为自动化边界证据：当前能力不足以支持无人审核分类。</p></section>
             </div>
-            <div class="project-result-group">
-              <header><span>ASSISTED LABELING</span><small>Business impact</small></header>
-              <div class="project-result-grid">
-                <div><strong>−8.0 pp</strong><span>AHT</span></div>
-                <div><strong>+1.90 pp</strong><span>Accuracy</span></div>
-                <div><strong>82.47%</strong><span>Top-3 Adoption</span></div>
-              </div>
+            <div class="project-deliverables">
+              <span>方法沉淀</span>
+              <ul>
+                <li>L1–L3 分层分类工作流</li>
+                <li>模块化 Prompt 规则框架</li>
+                <li>九类 RCA 错误归因体系</li>
+                <li>连接模型与业务指标的评测方法</li>
+              </ul>
             </div>
-            <p class="project-result-note">当前最适合 Candidate-first Copilot：模型负责高召回推荐，标注员负责最终判断。</p>
+            <p class="project-result-note">项目没有盲目追求全自动分类，而是基于模型能力与业务风险选择 Candidate-first，通过候选召回、人工决策和 RCA 闭环验证实际价值。</p>
           </article>
         </div>
       </div>
       <footer class="project-drawer-foot">
-        <span>IMAGE CLASSIFICATION AGENT</span>
+        <span>图片分类候选辅助标注系统</span>
         <span>2026</span>
       </footer>
     </aside>
@@ -192,7 +195,7 @@
           <div class="hero-message">
             <h1><span>Image Classification</span><em>AGENT</em></h1>
             <p class="hero-lead">
-              Agent 执行分层分类，Prompt 约束判断过程，RCA 将错误转化为下一版规则。
+              基于分层 Agent 的 Candidate-first 辅助标注方案，通过提高 Top-3 Recall 缩小类目搜索范围，并由标注员完成最终决策。
             </p>
           </div>
           <aside class="hero-impact" aria-label="个人角色与项目核心结果">
@@ -563,7 +566,7 @@
     </main>
 
     <footer class="shell">
-      <span>AI Agent Workflow / PT_Layer 工作流图谱</span>
+      <span>Photo Taxonomy Candidate Copilot / 项目案例</span>
       <a href="#top">回到顶部 <i data-lucide="arrow-up"></i></a>
     </footer>
 
