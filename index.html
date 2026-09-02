@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-10" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-12" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -417,116 +417,68 @@
       <section class="rca shell" id="rca">
         <div class="section-title" data-section-index="03">
           <span class="micro">03 / RCA · FEEDBACK LOOP</span>
-          <h2>自动 RCA 驱动规则迭代</h2>
-          <p>从评测差异中识别失败层、归因根因并生成修正动作，经定向回归验证后进入下一版基线。</p>
+          <h2>自动 RCA 规则闭环</h2>
+          <p>检测差异后按九类根因归因，将结论转为规则修正，并用 Focus Set 定向回归。</p>
         </div>
 
-        <div class="rca-loop" aria-label="自动 RCA 迭代闭环">
-          <article>
-            <span>01 / DETECT</span>
-            <i data-lucide="scan-search"></i>
-            <h3>发现差异</h3>
-            <p>对齐 Prediction、GT 与候选排序，定位失败层级。</p>
-          </article>
-          <article>
-            <span>02 / DIAGNOSE</span>
-            <i data-lucide="git-compare-arrows"></i>
-            <h3>自动归因</h3>
-            <p>按 A–I 顺序判定错误来源，输出唯一 RCA Code。</p>
-          </article>
-          <article>
-            <span>03 / PATCH</span>
-            <i data-lucide="file-pen-line"></i>
-            <h3>生成修正</h3>
-            <p>将根因转化为 Definition、Boundary 或 Priority 规则。</p>
-          </article>
-          <article>
-            <span>04 / VERIFY</span>
-            <i data-lucide="circle-check-big"></i>
-            <h3>定向回归</h3>
-            <p>使用 Focus Set 验证修正，达标后进入新基线。</p>
-          </article>
-        </div>
-
-        <div class="rca-trigger-panel">
-          <header>
-            <div>
-              <span class="micro">TRIGGER POLICY</span>
-              <h3>什么时候启动 RCA？</h3>
-            </div>
-            <p>先判断是否需要模型归因，避免对正确结果和可直接识别的系统异常重复调用。</p>
-          </header>
-          <div class="rca-trigger-list">
-            <article>
-              <b>01</b>
-              <div><span>L1 / L2</span><h4>候选召回或排序异常</h4><p>GT 未进入候选、未排在首位，或候选数超过上限。</p></div>
-              <code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code>
-            </article>
-            <article>
-              <b>02</b>
-              <div><span>L3</span><h4>最终决策与 GT 不一致</h4><p>Top-1 已生成，但与最终叶子类目 GT 不一致。</p></div>
-              <code>RUN RCA MODEL</code>
-            </article>
-            <article>
-              <b>03</b>
-              <div><span>SKIP</span><h4>无需进入模型归因</h4><p>结果正确，或输入、资源及执行异常已经能够直接定位。</p></div>
-              <code>SKIP · SYSTEM FAILURE</code>
-            </article>
+        <div class="rca-workbench">
+          <div class="rca-loop" aria-label="自动 RCA 迭代闭环">
+            <article><span>01 / DETECT</span><i data-lucide="scan-search"></i><div><h3>发现差异</h3><p>定位失败层级</p></div></article>
+            <article><span>02 / DIAGNOSE</span><i data-lucide="git-compare-arrows"></i><div><h3>自动归因</h3><p>输出 RCA Code</p></div></article>
+            <article><span>03 / PATCH</span><i data-lucide="file-pen-line"></i><div><h3>生成修正</h3><p>更新规则与边界</p></div></article>
+            <article><span>04 / VERIFY</span><i data-lucide="circle-check-big"></i><div><h3>定向回归</h3><p>Focus Set 验证</p></div></article>
           </div>
-        </div>
 
-        <header class="rca-library-heading">
-          <div>
-            <span class="micro">ROOT CAUSE LIBRARY</span>
-            <h3>九类根因，按 A–I 顺序判定</h3>
+          <div class="rca-trigger-strip" aria-label="RCA 触发条件">
+            <span class="micro">TRIGGER</span>
+            <article><b>L1 / L2</b><p>召回或排序异常</p><code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code></article>
+            <article><b>L3</b><p>Top-1 与 GT 不一致</p><code>RUN RCA MODEL</code></article>
+            <article><b>SKIP</b><p>正确结果或已知系统异常</p><code>SKIP · SYSTEM FAILURE</code></article>
           </div>
-          <p>优先排查证据与数据，再判断是否可由 Prompt 修复；只有前述原因均不成立时，才归为真实边界或模型能力缺口。</p>
-        </header>
 
-        <div class="rca-explorer">
-          <nav class="rca-rule-index" aria-label="九类 RCA 判定规则">
-            <section>
-              <h3>证据与数据</h3>
-              <p>Evidence &amp; Data</p>
-              <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span><strong>系统执行失败</strong><small>System failure</small></span></button>
-              <button class="rca-rule-button" data-rca-index="1"><b>B</b><span><strong>语言障碍</strong><small>Foreign language</small></span></button>
-              <button class="rca-rule-button" data-rca-index="2"><b>C</b><span><strong>潜在标注错误</strong><small>Potential GT error</small></span></button>
-            </section>
-            <section>
-              <h3>Prompt 可修复问题</h3>
-              <p>Prompt-fixable</p>
-              <button class="rca-rule-button" data-rca-index="3"><b>D</b><span><strong>定义设计缺口</strong><small>Definition gap</small></span></button>
-              <button class="rca-rule-button" data-rca-index="4"><b>E</b><span><strong>优先级规则缺失</strong><small>Priority rule missing</small></span></button>
-              <button class="rca-rule-button" data-rca-index="5"><b>F</b><span><strong>Prompt 指导缺口</strong><small>Prompt guidance gap</small></span></button>
-              <button class="rca-rule-button" data-rca-index="6"><b>G</b><span><strong>候选集噪声</strong><small>Candidate noise</small></span></button>
-            </section>
-            <section>
-              <h3>边界与能力</h3>
-              <p>Boundary &amp; Capability</p>
-              <button class="rca-rule-button" data-rca-index="7"><b>H</b><span><strong>真实边界案例</strong><small>True boundary case</small></span></button>
-              <button class="rca-rule-button" data-rca-index="8"><b>I</b><span><strong>模型能力缺口</strong><small>Model capability gap</small></span></button>
-            </section>
-          </nav>
-          <article class="rca-detail" aria-live="polite">
-            <header class="rca-detail-heading">
-              <b id="rcaDetailCode">A</b>
-              <div>
-                <span id="rcaDetailScope">全链路</span>
-                <h3 id="rcaDetailTitle">系统执行失败</h3>
-                <p class="rca-detail-zh" id="rcaDetailZh">System failure</p>
+          <div class="rca-explorer">
+            <nav class="rca-rule-index" aria-label="九类 RCA 判定规则">
+              <header><span class="micro">ROOT CAUSE LIBRARY</span><strong>九类根因</strong></header>
+              <section>
+                <h3>证据与数据</h3>
+                <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span><strong>系统执行失败</strong><small>System failure</small></span></button>
+                <button class="rca-rule-button" data-rca-index="1"><b>B</b><span><strong>语言障碍</strong><small>Foreign language</small></span></button>
+                <button class="rca-rule-button" data-rca-index="2"><b>C</b><span><strong>潜在标注错误</strong><small>Potential GT error</small></span></button>
+              </section>
+              <section>
+                <h3>Prompt 可修复</h3>
+                <button class="rca-rule-button" data-rca-index="3"><b>D</b><span><strong>定义设计缺口</strong><small>Definition gap</small></span></button>
+                <button class="rca-rule-button" data-rca-index="4"><b>E</b><span><strong>优先级规则缺失</strong><small>Priority rule missing</small></span></button>
+                <button class="rca-rule-button" data-rca-index="5"><b>F</b><span><strong>Prompt 指导缺口</strong><small>Prompt guidance gap</small></span></button>
+                <button class="rca-rule-button" data-rca-index="6"><b>G</b><span><strong>候选集噪声</strong><small>Candidate noise</small></span></button>
+              </section>
+              <section>
+                <h3>边界与能力</h3>
+                <button class="rca-rule-button" data-rca-index="7"><b>H</b><span><strong>真实边界案例</strong><small>True boundary case</small></span></button>
+                <button class="rca-rule-button" data-rca-index="8"><b>I</b><span><strong>模型能力缺口</strong><small>Model capability gap</small></span></button>
+              </section>
+            </nav>
+            <article class="rca-detail" aria-live="polite">
+              <header class="rca-detail-heading">
+                <b id="rcaDetailCode">A</b>
+                <div>
+                  <span id="rcaDetailScope">全链路</span>
+                  <h3 id="rcaDetailTitle">系统执行失败</h3>
+                  <p class="rca-detail-zh" id="rcaDetailZh">System failure</p>
+                </div>
+              </header>
+              <div class="rca-detail-body">
+                <section class="rca-detail-section">
+                  <span>适用条件</span>
+                  <p id="rcaDetailRule">图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。</p>
+                </section>
+                <section class="rca-detail-section">
+                  <span>修复动作</span>
+                  <p id="rcaDetailAction">检查输入完整性、资源加载和执行链路，不调用 RCA 模型。</p>
+                </section>
               </div>
-            </header>
-            <div class="rca-detail-body">
-              <section class="rca-detail-section">
-                <span>适用条件</span>
-                <p id="rcaDetailRule">图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、Taxonomy、Prompt 或模型能力。</p>
-              </section>
-              <section class="rca-detail-section">
-                <span>后续动作</span>
-                <p id="rcaDetailAction">检查输入完整性、资源加载和执行链路，不调用 RCA 模型。</p>
-              </section>
-            </div>
-          </article>
+            </article>
+          </div>
         </div>
       </section>
 
