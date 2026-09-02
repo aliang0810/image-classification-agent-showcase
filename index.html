@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-19" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-20" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -415,53 +415,72 @@
       <section class="rca shell" id="rca">
         <div class="section-title" data-section-index="03">
           <span class="micro">03 / RCA</span>
-          <h2>RCA 分析与 Prompt 迭代</h2>
-          <p>不逐条修补错例，而是归纳共性模式、生成规则草稿，再用同一评测集验证。</p>
+          <h2>错例归因与规则迭代</h2>
+          <p>确认根因后归纳共性问题，生成 Prompt 规则草稿，并通过同集评测决定是否合并。</p>
         </div>
 
         <div class="rca-workbench">
-          <div class="rca-trigger-strip" aria-label="RCA 触发条件">
-            <header><span>判断入口</span><strong>是否进入 RCA？</strong></header>
-            <article><b>L1 / L2</b><p>候选召回或排序异常</p><code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code><strong>进入归因</strong></article>
-            <article><b>L3</b><p>最终结果与 GT 不一致</p><strong>进入归因</strong></article>
-            <article><b>直接跳过</b><p>结果正确，或系统异常已能定位</p><strong>无需模型归因</strong></article>
-          </div>
-
-          <div class="rca-loop" aria-label="RCA 处理闭环">
-            <article><span>01</span><div><h3>发现差异</h3><p>收集错例与人工 RCA</p></div></article>
-            <article><span>02</span><div><h3>归纳共性</h3><p>聚类高频错误模式</p></div></article>
-            <article><span>03</span><div><h3>生成修正</h3><p>写入 Prompt 草稿</p></div></article>
-            <article><span>04</span><div><h3>对照评测</h3><p>同集比较基线与草稿</p></div></article>
-            <article><span>05</span><div><h3>决定合并</h3><p>指标改善后人工确认</p></div></article>
-          </div>
-
-          <article class="rca-iteration">
-            <header>
-              <div>
-                <span>生成修正</span>
-                <h3>Skill 自动总结 RCA 共性问题，生成 Prompt 规则草稿</h3>
+          <div class="rca-system">
+            <aside class="rca-entry" aria-label="RCA 触发条件">
+              <header>
+                <span>触发判断</span>
+                <h3>哪些样本进入 RCA？</h3>
+              </header>
+              <div class="rca-entry-row">
+                <b>L1 / L2</b>
+                <div><strong>候选召回或排序异常</strong><code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code></div>
               </div>
-              <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
-                Prompt 迭代 Skill <i data-lucide="external-link"></i>
-              </a>
-            </header>
-            <div class="rca-iteration-steps">
-              <section><b>01</b><strong>聚类共性问题</strong><p>以人工确认的 RCA 为准绳，对错例做语义聚类，提取高频模式与影响范围。</p></section>
-              <section><b>02</b><strong>转译为修正规则</strong><p>将共性问题映射为边界、优先级、Recovery 或排除规则，避免逐条打补丁。</p></section>
-              <section><b>03</b><strong>写入独立草稿</strong><p>自动生成 Prompt 草稿并展示前后差异，不直接修改线上生效版本。</p></section>
-            </div>
-            <footer>
-              <div><span>验证方式</span><strong>同一评测集对照 · 定向样本回归</strong></div>
-              <div><span>合并门槛</span><strong>指标改善 · 执行有效 · 人工确认</strong></div>
-            </footer>
-          </article>
+              <div class="rca-entry-row">
+                <b>L3</b>
+                <div><strong>最终结果与 GT 不一致</strong><p>进入根因判断，定位候选或仲裁问题。</p></div>
+              </div>
+              <footer><span>跳过</span><p>结果正确，或系统异常已经明确定位。</p></footer>
+            </aside>
 
-          <div class="rca-taxonomy-summary" aria-label="九类 RCA 根因摘要">
-            <header><span>归因标签</span><strong>九类根因仅用于统一记录与路由修复</strong></header>
-            <section><span>证据与数据</span><p><b>A</b> 系统失败 · <b>B</b> 语言障碍 · <b>C</b> 标注错误</p></section>
-            <section><span>规则可修复</span><p><b>D</b> 定义缺口 · <b>E</b> 优先级 · <b>F</b> Prompt 指导 · <b>G</b> 候选噪声</p></section>
-            <section><span>边界与能力</span><p><b>H</b> 真实边界 · <b>I</b> 模型能力</p></section>
+            <div class="rca-path" aria-label="RCA 到 Prompt 迭代流程">
+              <article>
+                <span>01</span>
+                <div><h3>确认根因</h3><p>结合 Trace、标注反馈与类目规则，为错例记录唯一主因。</p></div>
+                <strong>人工判断</strong>
+              </article>
+              <article>
+                <span>02</span>
+                <div><h3>归纳共性</h3><p>对已确认错例进行语义聚类，提取高频模式、影响类目与适用边界。</p></div>
+                <strong>模式摘要</strong>
+              </article>
+              <article class="is-highlight">
+                <span>03</span>
+                <div>
+                  <h3>生成 Prompt 草稿</h3>
+                  <p>Skill 将共性问题转译为边界、优先级、恢复或排除规则，并展示修改差异。</p>
+                  <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
+                    查看迭代 Skill <i data-lucide="external-link"></i>
+                  </a>
+                </div>
+                <strong>独立草稿</strong>
+              </article>
+              <article>
+                <span>04</span>
+                <div><h3>验证并决定合并</h3><p>使用同一评测集比较基线与草稿；指标改善且运行有效后，再由人工确认合并。</p></div>
+                <strong>评测结论</strong>
+              </article>
+            </div>
           </div>
+
+          <div class="rca-gates" aria-label="RCA 迭代约束">
+            <div><span>修改范围</span><strong>仅更新独立 Prompt 草稿</strong></div>
+            <div><span>验证方式</span><strong>同集对照与定向回归</strong></div>
+            <div><span>合并门槛</span><strong>指标改善、执行有效、人工确认</strong></div>
+          </div>
+
+          <details class="rca-taxonomy">
+            <summary><span>归因标签</span><strong>查看九类根因索引</strong><i data-lucide="chevron-down"></i></summary>
+            <div>
+              <p><span>证据与数据</span>系统失败 · 语言障碍 · 潜在标注错误</p>
+              <p><span>规则可修复</span>定义缺口 · 优先级缺失 · Prompt 指导不足 · 候选噪声</p>
+              <p><span>边界与能力</span>真实边界案例 · 模型能力缺口</p>
+            </div>
+          </details>
         </div>
       </section>
 
