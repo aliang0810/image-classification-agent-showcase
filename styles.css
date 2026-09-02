@@ -812,8 +812,8 @@ body.project-menu-open {
 
 .hero {
   position: relative;
-  min-height: calc(100vh - 118px);
-  margin-top: 46px;
+  min-height: calc(100vh - 64px);
+  margin-top: 0;
   padding: 0 0 34px;
   overflow: visible;
   border: 0;
@@ -3814,7 +3814,7 @@ footer a {
 
   .hero {
     min-height: auto;
-    margin-top: 24px;
+    margin-top: 0;
     padding: 0 0 24px;
     border-radius: 0;
   }
