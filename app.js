@@ -545,8 +545,6 @@ function renderOverview() {
     activeLayer === "main" ? "系统概览" : "关键路径";
   document.querySelector("#overviewFlowTitle").textContent = workflow.title;
   document.querySelector("#overviewFlowSubtitle").textContent = workflow.subtitle;
-  document.querySelector("#overviewPhaseCount").textContent = String(phases.length).padStart(2, "0");
-  document.querySelector("#overviewNodeCount").textContent = String(workflow.nodes.length).padStart(2, "0");
   overviewFlowTrack.style.setProperty("--overview-columns", phases.length);
 
   overviewFlowTrack.innerHTML = phases.map((phase, index) => `

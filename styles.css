@@ -1416,10 +1416,6 @@ footer svg {
 }
 
 .overview-flow-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 32px;
-  align-items: flex-end;
   padding-bottom: 30px;
   border-bottom: 1px solid var(--line);
 }
@@ -1435,29 +1431,6 @@ footer svg {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.65;
-}
-
-.overview-flow-stats {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 24px;
-}
-
-.overview-flow-stats span {
-  display: grid;
-  gap: 4px;
-  color: var(--dim);
-  font-family: var(--sans);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-
-.overview-flow-stats b {
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 1;
 }
 
 .overview-flow-track {
@@ -3483,17 +3456,11 @@ footer a {
   }
 
   .overview-flow-head {
-    align-items: flex-start;
-    flex-direction: column;
     padding-bottom: 22px;
   }
 
   .overview-flow-head h3 {
     font-size: 20px;
-  }
-
-  .overview-flow-stats {
-    gap: 18px;
   }
 
   .overview-flow-track {
