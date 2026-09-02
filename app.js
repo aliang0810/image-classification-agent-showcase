@@ -1639,11 +1639,18 @@ initProjectDrawer();
 
 function initSectionNavigation() {
   const links = [...document.querySelectorAll(".top-nav a[href^='#']")];
+  const jumpLinks = [
+    ...document.querySelectorAll(".top-nav a[href^='#'], .signal-list a[href^='#']"),
+  ];
+  const header = document.querySelector(".site-header");
   const sections = links
     .map((link) => document.querySelector(link.getAttribute("href")))
     .filter(Boolean);
   const workflowSection = document.querySelector("#workflow");
   if (workflowSection) sections.push(workflowSection);
+  const orderedSections = [...sections].sort(
+    (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top,
+  );
 
   function setActive(sectionId) {
     links.forEach((link) => {
@@ -1657,26 +1664,71 @@ function initSectionNavigation() {
     });
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      if (visible[0]) {
-        setActive(visible[0].target.id === "workflow" ? "overview" : visible[0].target.id);
-      }
-    },
-    { rootMargin: "-28% 0px -58% 0px", threshold: [0, 0.1, 0.35] },
-  );
-
-  sections.forEach((section) => observer.observe(section));
-  const initialSection = window.location.hash.slice(1);
-  if (initialSection) {
-    setActive(initialSection === "workflow" ? "overview" : initialSection);
+  function getSectionMarker(section) {
+    return section.querySelector(".section-title") || section;
   }
-  links.forEach((link) => {
-    link.addEventListener("click", () => setActive(link.getAttribute("href").slice(1)));
+
+  function getHeaderOffset() {
+    return (header?.getBoundingClientRect().height || 64) + 24;
+  }
+
+  function scrollToSection(section, behavior = "smooth") {
+    const marker = getSectionMarker(section);
+    const top = window.scrollY + marker.getBoundingClientRect().top - getHeaderOffset();
+    window.scrollTo({ top: Math.max(0, top), behavior });
+  }
+
+  let scrollFrame = 0;
+  function updateActiveFromScroll() {
+    scrollFrame = 0;
+    const activationLine = getHeaderOffset() + Math.min(160, window.innerHeight * 0.24);
+    let activeSection = orderedSections[0];
+
+    orderedSections.forEach((section) => {
+      if (getSectionMarker(section).getBoundingClientRect().top <= activationLine) {
+        activeSection = section;
+      }
+    });
+
+    const sectionId = activeSection.id === "workflow" ? "overview" : activeSection.id;
+    setActive(sectionId);
+  }
+
+  function scheduleActiveUpdate() {
+    if (scrollFrame) return;
+    scrollFrame = window.requestAnimationFrame(updateActiveFromScroll);
+  }
+
+  jumpLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const sectionId = link.getAttribute("href").slice(1);
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+
+      event.preventDefault();
+      window.history.pushState(null, "", `#${sectionId}`);
+      setActive(sectionId);
+      scrollToSection(section);
+    });
   });
+
+  window.addEventListener("scroll", scheduleActiveUpdate, { passive: true });
+  window.addEventListener("resize", scheduleActiveUpdate);
+  window.addEventListener("popstate", () => {
+    const section = document.getElementById(window.location.hash.slice(1));
+    if (section) {
+      scrollToSection(section);
+    } else {
+      updateActiveFromScroll();
+    }
+  });
+
+  const initialSection = document.getElementById(window.location.hash.slice(1));
+  if (initialSection) {
+    window.requestAnimationFrame(() => scrollToSection(initialSection, "auto"));
+  } else {
+    updateActiveFromScroll();
+  }
 }
 
 initSectionNavigation();
