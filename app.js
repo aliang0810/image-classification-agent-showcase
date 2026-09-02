@@ -1652,6 +1652,10 @@ function initProjectDrawer() {
 initProjectDrawer();
 
 function initSectionNavigation() {
+  if ("scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
+
   const links = [...document.querySelectorAll(".top-nav a[href^='#']")];
   const jumpLinks = [
     ...document.querySelectorAll(".top-nav a[href^='#'], .signal-list a[href^='#']"),
@@ -1694,7 +1698,7 @@ function initSectionNavigation() {
   function updateActiveFromScroll() {
     scrollFrame = 0;
     const activationLine = getHeaderOffset() + Math.min(160, window.innerHeight * 0.24);
-    let activeSection = orderedSections[0];
+    let activeSection = null;
 
     orderedSections.forEach((section) => {
       if (getSectionMarker(section).getBoundingClientRect().top <= activationLine) {
@@ -1702,7 +1706,7 @@ function initSectionNavigation() {
       }
     });
 
-    setActive(activeSection.id);
+    setActive(activeSection?.id || "");
   }
 
   function scheduleActiveUpdate() {
@@ -1734,12 +1738,14 @@ function initSectionNavigation() {
     }
   });
 
-  const initialSection = document.getElementById(window.location.hash.slice(1));
-  if (initialSection) {
-    window.requestAnimationFrame(() => scrollToSection(initialSection, "auto"));
-  } else {
-    updateActiveFromScroll();
+  if (window.location.hash) {
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
+  window.scrollTo({ top: 0, behavior: "auto" });
+  window.requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    updateActiveFromScroll();
+  });
 }
 
 initSectionNavigation();
