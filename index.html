@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-17" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-18" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -160,10 +160,10 @@
             <h3 class="project-panel-title">验证 Candidate-first 的可行性，并形成可持续迭代的分类体系</h3>
             <p class="project-panel-lead">候选辅助将开放式类目检索转化为有限选择，在保留人工质量控制的同时，改善了标注效率和准确率。</p>
             <div class="project-outcome-grid">
-              <section><strong>86.5%</strong><h3>L2 Top-3 Recall</h3><p>正确类目能够较稳定地进入候选范围，为辅助标注提供基础。</p></section>
+              <section><strong>88.2%</strong><h3>L2 Candidate Recall</h3><p>正确类目能够较稳定地进入排序候选，为辅助标注提供基础。</p></section>
               <section><strong>31.11s → 28.57s</strong><h3>标注员平均处理时长</h3><p>候选辅助降低检索与比较成本，平均处理时长下降约 8.2%。</p></section>
               <section><strong>71.63% → 73.53%</strong><h3>标注准确率</h3><p>效率提升的同时，准确率提升 1.90 个百分点。</p></section>
-              <section class="boundary"><strong>52.9%</strong><h3>L3 Top-1 Accuracy</h3><p>作为自动化边界证据：当前能力不足以支持无人审核分类。</p></section>
+              <section class="boundary"><strong>52.7%</strong><h3>L3 Top-1 Accuracy</h3><p>作为自动化边界证据：当前能力不足以支持无人审核分类。</p></section>
             </div>
             <div class="project-deliverables">
               <span>方法沉淀</span>
@@ -206,8 +206,8 @@
             </header>
             <div class="hero-results">
               <article>
-                <strong>86.5%</strong>
-                <span>L2 召回率<small>L2 Recall</small></span>
+                <strong>88.2%</strong>
+                <span>L2 候选召回率<small>L2 Candidate Recall</small></span>
               </article>
               <article>
                 <strong>−8.0%</strong>
@@ -475,16 +475,16 @@
         <div class="outcome-board">
           <article class="outcome-primary">
             <span>核心成功指标</span>
-            <strong>86.5%</strong>
-            <h3>L2 召回率</h3>
-            <p>22,886 / 26,448 个有效样本命中 Tier-3 GT</p>
-            <div class="outcome-meter" aria-label="L2 Recall 86.5%"><i></i></div>
+            <strong>88.2%</strong>
+            <h3>L2 候选召回率</h3>
+            <p>23,300 / 26,426 个排序样本命中 Tier-3 GT</p>
+            <div class="outcome-meter" aria-label="L2 Candidate Recall 88.2%"><i></i></div>
           </article>
           <div class="outcome-metrics">
-            <article><strong>80.5%</strong><span>Top-3 命中率</span><small>21,281 / 26,447 个排序样本</small></article>
-            <article><strong>85.4%</strong><span>Top-5 命中率</span><small>22,589 / 26,447 个排序样本</small></article>
-            <article><strong>1.66</strong><span>平均命中位置</span><small>GT 命中时的平均排序</small></article>
-            <article><strong>97.87%</strong><span>运行成功率</span><small>26,476 / 27,053 次运行</small></article>
+            <article><strong>80.9%</strong><span>L2 Top-3 Hit</span><small>21,367 / 26,426 个排序样本</small></article>
+            <article><strong>86.5%</strong><span>L2 Top-5 Hit</span><small>22,848 / 26,426 个排序样本</small></article>
+            <article><strong>1.74</strong><span>平均命中位置</span><small>GT 命中时的平均排序</small></article>
+            <article><strong>2.79</strong><span>L2 平均输出</span><small>每个有效样本的平均输出标签数</small></article>
           </div>
         </div>
 
@@ -534,7 +534,7 @@
           <article>
             <span>为什么选择 L2</span>
             <h3>先提高召回，再考虑自动化</h3>
-            <p>L3 最终 Top-1 准确率为 52.9%，因此当前阶段应优先保证 GT 进入 L2 候选集，再由人工完成确认。</p>
+            <p>L3 最终 Top-1 准确率为 52.7%，因此当前阶段应优先保证 GT 进入 L2 候选集，再由人工完成确认。</p>
           </article>
           <article>
             <span>下一步优化</span>
@@ -545,8 +545,8 @@
 
         <div class="outcome-source">
           <span>数据来源</span>
-          <code>batch_id = PT_Full_Training_0827</code>
-          <small>数据集：PT_FullTraining_0827 · Top-K 分母仅包含已排序样本</small>
+          <code>batch_id = PT_Full_Training_0901</code>
+          <small>数据集：PT_Full_Training_0901 · Top-K 分母仅包含已排序样本</small>
         </div>
       </section>
     </main>
@@ -557,6 +557,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260902-17"></script>
+    <script src="./app.js?v=20260902-18"></script>
   </body>
 </html>
