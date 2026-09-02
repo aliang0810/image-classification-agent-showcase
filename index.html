@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-06" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-09" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -301,7 +301,7 @@
             <span class="micro">01.2 / AGENT · WORKFLOW</span>
             <h2>先看链路，再看节点</h2>
           </div>
-          <p>先用五阶段概览理解系统，再进入三泳道节点图查看职责、分支与上下游关系。</p>
+          <p>总链路用五阶段理解系统，L1–L3 聚焦各自关键路径；需要深入时再进入三泳道节点图。</p>
         </div>
 
         <div class="workspace">
@@ -337,7 +337,7 @@
           <section class="workflow-overview" id="workflowOverview" aria-live="polite">
             <header class="overview-flow-head">
               <div>
-                <span class="micro">SYSTEM OVERVIEW</span>
+                <span class="micro" id="overviewFlowLabel">系统概览</span>
                 <h3 id="overviewFlowTitle">T5_Photo_Copilot_Offline · 总控链路</h3>
                 <p id="overviewFlowSubtitle">编排三级分类、统一错误处理、辅助标注实验、RCA 与运行上报。</p>
               </div>
@@ -676,6 +676,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260902-08"></script>
+    <script src="./app.js?v=20260902-09"></script>
   </body>
 </html>

@@ -228,6 +228,108 @@ const OVERVIEW_PHASES = [
   },
 ];
 
+const LAYER_OVERVIEWS = {
+  l1: [
+    {
+      code: "01",
+      label: "INPUT GATE",
+      title: "输入校验与任务准备",
+      description: "标准化 item_id 与图片列表，在推理前拦截缺失输入。",
+      color: "#42d4e8",
+      nodeIds: ["l1-start", "l1-init", "l1-input", "l1-item", "l1-image"],
+    },
+    {
+      code: "02",
+      label: "HIGH-RECALL INFERENCE",
+      title: "一级召回与补偿重试",
+      description: "加载 L1 Prompt 执行高召回推理，解析失败时自动补偿调用。",
+      color: "#ff8ca1",
+      nodeIds: [
+        "l1-model", "l1-aia", "l1-prompt-check", "l1-compose", "l1-call",
+        "l1-probe", "l1-retry-check", "l1-retry", "l1-merge",
+      ],
+    },
+    {
+      code: "03",
+      label: "MAP & OUTPUT",
+      title: "Taxonomy 映射与标准输出",
+      description: "将召回结果映射为标准一级类目，并统一错误、Metric 与 Trace。",
+      color: "#70d9c0",
+      nodeIds: [
+        "l1-final-check", "l1-result-check", "l1-taxonomy", "l1-extract", "l1-preout",
+        "l1-error", "l1-metric", "l1-report-metric", "l1-trace", "l1-end",
+      ],
+    },
+  ],
+  l2: [
+    {
+      code: "01",
+      label: "SUBTREE ROUTING",
+      title: "按 L1 路由专属 Prompt",
+      description: "将一级候选映射到对应子树 Prompt，只在相关类目空间内继续检索。",
+      color: "#8eb0ff",
+      nodeIds: [
+        "l2-start", "l2-init", "l2-image", "l2-model", "l2-map",
+        "l2-route", "l2-extract", "l2-aia", "l2-prompt-check", "l2-input",
+      ],
+    },
+    {
+      code: "02",
+      label: "LOOP INFERENCE",
+      title: "循环生成叶子候选",
+      description: "逐个子树执行模型推理和解析探针，不可用结果进入补偿重试。",
+      color: "#ff8ca1",
+      nodeIds: [
+        "l2-loop", "l2-call", "l2-probe", "l2-retry-check",
+        "l2-retry", "l2-merge", "l2-output",
+      ],
+    },
+    {
+      code: "03",
+      label: "RANK TOP-3",
+      title: "聚合排序并输出 Top-3",
+      description: "合并各子树结果，按置信度排序候选，并生成辅助标注推荐。",
+      color: "#70d9c0",
+      nodeIds: [
+        "l2-taxonomy", "l2-final", "l2-error", "l2-metric",
+        "l2-report-metric", "l2-trace", "l2-end",
+      ],
+    },
+  ],
+  l3: [
+    {
+      code: "01",
+      label: "CANDIDATE GATE",
+      title: "候选整理与跳过判断",
+      description: "过滤并排序 L2 候选；单候选直接输出，多候选才进入最终仲裁。",
+      color: "#42d4e8",
+      nodeIds: ["l3-start", "l3-init", "l3-process", "l3-skip"],
+    },
+    {
+      code: "02",
+      label: "RULE CONTEXT",
+      title: "装载定义与优先级规则",
+      description: "仅提取候选相关的类目定义和冲突规则，构造受约束的仲裁 Prompt。",
+      color: "#8eb0ff",
+      nodeIds: [
+        "l3-cards", "l3-model", "l3-system", "l3-rules",
+        "l3-valid", "l3-rules-check", "l3-prompt",
+      ],
+    },
+    {
+      code: "03",
+      label: "TOP-1 ARBITRATION",
+      title: "Top-1 仲裁与结果校验",
+      description: "完成最终模型裁决和必要重试，并校验输出必须属于候选集合。",
+      color: "#e6b763",
+      nodeIds: [
+        "l3-call", "l3-raw-check", "l3-retry", "l3-merge", "l3-final",
+        "l3-error", "l3-metric", "l3-report-metric", "l3-trace", "l3-end",
+      ],
+    },
+  ],
+};
+
 const LANE_DEFS = [
   { code: "A", label: "主推理链", color: "#63d6af" },
   { code: "B", label: "规则与异常", color: "#e6b763" },
@@ -428,15 +530,26 @@ function edgeKind(fromId, toId) {
 
 function renderOverview() {
   const workflow = getWorkflow();
-  const groupedNodes = OVERVIEW_PHASES.map(() => []);
-  workflow.nodes.forEach((node) => groupedNodes[phaseIndexForNode(node)].push(node));
+  const phases = LAYER_OVERVIEWS[activeLayer] || OVERVIEW_PHASES;
+  const groupedNodes = phases.map((phase, index) => {
+    if (phase.nodeIds) {
+      return phase.nodeIds
+        .map((nodeId) => workflow.nodes.find((node) => node.id === nodeId))
+        .filter(Boolean);
+    }
+    return workflow.nodes.filter((node) => phaseIndexForNode(node) === index);
+  });
 
+  workspace.dataset.layer = activeLayer;
+  document.querySelector("#overviewFlowLabel").textContent =
+    activeLayer === "main" ? "系统概览" : "关键路径";
   document.querySelector("#overviewFlowTitle").textContent = workflow.title;
   document.querySelector("#overviewFlowSubtitle").textContent = workflow.subtitle;
-  document.querySelector("#overviewPhaseCount").textContent = String(OVERVIEW_PHASES.length).padStart(2, "0");
+  document.querySelector("#overviewPhaseCount").textContent = String(phases.length).padStart(2, "0");
   document.querySelector("#overviewNodeCount").textContent = String(workflow.nodes.length).padStart(2, "0");
+  overviewFlowTrack.style.setProperty("--overview-columns", phases.length);
 
-  overviewFlowTrack.innerHTML = OVERVIEW_PHASES.map((phase, index) => `
+  overviewFlowTrack.innerHTML = phases.map((phase, index) => `
     <article class="overview-phase" style="--phase-color:${phase.color}">
       <header><span>${phase.code} / ${phase.label}</span><b>${String(groupedNodes[index].length).padStart(2, "0")}</b></header>
       <h4>${phase.title}</h4>

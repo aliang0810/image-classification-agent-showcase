@@ -1648,7 +1648,7 @@ footer svg {
 
 .overview-flow-track {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--overview-columns, 5), minmax(0, 1fr));
   gap: 24px;
   padding: 38px 0 32px;
   scrollbar-width: none;
@@ -1733,6 +1733,10 @@ footer svg {
   color: var(--dim);
   font-family: var(--sans);
   font-size: 10px;
+}
+
+.workspace:not([data-layer="main"]) .overview-lanes {
+  display: none;
 }
 
 .overview-lanes span {
