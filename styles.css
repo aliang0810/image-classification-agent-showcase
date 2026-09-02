@@ -873,7 +873,7 @@ body.project-menu-open {
 .hero-message {
   align-self: start;
   min-width: 0;
-  text-align: center;
+  padding-left: 36px;
 }
 
 .micro,
@@ -929,7 +929,7 @@ h1 em {
 
 .hero-lead {
   max-width: 690px;
-  margin: 0 auto;
+  margin-bottom: 0;
   color: var(--muted);
   font-size: 18px;
   line-height: 1.65;
