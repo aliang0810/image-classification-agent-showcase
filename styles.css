@@ -871,7 +871,7 @@ body.project-menu-open {
 }
 
 .hero-message {
-  align-self: start;
+  align-self: center;
   min-width: 0;
   padding-left: 36px;
 }
