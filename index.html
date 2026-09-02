@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-20" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-21" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -420,57 +420,45 @@
         </div>
 
         <div class="rca-workbench">
-          <div class="rca-system">
-            <aside class="rca-entry" aria-label="RCA 触发条件">
-              <header>
-                <span>触发判断</span>
-                <h3>哪些样本进入 RCA？</h3>
-              </header>
-              <div class="rca-entry-row">
-                <b>L1 / L2</b>
-                <div><strong>候选召回或排序异常</strong><code>RECALL_MISS · RANK_NOT_TOP1 · OVER_EMISSION</code></div>
-              </div>
-              <div class="rca-entry-row">
-                <b>L3</b>
-                <div><strong>最终结果与 GT 不一致</strong><p>进入根因判断，定位候选或仲裁问题。</p></div>
-              </div>
-              <footer><span>跳过</span><p>结果正确，或系统异常已经明确定位。</p></footer>
-            </aside>
-
-            <div class="rca-path" aria-label="RCA 到 Prompt 迭代流程">
-              <article>
-                <span>01</span>
-                <div><h3>确认根因</h3><p>结合 Trace、标注反馈与类目规则，为错例记录唯一主因。</p></div>
-                <strong>人工判断</strong>
-              </article>
-              <article>
-                <span>02</span>
-                <div><h3>归纳共性</h3><p>对已确认错例进行语义聚类，提取高频模式、影响类目与适用边界。</p></div>
-                <strong>模式摘要</strong>
-              </article>
-              <article class="is-highlight">
-                <span>03</span>
-                <div>
-                  <h3>生成 Prompt 草稿</h3>
-                  <p>Skill 将共性问题转译为边界、优先级、恢复或排除规则，并展示修改差异。</p>
-                  <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
-                    查看迭代 Skill <i data-lucide="external-link"></i>
-                  </a>
-                </div>
-                <strong>独立草稿</strong>
-              </article>
-              <article>
-                <span>04</span>
-                <div><h3>验证并决定合并</h3><p>使用同一评测集比较基线与草稿；指标改善且运行有效后，再由人工确认合并。</p></div>
-                <strong>评测结论</strong>
-              </article>
-            </div>
+          <div class="rca-trigger" aria-label="RCA 触发条件">
+            <span>进入条件</span>
+            <p><b>L1 / L2</b> 候选召回或排序异常 <i></i> <b>L3</b> 最终结果与 GT 不一致</p>
+            <small>结果正确或系统异常已明确定位时跳过</small>
           </div>
 
-          <div class="rca-gates" aria-label="RCA 迭代约束">
-            <div><span>修改范围</span><strong>仅更新独立 Prompt 草稿</strong></div>
-            <div><span>验证方式</span><strong>同集对照与定向回归</strong></div>
-            <div><span>合并门槛</span><strong>指标改善、执行有效、人工确认</strong></div>
+          <div class="rca-flow" aria-label="RCA 到 Prompt 迭代流程">
+            <article>
+              <span>01</span>
+              <h3>确认根因</h3>
+              <p>结合 Trace、标注反馈与类目规则，为错例记录唯一主因。</p>
+              <strong>人工结论</strong>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>归纳共性</h3>
+              <p>Skill 聚类已确认错例，提取高频模式、影响类目与适用边界。</p>
+              <strong>模式摘要</strong>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>生成规则草稿</h3>
+              <p>将共性问题转译为边界、优先级、恢复或排除规则，并展示修改差异。</p>
+              <strong>Prompt 草稿</strong>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>验证并合并</h3>
+              <p>使用同一评测集对照基线；指标改善且运行有效后，由人工确认合并。</p>
+              <strong>评测结论</strong>
+            </article>
+          </div>
+
+          <div class="rca-control">
+            <p><span>自动完成</span>共性聚类、规则生成、独立草稿与对照评测</p>
+            <p><span>人工决定</span>根因是否成立，以及规则是否合并</p>
+            <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
+              查看迭代 Skill <i data-lucide="external-link"></i>
+            </a>
           </div>
 
           <details class="rca-taxonomy">
