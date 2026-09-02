@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260902-16" />
+    <link rel="stylesheet" href="./styles.css?v=20260902-17" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -141,7 +141,7 @@
               <section><b>01</b><div><strong>定位召回瓶颈，推动方向调整</strong><p>通过离线评测和错例分析，确认 Top-3 Recall 是影响辅助标注体验的关键指标，并提出 Candidate-first 落地方式。</p><small>核心指标定义 · 候选缺失归因 · 人工最终决策</small></div></section>
               <section><b>02</b><div><strong>设计 L1–L3 分层分类工作流</strong><p>L1 召回一级类目，L2 在候选子树内生成 Top-3，L3 完成候选仲裁；统一输入输出、异常、重试、错误码与 Trace。</p></div></section>
               <section><b>03</b><div><strong>建立结构化 Prompt 规则体系</strong><p>拆分任务边界、类目范围、纳入排除、冲突优先级、证据要求和 JSON 输出契约，让判断与执行约束各司其职。</p></div></section>
-              <section><b>04</b><div><strong>建立评测与 RCA 闭环</strong><p>按固定顺序归因系统、标注、定义、规则、候选噪声和模型能力问题，并通过定向回测验证修正。</p></div></section>
+              <section><b>04</b><div><strong>建立评测与 RCA 闭环</strong><p>聚类人工 RCA 的共性问题，自动生成 Prompt 规则草稿，并通过同集对照与定向回测决定是否合并。</p></div></section>
               <section><b>05</b><div><strong>设计候选辅助标注实验</strong><p>将 Top-3 接入标注流程，对比实验组与基线组的处理时长、标注准确率及候选命中体验。</p></div></section>
             </div>
             <dl class="project-capabilities">
@@ -415,8 +415,8 @@
       <section class="rca shell" id="rca">
         <div class="section-title" data-section-index="03">
           <span class="micro">03 / RCA</span>
-          <h2>RCA 归因与规则修正</h2>
-          <p>先判断是否需要归因，再定位根因、生成修正，并通过定向样本集验证。</p>
+          <h2>RCA 分析与 Prompt 迭代</h2>
+          <p>不逐条修补错例，而是归纳共性模式、生成规则草稿，再用同一评测集验证。</p>
         </div>
 
         <div class="rca-workbench">
@@ -428,53 +428,39 @@
           </div>
 
           <div class="rca-loop" aria-label="RCA 处理闭环">
-            <article><span>01</span><div><h3>发现差异</h3><p>定位失败层级</p></div></article>
-            <article><span>02</span><div><h3>判定根因</h3><p>输出唯一编号</p></div></article>
-            <article><span>03</span><div><h3>生成修正</h3><p>更新定义与规则</p></div></article>
-            <article><span>04</span><div><h3>定向回归</h3><p>验证修正效果</p></div></article>
+            <article><span>01</span><div><h3>发现差异</h3><p>收集错例与人工 RCA</p></div></article>
+            <article><span>02</span><div><h3>归纳共性</h3><p>聚类高频错误模式</p></div></article>
+            <article><span>03</span><div><h3>生成修正</h3><p>写入 Prompt 草稿</p></div></article>
+            <article><span>04</span><div><h3>对照评测</h3><p>同集比较基线与草稿</p></div></article>
+            <article><span>05</span><div><h3>决定合并</h3><p>指标改善后人工确认</p></div></article>
           </div>
 
-          <div class="rca-explorer">
-            <nav class="rca-rule-index" aria-label="九类 RCA 判定规则">
-              <header><span>判定顺序</span><strong>九类根因</strong></header>
-              <section>
-                <h3>证据与数据</h3>
-                <button class="rca-rule-button active" data-rca-index="0"><b>A</b><span><strong>系统执行失败</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="1"><b>B</b><span><strong>语言障碍</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="2"><b>C</b><span><strong>潜在标注错误</strong></span></button>
-              </section>
-              <section>
-                <h3>规则可修复</h3>
-                <button class="rca-rule-button" data-rca-index="3"><b>D</b><span><strong>定义设计缺口</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="4"><b>E</b><span><strong>优先级规则缺失</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="5"><b>F</b><span><strong>Prompt 指导缺口</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="6"><b>G</b><span><strong>候选集噪声</strong></span></button>
-              </section>
-              <section>
-                <h3>边界与能力</h3>
-                <button class="rca-rule-button" data-rca-index="7"><b>H</b><span><strong>真实边界案例</strong></span></button>
-                <button class="rca-rule-button" data-rca-index="8"><b>I</b><span><strong>模型能力缺口</strong></span></button>
-              </section>
-            </nav>
-            <article class="rca-detail" aria-live="polite">
-              <header class="rca-detail-heading">
-                <b id="rcaDetailCode">A</b>
-                <div>
-                  <span id="rcaDetailScope">全链路</span>
-                  <h3 id="rcaDetailTitle">系统执行失败</h3>
-                </div>
-              </header>
-              <div class="rca-detail-body">
-                <section class="rca-detail-section">
-                  <span>适用条件</span>
-                  <p id="rcaDetailRule">图片缺失、损坏、加载失败或其他技术异常阻止可靠分析，且问题不属于标注、类目规则或模型能力。</p>
-                </section>
-                <section class="rca-detail-section">
-                  <span>修复动作</span>
-                  <p id="rcaDetailAction">检查输入完整性、资源加载和执行链路，无需进入模型归因。</p>
-                </section>
+          <article class="rca-iteration">
+            <header>
+              <div>
+                <span>生成修正</span>
+                <h3>Skill 自动总结 RCA 共性问题，生成 Prompt 规则草稿</h3>
               </div>
-            </article>
+              <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
+                Prompt 迭代 Skill <i data-lucide="external-link"></i>
+              </a>
+            </header>
+            <div class="rca-iteration-steps">
+              <section><b>01</b><strong>聚类共性问题</strong><p>以人工确认的 RCA 为准绳，对错例做语义聚类，提取高频模式与影响范围。</p></section>
+              <section><b>02</b><strong>转译为修正规则</strong><p>将共性问题映射为边界、优先级、Recovery 或排除规则，避免逐条打补丁。</p></section>
+              <section><b>03</b><strong>写入独立草稿</strong><p>自动生成 Prompt 草稿并展示前后差异，不直接修改线上生效版本。</p></section>
+            </div>
+            <footer>
+              <div><span>验证方式</span><strong>同一评测集对照 · 定向样本回归</strong></div>
+              <div><span>合并门槛</span><strong>指标改善 · 执行有效 · 人工确认</strong></div>
+            </footer>
+          </article>
+
+          <div class="rca-taxonomy-summary" aria-label="九类 RCA 根因摘要">
+            <header><span>归因标签</span><strong>九类根因仅用于统一记录与路由修复</strong></header>
+            <section><span>证据与数据</span><p><b>A</b> 系统失败 · <b>B</b> 语言障碍 · <b>C</b> 标注错误</p></section>
+            <section><span>规则可修复</span><p><b>D</b> 定义缺口 · <b>E</b> 优先级 · <b>F</b> Prompt 指导 · <b>G</b> 候选噪声</p></section>
+            <section><span>边界与能力</span><p><b>H</b> 真实边界 · <b>I</b> 模型能力</p></section>
           </div>
         </div>
       </section>
@@ -571,6 +557,6 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-    <script src="./app.js?v=20260902-15"></script>
+    <script src="./app.js?v=20260902-17"></script>
   </body>
 </html>
