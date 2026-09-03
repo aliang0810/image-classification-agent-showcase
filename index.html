@@ -8,7 +8,7 @@
       content="基于分层 Agent 的 Candidate-first 图片分类候选辅助标注方案。"
     />
     <title>Photo Taxonomy Candidate Copilot · Project Case</title>
-    <link rel="stylesheet" href="./styles.css?v=20260903-03" />
+    <link rel="stylesheet" href="./styles.css?v=20260903-04" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -410,7 +410,7 @@
         <div class="section-title" data-section-index="03">
           <span class="micro">03 / RCA</span>
           <h2>错例归因与规则迭代</h2>
-          <p>确认根因后归纳共性问题，生成 Prompt 规则草稿，并通过同集评测决定是否合并。</p>
+          <p>Agent 自动识别 RCA Code，由 Skill 总结共性并生成修正规则，在训练集上持续迭代。</p>
         </div>
 
         <div class="rca-workbench">
@@ -434,41 +434,43 @@
               <path class="rca-cycle-path path-4" d="M 208 310 A 192 192 0 0 1 400 118"></path>
             </svg>
 
+            <div class="rca-cycle-pointer" aria-hidden="true"></div>
+
             <div class="rca-cycle-center">
-              <span>自动迭代闭环</span>
+              <span>Agent 自动闭环</span>
               <strong>RCA <i>→</i> Prompt</strong>
-              <small>持续吸收错例</small>
+              <small>训练集持续迭代</small>
             </div>
 
             <article class="rca-cycle-step step-1">
-              <span>01 / 人工</span>
-              <h3>确认根因</h3>
-              <p>结合 Trace、标注反馈与类目规则，为错例记录唯一主因。</p>
-              <strong>人工结论</strong>
+              <span>01 / 自动</span>
+              <h3>识别 RCA Code</h3>
+              <p>Agent 分析 Trace、预测与 GT 差异，将错例映射为唯一 RCA Code。</p>
+              <strong>RCA Code</strong>
             </article>
             <article class="rca-cycle-step step-2">
               <span>02 / 自动</span>
-              <h3>归纳共性</h3>
-              <p>Skill 聚类已确认错例，提取高频模式、影响类目与适用边界。</p>
-              <strong>模式摘要</strong>
+              <h3>总结共性问题</h3>
+              <p>Skill 聚合同类 RCA Code，提取高频模式、影响类目与适用边界。</p>
+              <strong>共性摘要</strong>
             </article>
             <article class="rca-cycle-step step-3">
               <span>03 / 自动</span>
-              <h3>生成规则草稿</h3>
-              <p>将共性问题转译为边界、优先级、恢复或排除规则，并展示修改差异。</p>
+              <h3>生成修正规则</h3>
+              <p>将共性问题转译为边界、恢复、排除或排序规则，写入独立 Prompt 草稿。</p>
               <strong>Prompt 草稿</strong>
             </article>
             <article class="rca-cycle-step step-4">
-              <span>04 / 人工</span>
-              <h3>验证并合并</h3>
-              <p>使用同一评测集对照基线；指标改善且运行有效后，由人工确认合并。</p>
-              <strong>评测结论</strong>
+              <span>04 / 自动</span>
+              <h3>训练集迭代</h3>
+              <p>自动回测并比较基线，继续修正规则，收敛后输出 Prompt 候选版本。</p>
+              <strong>迭代候选</strong>
             </article>
           </div>
 
           <div class="rca-control">
-            <p><span>自动完成</span>共性聚类、规则生成、独立草稿与对照评测</p>
-            <p><span>人工决定</span>根因是否成立，以及规则是否合并</p>
+            <p><span>全程自动</span>RCA Code 识别、共性聚类、规则生成与训练集回测</p>
+            <p><span>输出边界</span>生成独立 Prompt 草稿与候选版本，不直接发布生产</p>
             <a href="https://skills.bytedance.net/skill/skills:skills.byted.org/adso/aia/aia-prompt-iteration?fromSpaceId=skills.byted.org%2Fadso%2Faia&amp;fromSpaceName=skills.byted.org%2Fadso%2Faia" target="_blank" rel="noreferrer">
               查看迭代 Skill <i data-lucide="external-link"></i>
             </a>

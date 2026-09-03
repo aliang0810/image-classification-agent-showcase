@@ -2639,8 +2639,50 @@ footer svg {
   fill: var(--cyan);
 }
 
+.rca-cycle-pointer {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(384px, 35.5%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.rca-cycle-pointer::before {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 2px;
+  height: calc(50% - 3px);
+  background: linear-gradient(to bottom, var(--cyan), rgba(104, 213, 189, 0.06));
+  content: "";
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+}
+
+.rca-cycle-pointer::after {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 9px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 18px rgba(104, 213, 189, 0.72);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.rca-cycle-pointer {
+  animation: rca-pointer-spin 7s linear infinite;
+}
+
 .rca-cycle-center {
   position: absolute;
+  z-index: 2;
   top: 50%;
   left: 50%;
   display: flex;
@@ -2742,13 +2784,7 @@ footer svg {
   font-weight: 600;
 }
 
-.rca-cycle-step.step-1,
-.rca-cycle-step.step-4 {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-.rca-cycle-step.step-2,
-.rca-cycle-step.step-3 {
+.rca-cycle-step {
   border-color: rgba(104, 213, 189, 0.28);
 }
 
@@ -2779,13 +2815,23 @@ footer svg {
   font-weight: 600;
 }
 
-.rca-control p:nth-child(2) {
+.rca-control p:first-child {
   min-height: 48px;
   padding: 10px 16px;
   border-left: 2px solid var(--cyan);
   background: rgba(104, 213, 189, 0.055);
   color: #f4f7f6;
   font-weight: 600;
+}
+
+@keyframes rca-pointer-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .rca-control a {
@@ -3800,6 +3846,10 @@ footer a {
     width: min(720px, 90%);
   }
 
+  .rca-cycle-pointer {
+    width: min(346px, 43.2%);
+  }
+
   .rca-cycle-step {
     width: min(230px, 29%);
     min-height: 144px;
@@ -3937,6 +3987,10 @@ footer a {
     top: 50%;
     width: 520px;
     opacity: 0.48;
+  }
+
+  .rca-cycle-pointer {
+    width: 250px;
   }
 
   .rca-cycle-center {
@@ -4130,5 +4184,10 @@ footer a {
   .project-drawer,
   .project-drawer-backdrop {
     transition: none;
+  }
+
+  .rca-cycle-pointer {
+    animation: none;
+    transform: translate(-50%, -50%) rotate(45deg);
   }
 }
