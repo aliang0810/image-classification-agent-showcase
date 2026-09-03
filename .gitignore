@@ -3,4 +3,5 @@
 node_modules/
 .public-tunnel/
 .tools/
+.chrome-layout-check/
 image-classification-agent-workflow.zip
