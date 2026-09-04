@@ -8,7 +8,7 @@
       content="基于分层 Agent 的 Candidate-first 图片分类候选辅助标注方案。"
     />
     <title>Photo Taxonomy Candidate Copilot · Project Case</title>
-    <link rel="stylesheet" href="./styles.css?v=20260904-01" />
+    <link rel="stylesheet" href="./styles.css?v=20260903-04" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -368,86 +368,40 @@
         <div class="section-title" data-section-index="02">
           <span class="micro">02 / PROMPT · RULE SYSTEM</span>
           <h2>七层 Prompt 规则框架</h2>
-          <p>一条从理解任务到稳定输出的规则故事线：先定义模型如何判断，再规定如何纠错，最后收束为机器可解析的结果。</p>
+          <p>从角色、推理流程和边界规则开始，到类目证据、置信度与 JSON 契约结束；每一层都有明确职责。</p>
         </div>
-        <div class="prompt-story" aria-label="七层 Prompt 规则故事线">
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>01</span><small>起点</small></div>
-            <div class="prompt-chapter-copy">
-              <span>故事从任务定义开始</span>
-              <h3>先确定模型是谁</h3>
-              <p>定义专业角色、任务目标与单／多标签方式，并把高召回、证据驱动和禁止幻觉设为总原则。</p>
+        <div class="prompt-explorer">
+          <div class="prompt-stepper" role="tablist" aria-label="Prompt 结构层级">
+            <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true"><b>01</b><span>角色</span></button>
+            <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false"><b>02</b><span>流程</span></button>
+            <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false"><b>03</b><span>边界</span></button>
+            <button class="prompt-tab" data-prompt-index="3" role="tab" aria-selected="false"><b>04</b><span>修正</span></button>
+            <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false"><b>05</b><span>类目</span></button>
+            <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false"><b>06</b><span>证据</span></button>
+            <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false"><b>07</b><span>输出</span></button>
+          </div>
+          <article class="prompt-detail" aria-live="polite">
+            <header>
+              <span class="micro" id="promptDetailCode">01 / ROLE</span>
+              <h3 id="promptDetailTitle">角色定义</h3>
+              <p id="promptDetailSubtitle">Role Definition</p>
+            </header>
+            <ul id="promptDetailItems">
+              <li>说明模型承担的专业角色与任务目标</li>
+              <li>明确任务是多标签还是单标签分类</li>
+              <li>强调高召回、证据驱动和禁止幻觉</li>
+            </ul>
+            <div class="prompt-detail-intent">
+              <span>设计意图</span>
+              <p id="promptDetailIntent">先固定模型身份和任务边界，避免后续规则建立在模糊目标上。</p>
             </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>角色与任务边界</strong></div>
           </article>
-
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>02</span><small>理解</small></div>
-            <div class="prompt-chapter-copy">
-              <span>然后规定思考顺序</span>
-              <h3>把判断拆成稳定流程</h3>
-              <p>先理解图片整体内容，再逐个类别独立核验，最后按证据强度组装并排序候选。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>可复现的推理路径</strong></div>
-          </article>
-
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>03</span><small>收窄</small></div>
-            <div class="prompt-chapter-copy">
-              <span>当相似类目发生冲突</span>
-              <h3>用边界和优先级收窄选择</h3>
-              <p>先确认目标大类，再处理核心子类型、Residual／Other、格式与真实意图之间的冲突。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>明确的互斥规则</strong></div>
-          </article>
-
-          <article class="prompt-chapter prompt-chapter-feedback">
-            <div class="prompt-chapter-index"><span>04</span><small>回流</small></div>
-            <div class="prompt-chapter-copy">
-              <span>错误不会停在结果页</span>
-              <h3>让 RCA 进入下一轮 Prompt</h3>
-              <p>针对漏召、误召和排序错误，分别生成 Recovery、Boundary、Exclusion 与 Re-ranking 规则。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>可迭代的修正规则</strong></div>
-          </article>
-
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>05</span><small>定义</small></div>
-            <div class="prompt-chapter-copy">
-              <span>进入具体类目判断</span>
-              <h3>统一每个类目的定义结构</h3>
-              <p>每个类目都按 Definition、Signals、Exclusions 和 Priority 描述，保证规则完整且可比较。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>标准化类目模板</strong></div>
-          </article>
-
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>06</span><small>验证</small></div>
-            <div class="prompt-chapter-copy">
-              <span>候选必须用证据自证</span>
-              <h3>独立评分，而不是依赖整体印象</h3>
-              <p>定义强、中、弱证据与输出阈值；多标签可以并存，但每个标签必须拥有独立证据。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>本层产出</span><strong>可追溯的置信度</strong></div>
-          </article>
-
-          <article class="prompt-chapter">
-            <div class="prompt-chapter-index"><span>07</span><small>终点</small></div>
-            <div class="prompt-chapter-copy">
-              <span>最后收束成机器契约</span>
-              <h3>只输出合法且可解析的结果</h3>
-              <p>限定类别白名单与输出数量，按置信度排序，引用可观察证据，并固定为 JSON Array。</p>
-            </div>
-            <div class="prompt-chapter-result"><span>最终产出</span><strong>稳定的结构化结果</strong></div>
-          </article>
-
-          <div class="prompt-story-contract" aria-label="Prompt 最终判断链">
-            <span>最终判断链</span>
-            <div><b>01</b><strong>读取可观察证据</strong></div>
+          <div class="prompt-contract" aria-label="Prompt 输出链">
+            <div><b>01</b><span>EVIDENCE</span><strong>可观察证据</strong></div>
             <i data-lucide="arrow-right"></i>
-            <div><b>02</b><strong>形成独立置信度</strong></div>
+            <div><b>02</b><span>SCORE</span><strong>独立置信度</strong></div>
             <i data-lucide="arrow-right"></i>
-            <div><b>03</b><strong>输出白名单 JSON</strong></div>
+            <div><b>03</b><span>OUTPUT</span><strong>白名单 JSON</strong></div>
           </div>
         </div>
       </section>
@@ -625,6 +579,6 @@
     </footer>
 
     <script src="./assets/vendor/lucide.min.js?v=0.468.0"></script>
-    <script src="./app.js?v=20260904-01"></script>
+    <script src="./app.js?v=20260902-19"></script>
   </body>
 </html>
