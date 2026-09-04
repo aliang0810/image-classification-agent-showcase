@@ -8,7 +8,7 @@
       content="基于分层 Agent 的 Candidate-first 图片分类候选辅助标注方案。"
     />
     <title>Photo Taxonomy Candidate Copilot · Project Case</title>
-    <link rel="stylesheet" href="./styles.css?v=20260903-04" />
+    <link rel="stylesheet" href="./styles.css?v=20260904-02" />
   </head>
   <body>
     <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
@@ -371,14 +371,44 @@
           <p>从角色、推理流程和边界规则开始，到类目证据、置信度与 JSON 契约结束；每一层都有明确职责。</p>
         </div>
         <div class="prompt-explorer">
-          <div class="prompt-stepper" role="tablist" aria-label="Prompt 结构层级">
-            <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true"><b>01</b><span>角色</span></button>
-            <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false"><b>02</b><span>流程</span></button>
-            <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false"><b>03</b><span>边界</span></button>
-            <button class="prompt-tab" data-prompt-index="3" role="tab" aria-selected="false"><b>04</b><span>修正</span></button>
-            <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false"><b>05</b><span>类目</span></button>
-            <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false"><b>06</b><span>证据</span></button>
-            <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false"><b>07</b><span>输出</span></button>
+          <div class="prompt-logic-map" role="tablist" aria-label="Prompt 规则逻辑图">
+            <svg class="prompt-logic-lines" viewBox="0 0 1200 320" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <marker id="prompt-logic-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z"></path>
+                </marker>
+              </defs>
+              <path class="prompt-main-line" d="M 82 84 H 1118" marker-end="url(#prompt-logic-arrow)"></path>
+              <path class="prompt-feedback-line" d="M 1118 104 C 1118 274 780 280 650 232"></path>
+              <path class="prompt-feedback-line" d="M 550 232 C 430 278 430 170 470 112" marker-end="url(#prompt-logic-arrow)"></path>
+            </svg>
+
+            <div class="prompt-logic-flow">
+              <button class="prompt-tab active" data-prompt-index="0" role="tab" aria-selected="true">
+                <b>01</b><small>任务入口</small><span>角色定义</span>
+              </button>
+              <button class="prompt-tab" data-prompt-index="1" role="tab" aria-selected="false">
+                <b>02</b><small>推理编排</small><span>工作流程</span>
+              </button>
+              <button class="prompt-tab" data-prompt-index="2" role="tab" aria-selected="false">
+                <b>03</b><small>决策护栏</small><span>边界规则</span>
+              </button>
+              <button class="prompt-tab" data-prompt-index="4" role="tab" aria-selected="false">
+                <b>05</b><small>知识底座</small><span>类目定义</span>
+              </button>
+              <button class="prompt-tab" data-prompt-index="5" role="tab" aria-selected="false">
+                <b>06</b><small>判断依据</small><span>证据评分</span>
+              </button>
+              <button class="prompt-tab" data-prompt-index="6" role="tab" aria-selected="false">
+                <b>07</b><small>结果出口</small><span>输出契约</span>
+              </button>
+            </div>
+
+            <span class="prompt-logic-signal" aria-hidden="true"></span>
+            <div class="prompt-feedback-label">错误回流</div>
+            <button class="prompt-tab prompt-feedback-node" data-prompt-index="3" role="tab" aria-selected="false">
+              <b>04</b><small>反馈回路</small><span>RCA 修正</span>
+            </button>
           </div>
           <article class="prompt-detail" aria-live="polite">
             <header>
